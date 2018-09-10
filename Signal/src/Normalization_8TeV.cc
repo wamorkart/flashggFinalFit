@@ -149,9 +149,10 @@ void Normalization_8TeV::FillSignalTypes(){
 
 TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 {
+		std::cout << process  << "  "<<process.Contains("HHTo2B2G")<< std::endl;
 	TGraph * gr = new TGraph();
 	std::map<double, double> * XSectionMap = 0 ;
-	if ( process == "ggh" || process == "ggH" || process.Contains("GG2H") ) {
+	if ( process == "ggh" || process == "ggH" || process.Contains("GG2H") || process.Contains("HHTo2B2G") ) {
 		XSectionMap = &XSectionMap_ggh;
 	} else if ( process == "vbf" || process.Contains("VBF") ) { // FIXME
 		XSectionMap = &XSectionMap_vbf;
@@ -234,7 +235,7 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 
 	std::map<double,double> *XSectionMap;
 
-	if (HistName.Contains("ggh") || HistName.Contains("GG2H")) {
+	if (HistName.Contains("ggh") || HistName.Contains("GG2H") || HistName.Contains("HHTo2B2G")) {
 		XSectionMap = &XSectionMap_ggh;
 	} else if ((HistName.Contains("vbf") || HistName.Contains("VBF")) && !HistName.Contains("vbfold")) {
 		XSectionMap = &XSectionMap_vbf;

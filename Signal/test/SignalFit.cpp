@@ -50,10 +50,12 @@ string mergefilename_;
 string datfilename_;
 string systfilename_;
 string plotDir_;
-//bool skipPlots_=false;
-bool skipPlots_=true;
+bool skipPlots_=false;
+//bool skipPlots_=true;
 int mhLow_=115;
 int mhHigh_=135;
+//int mhLow_=125;
+//int mhHigh_=125;
 int nCats_;
 float constraintValue_;
 float iterativeFitConstraint_;
@@ -445,10 +447,13 @@ int main(int argc, char *argv[]){
   // need to make this configurable ?! -LC
   //referenceProc_="ggh";
   referenceProc_="GG2H";
+  referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph";
   //referenceProcTTH_="tth";
   referenceProcTTH_="TTH";
-  referenceTagWV_="UntaggedTag_2"; // histest stats WV is ggh Untagged 3. 
-  referenceTagRV_="UntaggedTag_2"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
+//  referenceTagWV_="UntaggedTag_2"; // histest stats WV is ggh Untagged 3. 
+ // referenceTagRV_="UntaggedTag_2"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
+  referenceTagWV_="DoubleHTag_1"; // histest stats WV is ggh Untagged 3. 
+  referenceTagRV_="DoubleHTag_1"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
   // are WV which needs to borrow should be taken from here
   
   // isFlashgg should now be the only option.
@@ -722,8 +727,10 @@ int main(int argc, char *argv[]){
       RooDataSet *data;  
       RooDataHist *dataH;  
 
-        if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str()) << " in in WS " << inWS << std::endl;
-        RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str())));
+      //  if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str()) << " in in WS " << inWS << std::endl;
+        if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_13TeV_%s",proc.c_str(),cat.c_str()) << " in in WS " << inWS << std::endl;
+      //  RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str())));
+        RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_13TeV_%s",proc.c_str(),cat.c_str())));
 				if (beamSpotReweigh_){
         data = beamSpotReweigh(intLumiReweigh(data0));
 				} else {
@@ -766,7 +773,8 @@ int main(int argc, char *argv[]){
 													rvwvDataset(
                         		intLumiReweigh(
                           		reduceDataset(
-                          			(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          		//	(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          			(RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
                               )
                             ), "RV"
                           )
@@ -776,7 +784,8 @@ int main(int argc, char *argv[]){
           data0Ref   = rvwvDataset(
                         intLumiReweigh(
                           reduceDataset(
-                          (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                         // (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          (RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
                          )
                        ), "RV"
                       );
@@ -819,7 +828,8 @@ int main(int argc, char *argv[]){
                         intLumiReweigh(
                           reduceDataset(
                           //(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",referenceProcWV_.c_str(),mh,referenceTagWV_.c_str()))
-                            (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          //  (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                            (RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
                          )
                        ), "WV"
                       )
@@ -829,7 +839,8 @@ int main(int argc, char *argv[]){
                         intLumiReweigh(
                           reduceDataset(
                           //(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",referenceProcWV_.c_str(),mh,referenceTagWV_.c_str()))
-                          	(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          //	(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
+                          	(RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
                          )
                        ), "WV"
                       );
@@ -999,6 +1010,10 @@ int main(int argc, char *argv[]){
     
       allParameters[ make_pair(proc,cat) ] = make_pair(fitParamsRV,fitParamsWV);
     
+
+      cout << "[INFO] Now I will be running FITs" << endl;
+      cout << proc << procs_[0]<< endl;
+
       //Ok, now that we have made the fit parameters eitehr with the regular dataset or the replacement one.
       // Now we should be using the ORIGINAL dataset
       if (!runInitialFitsOnly_) {
@@ -1064,7 +1079,8 @@ int main(int argc, char *argv[]){
     
     // if we are doing jobs for each proc/tag, want to do the split.
     bool split =0;
-    if (split_.size() > 0) split=1; 
+   // if (split_.size() > 0) split=1; 
+	 std::cout<< "value of split and split_ "<<split<<" ,  "<<split_[0]<<" , "<<split_[1]<<std::endl;
     packager.packageOutput(/*split*/split, /*proc*/split_[0], /*tag*/ split_[1] );
     sw.Stop();
     cout << "[INFO] Combination complete." << endl;
