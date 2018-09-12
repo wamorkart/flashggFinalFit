@@ -67,7 +67,7 @@ std::pair<std::string,std::string> WSTFileWrapper::convertTemplatedName(std::str
   std::string theProcName = "";
   std::map<std::string,std::string> tpMap;
   tpMap["GG2H"] = "ggh";
-  tpMap["VBF"] = "vbf";
+//  tpMap["VBF"] = "vbf";
   tpMap["TTH"] = "tth";
   tpMap["QQ2HLNU"] = "wh";
   tpMap["QQ2HLL"] = "zh";

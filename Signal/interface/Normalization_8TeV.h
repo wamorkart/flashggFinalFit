@@ -63,6 +63,8 @@ class Normalization_8TeV {
 	std::map<double,double> XSectionMap_testBBH;
 	std::map<double,double> XSectionMap_testTHQ;
 	std::map<double,double> XSectionMap_testTHW;
+	
+   std::map<double,double> XSectionMap_HHbbgg;
 
 	std::map<int,std::pair<TString,double > > SignalTypeMap;
 	

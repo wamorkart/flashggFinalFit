@@ -38,20 +38,21 @@ class WSTFileWrapper:
         f = r.TFile.Open(fn) 
         self.fileList.append(f)
         thing = f.Get(wsname)
+        thing.Print()
         self.wsList.append(self.fileList[-1].Get(wsname))
         f.Close()
 
    def convertTemplatedName(self,dataName):
         theProcName = ""
         theDataName = ""
-        tpMap = {"GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
+        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"HHbbgg","GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
         for stxsProc in tpMap:
           if dataName.startswith(stxsProc):
             theProcName = stxsProc
             theDataName = dataName.replace(stxsProc,tpMap[stxsProc],1)
         return [theDataName,theProcName]
 
-   def data(self,dataName):
+   def data_new(self,dataName):
         thePair = self.convertTemplatedName(dataName)
         newDataName = thePair[0]
         newProcName = thePair[1]
@@ -66,6 +67,19 @@ class WSTFileWrapper:
             if this_result_obj: # [3]
                result = this_result_obj
         return result 
+
+   def data(self,dataName):
+        result = None
+        complained_yet =0 
+        for i in range(len(self.fnList)):
+          this_result_obj = self.wsList[i].data(dataName);
+          if ( result and this_result_obj and (not complained_yet) ):
+            complained_yet = true;
+          if this_result_obj: # [3]
+             result = this_result_obj
+        return result 
+
+
    
    def var(self,varName):
         result = None
@@ -128,14 +142,20 @@ outFile = open(options.outfilename,'w')
 ## PROCS HANDLING & DICT ######################################################
 ###############################################################################
 # convert flashgg style to combine style process
-combProc = {'ggH':'ggH_hgg','VBF':'qqH_hgg','ggh':'ggH_hgg','vbf':'qqH_hgg','wzh':'VH','wh':'WH_hgg','zh':'ZH_hgg','tth':'ttH_hgg','bkg_mass':'bkg_mass','gg_grav':'ggH_hgg_ALT','qq_grav':'qqbarH_ALT'}
-if options.doSTXS: 
-  combProc = {'GG2H':'ggH_hgg','VBF':'qqH_hgg','TTH':'ttH_hgg','QQ2HLNU':'WH_lep_hgg','QQ2HLL':'ZH_lep_hgg','WH2HQQ':'WH_had_hgg','ZH2HQQ':'ZH_had_hgg','testBBH':'bbH_hgg','testTHQ':'tHq_hgg','testTHW':'tHW_hgg','bkg_mass':'bkg_mass'}
-flashggProc = {'ggH_hgg':'ggh','qqH_hgg':'vbf','VH':'wzh','WH_hgg':'wh','ZH_hgg':'zh','ttH_hgg':'tth','bkg_mass':'bkg_mass','ggH_hgg_ALT':'gg_grav','qqbarH_ALT':'qq_grav'}
-if options.doSTXS: 
-  flashggProc = {'ggH_hgg':'GG2H','qqH_hgg':'VBF','ttH_hgg':'TTH','WH_lep_hgg':'QQ2HLNU','ZH_lep_hgg':'QQ2HLL','WH_had_hgg':'WH2HQQ','ZH_had_hgg':'ZH2HQQ','bbH_hgg':'testBBH','tHq_hgg':'testTHQ','tHW_hgg':'testTHW','bkg_mass':'bkg_mass'}
-procId = {'ggH_hgg':0,'qqH_hgg':-1,'ttH_hgg':-2,'WH_lep_hgg':-2,'ZH_lep_hgg':-3,'WH_had_hgg':-4,'ZH_had_hgg':-5,'bbH_hgg':-6,'tHq_hgg':-7,'tHW_hgg':-8,'bkg_mass':1}
-bkgProcs = ['bkg_mass','bbH_hgg','tHq_hgg','tHW_hgg'] #what to treat as background
+#combProc = {'ggH':'ggH_hgg','VBF':'qqH_hgg','ggh':'ggH_hgg','vbf':'qqH_hgg','wzh':'VH','wh':'WH_hgg','zh':'ZH_hgg','tth':'ttH_hgg','bkg_mass':'bkg_mass','gg_grav':'ggH_hgg_ALT','qq_grav':'qqbarH_ALT'}
+#if options.doSTXS: 
+#  combProc = {'GG2H':'ggH_hgg','VBF':'qqH_hgg','TTH':'ttH_hgg','QQ2HLNU':'WH_lep_hgg','QQ2HLL':'ZH_lep_hgg','WH2HQQ':'WH_had_hgg','ZH2HQQ':'ZH_had_hgg','testBBH':'bbH_hgg','testTHQ':'tHq_hgg','testTHW':'tHW_hgg','bkg_mass':'bkg_mass'}
+#flashggProc = {'ggH_hgg':'ggh','qqH_hgg':'vbf','VH':'wzh','WH_hgg':'wh','ZH_hgg':'zh','ttH_hgg':'tth','bkg_mass':'bkg_mass','ggH_hgg_ALT':'gg_grav','qqbarH_ALT':'qq_grav'}
+#if options.doSTXS: 
+#  flashggProc = {'ggH_hgg':'GG2H','qqH_hgg':'VBF','ttH_hgg':'TTH','WH_lep_hgg':'QQ2HLNU','ZH_lep_hgg':'QQ2HLL','WH_had_hgg':'WH2HQQ','ZH_had_hgg':'ZH2HQQ','bbH_hgg':'testBBH','tHq_hgg':'testTHQ','tHW_hgg':'testTHW','bkg_mass':'bkg_mass'}
+#procId = {'ggH_hgg':0,'qqH_hgg':-1,'ttH_hgg':-2,'WH_lep_hgg':-2,'ZH_lep_hgg':-3,'WH_had_hgg':-4,'ZH_had_hgg':-5,'bbH_hgg':-6,'tHq_hgg':-7,'tHW_hgg':-8,'bkg_mass':1}
+#bkgProcs = ['bkg_mass','bbH_hgg','tHq_hgg','tHW_hgg'] #what to treat as background
+
+combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'HHbbgg',  'bkg_mass':'bkg_mass'}
+flashggProc = {'HHbbgg':'HHbbgg',  'bkg_mass':'bkg_mass'}
+procId = {'HHbbgg':0,'bkg_mass':1}
+bkgProcs = ['bkg_mass'] #what to treat as background
+
 #Determine if VH or WZH_hgg
 splitVH=False
 if 'wzh'in options.procs.split(','):
@@ -216,6 +236,7 @@ else: options.globalScalesCorr = options.globalScalesCorr.split(',')
 ###############################################################################
 ## OPEN WORKSPACE AND EXTRACT INFO # ##########################################
 sqrts=13
+print options.infilename
 inWS = WSTFileWrapper(options.infilename,"tagsDumper/cms_hgg_%sTeV"%sqrts)
 #inWS = inFile.Get('wsig_13TeV')
 #if (inWS==None) : inWS = inFile.Get('tagsDumper/cms_hgg_%sTeV'%sqrts)
@@ -255,10 +276,13 @@ if options.doSTXS:
   fileDetails['bbH_hgg']       = [sigFile.replace('$PROC',"testBBH"),sigWS,'hggpdfsmrel_%dTeV_testBBH_$CHANNEL'%sqrts]
   fileDetails['tHq_hgg']       = [sigFile.replace('$PROC',"testTHQ"),sigWS,'hggpdfsmrel_%dTeV_testTHQ_$CHANNEL'%sqrts]
   fileDetails['tHW_hgg']       = [sigFile.replace('$PROC',"testTHW"),sigWS,'hggpdfsmrel_%dTeV_testTHW_$CHANNEL'%sqrts]
+  fileDetails['HHbbgg']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
 else:
   fileDetails['ggH_hgg']       = [sigFile.replace('$PROC',"ggh"),sigWS,'hggpdfsmrel_%dTeV_ggh_$CHANNEL'%sqrts]
   fileDetails['qqH_hgg']       = [sigFile.replace('$PROC',"vbf"),sigWS,'hggpdfsmrel_%dTeV_vbf_$CHANNEL'%sqrts]
   fileDetails['ttH_hgg']       = [sigFile.replace('$PROC',"tth"),sigWS,'hggpdfsmrel_%dTeV_tth_$CHANNEL'%sqrts]
+  fileDetails['HHbbgg']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
+
   if splitVH:
     fileDetails['WH_hgg']      =  [sigFile.replace('$PROC',"wh"),sigWS,'hggpdfsmrel_%dTeV_wh_$CHANNEL'%sqrts]
     fileDetails['ZH_hgg']      =  [sigFile.replace('$PROC',"zh"),sigWS,'hggpdfsmrel_%dTeV_zh_$CHANNEL'%sqrts]
@@ -276,13 +300,14 @@ theorySyst = {}
 #theorySyst['scaleWeight'] = [1,2,3,4,6,8,"replicas"] #5,7 unphysical
 theorySyst['scaleWeight'] = [[1,2],[3,6],[4,8],"asym"] #5,7 unphysical
 theorySyst['alphaSWeight'] = [[0,1],"asym"]
-theorySyst['pdfWeight'] = [[0,60],"sym"]
+#theorySyst['pdfWeight'] = [[0,60],"sym"]
 
 theorySystAbsScale={}
 #theorySystAbsScale['names'] = ["QCDscale_qqbar_up","QCDscale_gg_up","QCDscale_qqbar_down","QCDscale_gg_down","pdf_alphaS_qqbar","pdf_alphaS_gg"] #QCD scale up, QCD scale down, PDF+alpha S, PDF, alpha S
 #theorySystAbsScale['names_to_consider'] = ["QCDscale_qqbar_up","QCDscale_gg_up","QCDscale_qqbar_down","QCDscale_gg_down","pdf_alphaS_qqbar","pdf_alphaS_gg"]  
 #theorySystAbsScale['names'] = ["QCDscale_qqbar_up","QCDscale_gg_up","QCDscale_qqbar_down","QCDscale_gg_down","pdf_alphaS_qqbar","pdf_alphaS_gg"] 
 #theorySystAbsScale['names_to_consider'] =   ["QCDscale_ggH_up",  "QCDscale_qqH_up",  "QCDscale_VH_up",  "QCDscale_ttH_up",  "QCDscale_ggH_down",  "QCDscale_qqH_down",  "QCDscale_VH_down",  "QCDscale_ttH_down",  "pdf_Higgs_qqbar",  "pdf_alphaS_gg",  "pdf_alphaS_ttH"] #QCD scale up, QCD scale down, PDF+alpha S, PDF, alpha S 
+theorySystAbsScale['names_to_consider'] =   [] #QCD scale up, QCD scale down, PDF+alpha S, PDF, alpha S 
 theorySystAbsScale['names'] =   ["QCDscale_ggH_up",  "QCDscale_qqH_up",  "QCDscale_VH_up",  "QCDscale_ttH_up",  "QCDscale_ggH_down",  "QCDscale_qqH_down",  "QCDscale_VH_down",  "QCDscale_ttH_down",  "pdf_Higgs_qqbar",  "pdf_Higgs_gg",  "pdf_Higgs_ttH"] #QCD scale up, QCD scale down, PDF+alpha S, PDF, alpha S 
 theorySystAbsScale['ttH_hgg'] = [0.0,                 0.0,                0.0,               0.058,              0.0,                   0.0,                 0.0,                 -0.092,               0.0,                0.0,              0.036] # ttH is a _qqbar process
 theorySystAbsScale['ZH_lep_hgg'] =  [0.0,                 0.0,                0.038,             0.0,                0.0,                   0.0,                 -0.03,               0.0,                  0.016,              0.0,              0.0] # WH is a _qqbar process
@@ -322,7 +347,8 @@ for proc in options.procs:
       weight_sumW = inWS.var("sumW")
       for cat in inclusiveCats:
         #print "---> this is proc ", proc, "look for", "%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat) 
-        data_nominal= inWS.data("%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat))
+       # data_nominal= inWS.data("%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat))
+        data_nominal= inWS.data("%s_13TeV_%s"%(combProc.keys()[combProc.values().index(proc)],cat))
         data_nominal_sum = data_nominal.sumEntries()
         data_up = data_nominal.emptyClone();
         data_nominal_new = data_nominal.emptyClone();
@@ -379,7 +405,8 @@ def printTheorySysts():
               outFile.write('- ')
               continue
             else:
-              outFile.write(getFlashggLineTheoryEnvelope(flashggProc[p],c,systName,systDetails))
+        #      outFile.write(getFlashggLineTheoryEnvelope(flashggProc[p],c,systName,systDetails))
+              print 'Vittorio commented out this part, no PdfWeights'
         outFile.write('\n')
     else: #sym or asym uncertainties
       #print "consider ", systName
@@ -410,13 +437,15 @@ def printTheorySysts():
               outFile.write('- ')
               continue
             else:
-              outFile.write(getFlashggLineTheoryWeights(flashggProc[p],c,systName,i,asymmetric,j,factor))
+             # outFile.write(getFlashggLineTheoryWeights(flashggProc[p],c,systName,i,asymmetric,j,factor))
+              print 'Vittorio commented out this part, no PdfWeights'
         if '%s:%s'%(p,c) in options.toSkip: continue
         outFile.write('\n')
       outFile.write('\n')
   
   #absolute scales for theory uncertainties.
-  for syst in theorySystAbsScale['names'] :
+ # for syst in theorySystAbsScale['names'] :
+  for syst in theorySystAbsScale['names_to_consider'] :
     #with new WG1 prescription, specific other nuisances deal with ggH theory uncerts
     if 'QCDscale_ggH' in syst and options.newGghScheme: continue
     if (not "Theory" in allSystList ) :allSystList.append("Theory")
@@ -464,6 +493,7 @@ def getFlashggLineTheoryWeights(proc,cat,name,i,asymmetric,j=0,factor=1):
   theoryNormFactor_m= 1/theoryNormFactors["%s_%s"%(combProc[proc],name)][m] #up
   
   mass = inWS.var("CMS_hgg_mass")
+  print 'mass is = ',mass.Print()
   weight = r.RooRealVar("weight","weight",0)
   weight_up = inWS.var("%s_%d"%(name,n))
   weight_down = inWS.var("%s_%d"%(name,m))
@@ -472,7 +502,8 @@ def getFlashggLineTheoryWeights(proc,cat,name,i,asymmetric,j=0,factor=1):
   #data_nominal = inWS.data("%s_%d_13TeV_%s"%(proc,options.mass,cat))
   data_nominal= inWS.data("%s_%d_13TeV_%s_pdfWeights"%(proc,options.mass,cat))
   data_nominal_sum = data_nominal.sumEntries()
-  if (data_nominal_sum <= 0.):
+ # if (data_nominal_sum <= 0.):
+  if (data_nominal_sum <= 0.  or 1): ###WARNING: quick and dirty fix to skip pdf weight part):
       print "[WARNING] This dataset has 0 or negative sum of weight. Systematic calulcxation meaningless, so list as '- '"
       line = '- '
       return line
@@ -721,7 +752,7 @@ def printUEPSSyst():
     uepsFiles['PS'] = options.uepsfilename.split(',UEPS,')[1].split(',')
     print uepsFiles['PS']
     
-    tpMap = {'GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
+    tpMap = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'HHbbgg','GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
     
     lines = {}
 
@@ -802,7 +833,7 @@ flashggSysts['JetBTagCutWeight'] = 'eff_b'
 flashggSysts['metPhoUncertainty'] = 'MET_PhotonScale'
 flashggSysts['metUncUncertainty'] = 'MET_Unclustered'
 flashggSysts['metJecUncertainty'] = 'MET_JEC'
-flashggSysts['metJerUncertainty'] = 'MET_JER'
+#flashggSysts['metJerUncertainty'] = 'MET_JER'
 
 #new ggH uncert prescription (replaces theory, JetVeto)
 if options.newGghScheme:

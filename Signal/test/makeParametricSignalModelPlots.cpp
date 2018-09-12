@@ -517,12 +517,18 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   lat1.SetTextSize(0.047);
 
   TString catLabel_humanReadable  = title;
+  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","HH SM");
+  catLabel_humanReadable.ReplaceAll("GluGluToHToGG","GF Tag");
   catLabel_humanReadable.ReplaceAll("_"," ");
   catLabel_humanReadable.ReplaceAll("UntaggedTag","Untagged");
   catLabel_humanReadable.ReplaceAll("VBFTag","VBF Tag");
+  catLabel_humanReadable.ReplaceAll("VBF","VBF Tag");
   catLabel_humanReadable.ReplaceAll("TTHLeptonicTag","TTH Leptonic Tag");
+  catLabel_humanReadable.ReplaceAll("ttH","TTH Tag");
+  catLabel_humanReadable.ReplaceAll("VH","VH Tag");
   catLabel_humanReadable.ReplaceAll("TTHHadronicTag","TTH Hadronic Tag");
   catLabel_humanReadable.ReplaceAll("all","All Categories");
+  catLabel_humanReadable.ReplaceAll("DoubleHTag","MVA");
 
   TLatex lat2(0.93,0.88,catLabel_humanReadable);
   lat2.SetTextAlign(33);

@@ -24,13 +24,14 @@ int Normalization_8TeV::Init(int sqrtS){
     TPython::Eval(Form("buildSMHiggsSignalXSBR.Init%dTeV()", sqrtS));
     
     for (double mH=120;mH<=135.0;mH+=0.1){ // Do we need this up to 250 ?
-	double valBR    =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getBR(%f)",mH));
-	double valXSggH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ggH"));
-	double valXSqqH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"qqH"));
-	double valXSttH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ttH"));
-	double valXSWH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"WH"));
-	double valXSZH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ZH"));
-	double valXSbbH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"bbH"));
+   double mH_constant=125.;
+	double valBR    =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getBR(%f)",mH_constant));
+	double valXSggH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ggH"));
+	double valXSqqH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"qqH"));
+	double valXSttH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ttH"));
+	double valXSWH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"WH"));
+	double valXSZH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ZH"));
+	double valXSbbH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"bbH"));
 	BranchingRatioMap[mH]	= valBR;
         XSectionMap_ggh[mH]	= valXSggH; 	
         XSectionMap_vbf[mH]	= valXSqqH; 	
@@ -48,6 +49,7 @@ int Normalization_8TeV::Init(int sqrtS){
         XSectionMap_testBBH[mH]	= valXSbbH;
         XSectionMap_testTHQ[mH]	= 0.074;
         XSectionMap_testTHW[mH]	= 0.015;
+        XSectionMap_HHbbgg[mH]	= 1.;
 	
     }
 
@@ -149,19 +151,18 @@ void Normalization_8TeV::FillSignalTypes(){
 
 TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 {
-		std::cout << process  << "  "<<process.Contains("HHTo2B2G")<< std::endl;
 	TGraph * gr = new TGraph();
 	std::map<double, double> * XSectionMap = 0 ;
-	if ( process == "ggh" || process == "ggH" || process.Contains("GG2H") || process.Contains("HHTo2B2G") ) {
+	if ( process == "ggh" || process == "ggH" || process.Contains("GG2H") || process.Contains("GluGluHToGG") ) {
 		XSectionMap = &XSectionMap_ggh;
 	} else if ( process == "vbf" || process.Contains("VBF") ) { // FIXME
 		XSectionMap = &XSectionMap_vbf;
 	} else if ( process == "vbfold") {
 		XSectionMap = &XSectionMap_vbfold;
 	//} else if ( process == "wzh") {
-	} else if ( process == "wzh" || process == "vh" ) {
+	} else if ( process == "wzh" || process == "vh" || process == "VH" ) {
 		XSectionMap = &XSectionMap_wzh;
-	} else if ( process == "tth" || process.Contains("TTH") ) {
+	} else if ( process == "tth" || process.Contains("TTH") || process.Contains("ttH") ) {
 		XSectionMap = &XSectionMap_tth;
 	} else if ( process == "wh") {
 		XSectionMap = &XSectionMap_wh;
@@ -185,9 +186,11 @@ TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if ( process.Contains("testTHW") ) {
 		XSectionMap = &XSectionMap_testTHW;
+	} else if ( process.Contains("HHTo2B2G") ) {
+		XSectionMap = &XSectionMap_HHbbgg;
 	} else {
 		std::cout << "[WARNING] Warning ggh, vbf, wh, zh, wzh, tth or grav or STXS proc not found in histname!!!!" << std::endl;
-		//exit(1);
+		exit(1);//better exit than seg fault
 	}
 
 	for (std::map<double, double>::const_iterator iter = XSectionMap->begin();  iter != XSectionMap->end(); ++iter) {
@@ -208,16 +211,17 @@ TGraph * Normalization_8TeV::GetBrGraph()
 
 double Normalization_8TeV::GetBR(double mass) {
 
+   double mass_constant = 125.;
 	for (std::map<double, double>::const_iterator iter = BranchingRatioMap.begin();  iter != BranchingRatioMap.end(); ++iter) {
-		if (mass==iter->first) return iter->second;
-		if (mass>iter->first) {
+		if (mass_constant==iter->first) return iter->second;
+		if (mass_constant>iter->first) {
 			double lowmass = iter->first;
 			double lowbr = iter->second;
 			++iter;
-			if (mass<iter->first) {
+			if (mass_constant<iter->first) {
 				double highmass = iter->first;
 				double highbr = iter->second;
-				double br = (highbr-lowbr)/(highmass-lowmass)*(mass-lowmass)+lowbr;
+				double br = (highbr-lowbr)/(highmass-lowmass)*(mass_constant-lowmass)+lowbr;
 				return br;
 			}
 			--iter;
@@ -235,7 +239,7 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 
 	std::map<double,double> *XSectionMap;
 
-	if (HistName.Contains("ggh") || HistName.Contains("GG2H") || HistName.Contains("HHTo2B2G")) {
+	if (HistName.Contains("ggh") || HistName.Contains("GG2H") || HistName.Contains("GluGluHToGG")) {
 		XSectionMap = &XSectionMap_ggh;
 	} else if ((HistName.Contains("vbf") || HistName.Contains("VBF")) && !HistName.Contains("vbfold")) {
 		XSectionMap = &XSectionMap_vbf;
@@ -245,9 +249,9 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 		XSectionMap = &XSectionMap_wh;
 	} else if (HistName.Contains("zh") && !HistName.Contains("wzh")) {
 		XSectionMap = &XSectionMap_zh;
-	} else if (HistName.Contains("wzh") || HistName.Contains("vh")) {
+	} else if (HistName.Contains("wzh") || HistName.Contains("vh") || HistName.Contains("VH") ) {
 		XSectionMap = &XSectionMap_wzh;
-	} else if (HistName.Contains("tth") || HistName.Contains("TTH")) {
+	} else if (HistName.Contains("tth") || HistName.Contains("TTH") || HistName.Contains("ttH") ) {
 		XSectionMap = &XSectionMap_tth;
 	} else if (HistName.Contains("grav")) {
 		XSectionMap = &XSectionMap_sm;
@@ -267,6 +271,8 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if (HistName.Contains("testTHW")) {
 		XSectionMap = &XSectionMap_testTHW;
+	} else if (HistName.Contains("HHTo2B2G")) {
+		XSectionMap = &XSectionMap_HHbbgg;
 	} else {
 		std::cout << "[WARNING] Warning ggh, vbf, wh, zh, wzh, tth or grav or STXS proc not found in " << HistName << std::endl;
 		//exit(1);
