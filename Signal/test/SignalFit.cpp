@@ -449,7 +449,7 @@ int main(int argc, char *argv[]){
   referenceProc_="GG2H";
   referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph";
   //referenceProcTTH_="tth";
-  referenceProcTTH_="TTH";
+ // referenceProcTTH_="TTH";
 //  referenceTagWV_="UntaggedTag_2"; // histest stats WV is ggh Untagged 3. 
  // referenceTagRV_="UntaggedTag_2"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
   referenceTagWV_="DoubleHTag_1"; // histest stats WV is ggh Untagged 3. 

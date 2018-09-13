@@ -33,7 +33,7 @@ class WSTFileWrapper:
     self.fnList = files.split(",") # [1]       
     self.fileList = []
     self.wsList = [] #now list of ws names...
-    #print files
+    print files
     for fn in self.fnList: # [2]
         f = r.TFile.Open(fn) 
         self.fileList.append(f)
@@ -45,7 +45,8 @@ class WSTFileWrapper:
    def convertTemplatedName(self,dataName):
         theProcName = ""
         theDataName = ""
-        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"HHbbgg","GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
+        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"GluGluToHHTo2B2G_node_SM_13TeV_madgraph","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",
+"GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
         for stxsProc in tpMap:
           if dataName.startswith(stxsProc):
             theProcName = stxsProc
@@ -116,7 +117,7 @@ parser.add_option("--globalScalesCorr",default="",help="String list of global sc
 parser.add_option("--toSkip",default="",help="proc:cat which are to skipped e.g ggH_hgg:11,qqH_hgg:12 etc. (default: %default)")
 parser.add_option("--isMultiPdf",default=False,action="store_true")
 parser.add_option("--submitSelf",default=False,action="store_true",help="Tells script to submit itself to the batch")
-parser.add_option("--justThisSyst",default="",help="Only calculate the line corresponding to thsi systematic")
+parser.add_option("--justThisSyst",default="",help="Only calculate the line corresponding to this systematic")
 parser.add_option("--simplePdfWeights",default=False,action="store_true",help="Condense pdfWeight systematics into 1 line instead of full shape systematic" )
 parser.add_option("--scaleFactors",help="Scale factor for spin model pass as e.g. gg_grav:1.351,qq_grav:1.027")
 parser.add_option("--quadInterpolate",type="int",default=0,help="Do a quadratic interpolation of flashgg templates back to 1 sigma from this sigma. 0 means off (default: %default)")
@@ -151,9 +152,9 @@ outFile = open(options.outfilename,'w')
 #procId = {'ggH_hgg':0,'qqH_hgg':-1,'ttH_hgg':-2,'WH_lep_hgg':-2,'ZH_lep_hgg':-3,'WH_had_hgg':-4,'ZH_had_hgg':-5,'bbH_hgg':-6,'tHq_hgg':-7,'tHW_hgg':-8,'bkg_mass':1}
 #bkgProcs = ['bkg_mass','bbH_hgg','tHq_hgg','tHW_hgg'] #what to treat as background
 
-combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'HHbbgg',  'bkg_mass':'bkg_mass'}
-flashggProc = {'HHbbgg':'HHbbgg',  'bkg_mass':'bkg_mass'}
-procId = {'HHbbgg':0,'bkg_mass':1}
+combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8", "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8", 'bkg_mass':'bkg_mass'}
+flashggProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph',"GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8",  "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",'bkg_mass':'bkg_mass'}
+procId = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':0,"GluGluHToGG_M_125_13TeV_powheg_pythia8":2,"VBFHToGG_M_125_13TeV_powheg_pythia8":3,'bkg_mass':1}
 bkgProcs = ['bkg_mass'] #what to treat as background
 
 #Determine if VH or WZH_hgg
@@ -251,13 +252,16 @@ print "[INFO] Get Intlumi from file, value : ", intL," pb^{-1}", " sqrts ", sqrt
 ###############################################################################
 ## SHAPE SYSTEMATIC SETUP  ####################################################
 ###############################################################################
-file_ext = 'mva'
+#file_ext = 'mva'
+file_ext = 'data'
 dataFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
 bkgFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
 dataWS = 'multipdf'
 bkgWS = 'multipdf'
 #sigFile = 'CMS-HGG_%s_%dTeV_sigfit.root'%(file_ext,sqrts)
 sigFile = 'CMS-HGG_sigfit_%s_$PROC_$CAT.root'%(file_ext)
+sigFile = 'CMS-HGG_sigfit_%s_$PROC.root'%(file_ext)
+sigFile = 'CMS-HGG_sigfit_data_GluGluToHHTo2B2G_node_SM_13TeV_madgraph.root'
 #print "making sigfile " ,sigFile
 sigWS = 'wsig_%dTeV'%(sqrts)
 # file detaisl: for FLashgg always use unbinned signal and multipdf
@@ -276,12 +280,16 @@ if options.doSTXS:
   fileDetails['bbH_hgg']       = [sigFile.replace('$PROC',"testBBH"),sigWS,'hggpdfsmrel_%dTeV_testBBH_$CHANNEL'%sqrts]
   fileDetails['tHq_hgg']       = [sigFile.replace('$PROC',"testTHQ"),sigWS,'hggpdfsmrel_%dTeV_testTHQ_$CHANNEL'%sqrts]
   fileDetails['tHW_hgg']       = [sigFile.replace('$PROC',"testTHW"),sigWS,'hggpdfsmrel_%dTeV_testTHW_$CHANNEL'%sqrts]
-  fileDetails['HHbbgg']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
+  fileDetails['GluGluToHHTo2B2G_node_SM_13TeV_madgraph']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
+  fileDetails['GluGluHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile.replace('$PROC',"GluGluHToGG_M_125_13TeV_powheg_pythia8"),sigWS,'hggpdfsmrel_%dTeV_GluGluHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
+  fileDetails['VBFHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile.replace('$PROC',"VBFHToGG_M_125_13TeV_powheg_pythia8"),sigWS,'hggpdfsmrel_%dTeV_VBFHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
 else:
   fileDetails['ggH_hgg']       = [sigFile.replace('$PROC',"ggh"),sigWS,'hggpdfsmrel_%dTeV_ggh_$CHANNEL'%sqrts]
   fileDetails['qqH_hgg']       = [sigFile.replace('$PROC',"vbf"),sigWS,'hggpdfsmrel_%dTeV_vbf_$CHANNEL'%sqrts]
   fileDetails['ttH_hgg']       = [sigFile.replace('$PROC',"tth"),sigWS,'hggpdfsmrel_%dTeV_tth_$CHANNEL'%sqrts]
-  fileDetails['HHbbgg']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
+  fileDetails['GluGluToHHTo2B2G_node_SM_13TeV_madgraph']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
+  fileDetails['GluGluHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_GluGluHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
+  fileDetails['VBFHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_VBFHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
 
   if splitVH:
     fileDetails['WH_hgg']      =  [sigFile.replace('$PROC',"wh"),sigWS,'hggpdfsmrel_%dTeV_wh_$CHANNEL'%sqrts]
@@ -297,10 +305,10 @@ else:
 # --> globe info these come in specific types (as must be correlated with combination)
 # -- globe info  - see https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsWG/HiggsCombinationConventions
 theorySyst = {}
-#theorySyst['scaleWeight'] = [1,2,3,4,6,8,"replicas"] #5,7 unphysical
-theorySyst['scaleWeight'] = [[1,2],[3,6],[4,8],"asym"] #5,7 unphysical
-theorySyst['alphaSWeight'] = [[0,1],"asym"]
-#theorySyst['pdfWeight'] = [[0,60],"sym"]
+##theorySyst['scaleWeight'] = [1,2,3,4,6,8,"replicas"] #5,7 unphysical
+#theorySyst['scaleWeight'] = [[1,2],[3,6],[4,8],"asym"] #5,7 unphysical
+#theorySyst['alphaSWeight'] = [[0,1],"asym"]
+##theorySyst['pdfWeight'] = [[0,60],"sym"]
 
 theorySystAbsScale={}
 #theorySystAbsScale['names'] = ["QCDscale_qqbar_up","QCDscale_gg_up","QCDscale_qqbar_down","QCDscale_gg_down","pdf_alphaS_qqbar","pdf_alphaS_gg"] #QCD scale up, QCD scale down, PDF+alpha S, PDF, alpha S
@@ -346,7 +354,7 @@ for proc in options.procs:
       weight_central = inWS.var("centralObjectWeight") 
       weight_sumW = inWS.var("sumW")
       for cat in inclusiveCats:
-        #print "---> this is proc ", proc, "look for", "%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat) 
+        print "---> this is proc ", proc, "look for", "%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat) 
        # data_nominal= inWS.data("%s_%d_13TeV_%s_pdfWeights"%(combProc.keys()[combProc.values().index(proc)],options.mass,cat))
         data_nominal= inWS.data("%s_13TeV_%s"%(combProc.keys()[combProc.values().index(proc)],cat))
         data_nominal_sum = data_nominal.sumEntries()
@@ -382,7 +390,7 @@ for proc in options.procs:
       else: norm_factors_file.write(", %.3f"%effect)
       result["%s_%s"%(proc,name)].append(effect)
     norm_factors_file.write("]\n")
-    #print result
+    print result
 #exit(1)
 norm_factors_file.close()
 theoryNormFactors=result
@@ -409,7 +417,7 @@ def printTheorySysts():
               print 'Vittorio commented out this part, no PdfWeights'
         outFile.write('\n')
     else: #sym or asym uncertainties
-      #print "consider ", systName
+      print "consider ", systName
       asymmetric=("asym" in systDetails[-1])
       if asymmetric:
         iteration_list=systDetails[:-1]
@@ -418,7 +426,7 @@ def printTheorySysts():
         for a in range(systDetails[0][0],systDetails[0][1]):
           iteration_list.append([a,0])
 
-      #print "THIS SYST: ", systName ," is assymetric ? ", asymmetric, " and we will iterate over ", iteration_list 
+      print "THIS SYST: ", systName ," is assymetric ? ", asymmetric, " and we will iterate over ", iteration_list 
       factor=1.0
       if "alphaS" in systName: factor=1.5
       for it in iteration_list:
@@ -451,7 +459,7 @@ def printTheorySysts():
     if (not "Theory" in allSystList ) :allSystList.append("Theory")
     if (not options.justThisSyst=="") :
       if (not options.justThisSyst=="Theory"): continue
-    #print  "DEBUG consider name ", syst
+    print  "DEBUG consider name ", syst
     asymmetric= False
     if "_up" in syst : asymmetric= True
     if "_down" in syst : continue #already considered as part of "_up"
@@ -548,23 +556,23 @@ def getFlashggLineTheoryWeights(proc,cat,name,i,asymmetric,j=0,factor=1):
   systVals = interp1SigmaDataset(data_nominal_new,data_down,data_up,ad_hoc_factor)
   if (math.isnan(systVals[0]) or math.isnan(systVals[1]) or systVals[0]<0.6 or systVals[1]<0.6 ): 
     print "ERROR look at the value of these uncertainties!! systVals[0] ", systVals[0], " systVals[1] ", systVals[1]
-    #print "data Nominal"
-    #data_nominal_new.Print()
-    #print "data down "
-    #data_down.Print()
-    #print "data up "
-    #data_up.Print()
+    print "data Nominal"
+    data_nominal_new.Print()
+    print "data down "
+    data_down.Print()
+    print "data up "
+    data_up.Print()
     #exit (1)
   if (systVals[0] >10) : 
     print "ERROR look at the value of these uncertainties!! systVals[0] ", systVals[0], " systVals[1] ", systVals[1]
-    #print "data_nominal_new"
-    #data_nominal_new.Print()
-    #print "data_down"
-    #data_down.Print()
-    #print "data_up"
-    #data_up.Print()
-    #print "ad_hoc_factor"
-    #ad_hoc_factor
+    print "data_nominal_new"
+    data_nominal_new.Print()
+    print "data_down"
+    data_down.Print()
+    print "data_up"
+    data_up.Print()
+    print "ad_hoc_factor"
+    ad_hoc_factor
     #exit (1)
   if ((systVals[1] >10)) : 
     #print "data_nominal_new"
@@ -599,9 +607,9 @@ def getFlashggLineTheoryWeights(proc,cat,name,i,asymmetric,j=0,factor=1):
 ## envelope computation, for Theory scale weights
 def getFlashggLineTheoryEnvelope(proc,cat,name,details):
   
-  #print "consider proc ", proc, " cat ", cat , " name ", name , " detail ", details
-  #print "DEBug cat ", cat
-  #if "Untagged" in cat : return " - "
+  print "consider proc ", proc, " cat ", cat , " name ", name , " detail ", details
+  print "DEBug cat ", cat
+  if "Untagged" in cat : return " - "
   indices=details[0:-1] # skip last entry whcuh is text specifying the treatment of uncertainty eg "replicas"
   histograms=[]
   h_nominal =None
@@ -752,7 +760,7 @@ def printUEPSSyst():
     uepsFiles['PS'] = options.uepsfilename.split(',UEPS,')[1].split(',')
     print uepsFiles['PS']
     
-    tpMap = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'HHbbgg','GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
+    tpMap = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8" ,'GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
     
     lines = {}
 
@@ -817,22 +825,22 @@ flashggSysts={}
 vtxSyst = 0.02 #updated for Moriond17
 
 #photon ID
-flashggSysts['MvaShift'] =  'phoIdMva'
-flashggSysts['LooseMvaSF'] =  'LooseMvaSF'
-flashggSysts['PreselSF']    =  'PreselSF'
-flashggSysts['SigmaEOverEShift'] = 'SigmaEOverEShift'
-flashggSysts['ElectronWeight'] = 'eff_e'
-flashggSysts['electronVetoSF'] = 'electronVetoSF'
-flashggSysts['MuonWeight'] = 'eff_m'
-flashggSysts['MuonMiniIsoWeight'] = 'eff_m_MiniIso'
-flashggSysts['TriggerWeight'] = 'TriggerWeight'
-#flashggSysts['JetBTagWeight'] = 'eff_b'
-flashggSysts['JetBTagCutWeight'] = 'eff_b'
+#flashggSysts['MvaShift'] =  'phoIdMva'
+#flashggSysts['LooseMvaSF'] =  'LooseMvaSF'
+#flashggSysts['PreselSF']    =  'PreselSF'
+#flashggSysts['SigmaEOverEShift'] = 'SigmaEOverEShift'
+#flashggSysts['ElectronWeight'] = 'eff_e'
+#flashggSysts['electronVetoSF'] = 'electronVetoSF'
+#flashggSysts['MuonWeight'] = 'eff_m'
+#flashggSysts['MuonMiniIsoWeight'] = 'eff_m_MiniIso'
+#flashggSysts['TriggerWeight'] = 'TriggerWeight'
+##flashggSysts['JetBTagWeight'] = 'eff_b'
+#flashggSysts['JetBTagCutWeight'] = 'eff_b'
 #flashggSysts['MvaLinearSyst'] = 'MvaLinearSyst'
 #flashggSysts[''] =  ''
-flashggSysts['metPhoUncertainty'] = 'MET_PhotonScale'
-flashggSysts['metUncUncertainty'] = 'MET_Unclustered'
-flashggSysts['metJecUncertainty'] = 'MET_JEC'
+#flashggSysts['metPhoUncertainty'] = 'MET_PhotonScale'
+#flashggSysts['metUncUncertainty'] = 'MET_Unclustered'
+#flashggSysts['metJecUncertainty'] = 'MET_JEC'
 #flashggSysts['metJerUncertainty'] = 'MET_JER'
 
 #new ggH uncert prescription (replaces theory, JetVeto)
@@ -903,9 +911,9 @@ metSyst['ttH_hgg'] = [0.011,0.012,0.040]#not used for ICHEP16
 ggHforttHSysts = {}
 
 # spec for ggh in tth cats - [MC_low_stat,gluon_splitting,parton_shower]
-ggHforttHSysts['CMS_hgg_tth_mc_low_stat'] = 0.10 ##FIXME needs double checking for Moriond17
-ggHforttHSysts['CMS_hgg_tth_gluon_splitting'] = 0.52 #re-evaluated for Moriond17, using TOP-16-010
-ggHforttHSysts['CMS_hgg_tth_parton_shower'] = 0.35 #updated for Moriond17
+#ggHforttHSysts['CMS_hgg_tth_mc_low_stat'] = 0.10 ##FIXME needs double checking for Moriond17
+#ggHforttHSysts['CMS_hgg_tth_gluon_splitting'] = 0.52 #re-evaluated for Moriond17, using TOP-16-010
+#ggHforttHSysts['CMS_hgg_tth_parton_shower'] = 0.35 #updated for Moriond17
 
 # rate adjustments
 tthLepRateScale = 1.0 #not used for ICHEP16
@@ -1119,15 +1127,15 @@ def getFlashggLine(proc,cat,syst):
   dataNOMINAL =  inWS.data("%s_%d_13TeV_%s"%(flashggProc[proc],options.mass,cat)) #Nominal RooDataSet,. May contain required weights if UP/DOWN/SYMMETRIC roodatahists do not exist (ie systematic stored as event weigths)
   if (dataSYMMETRIC==None):
     if( (dataUP==None) or  (dataDOWN==None)) :
-      #print "[INFO] Systematic ", syst," stored as asymmetric event weights in RooDataSet"
+      print "[INFO] Systematic ", syst," stored as asymmetric event weights in RooDataSet"
       asymmetric=True
       eventweight=True
     else:
-      #print "[INFO] Systematic ", syst," stored as asymmetric rooDataHists"
+      print "[INFO] Systematic ", syst," stored as asymmetric rooDataHists"
       asymmetric=True
       eventweight=False
   else:
-      #print "[INFO] Systematic ", syst," stored as symmetric rooDataHist"
+      print "[INFO] Systematic ", syst," stored as symmetric rooDataHist"
       asymmetric=False
       eventweight=False
   
