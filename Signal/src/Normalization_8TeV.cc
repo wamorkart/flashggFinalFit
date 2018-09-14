@@ -49,7 +49,7 @@ int Normalization_8TeV::Init(int sqrtS){
         XSectionMap_testBBH[mH]	= valXSbbH;
         XSectionMap_testTHQ[mH]	= 0.074;
         XSectionMap_testTHW[mH]	= 0.015;
-        XSectionMap_HHbbgg[mH]	= 1000.;
+        XSectionMap_HHbbgg[mH]	= 1e-03.;//*2*0.58
 	
     }
 
