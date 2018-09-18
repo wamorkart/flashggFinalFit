@@ -24,14 +24,13 @@ int Normalization_8TeV::Init(int sqrtS){
     TPython::Eval(Form("buildSMHiggsSignalXSBR.Init%dTeV()", sqrtS));
     
     for (double mH=120;mH<=135.0;mH+=0.1){ // Do we need this up to 250 ?
-   double mH_constant=125.;
-	double valBR    =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getBR(%f)",mH_constant));
-	double valXSggH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ggH"));
-	double valXSqqH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"qqH"));
-	double valXSttH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ttH"));
-	double valXSWH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"WH"));
-	double valXSZH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"ZH"));
-	double valXSbbH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH_constant,"bbH"));
+	double valBR    =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getBR(%f)",mH));
+	double valXSggH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ggH"));
+	double valXSqqH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"qqH"));
+	double valXSttH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ttH"));
+	double valXSWH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"WH"));
+	double valXSZH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ZH"));
+	double valXSbbH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"bbH"));
 	BranchingRatioMap[mH]	= valBR;
         XSectionMap_ggh[mH]	= valXSggH; 	
         XSectionMap_vbf[mH]	= valXSqqH; 	
@@ -49,7 +48,11 @@ int Normalization_8TeV::Init(int sqrtS){
         XSectionMap_testBBH[mH]	= valXSbbH;
         XSectionMap_testTHQ[mH]	= 0.074;
         XSectionMap_testTHW[mH]	= 0.015;
-        XSectionMap_HHbbgg[mH]	= 1e-03.;//*2*0.58
+        XSectionMap_bbH_ybyt[mH]	= 0.045 ;
+        XSectionMap_bbH_yb2[mH]	= 0.533 ;
+  ///////////////////////////////////////////////////////////////////TEMPORARY FIX FOR XSECTION OVER BR//////////////////////////////////////////////////////////////
+        XSectionMap_HHbbgg[mH]	= 1e-03/GetBR(mH) ;
+  ///////////////////////////////////////////////////////////////////TEMPORARY FIX FOR XSECTION OVER BR//////////////////////////////////////////////////////////////
 	
     }
 
@@ -186,6 +189,10 @@ TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if ( process.Contains("testTHW") ) {
 		XSectionMap = &XSectionMap_testTHW;
+	} else if ( process.Contains("4FS_ybyt") ) {
+		XSectionMap = &XSectionMap_bbH_ybyt;
+	} else if ( process.Contains("4FS_yb2") ) {
+		XSectionMap = &XSectionMap_bbH_yb2;
 	} else if ( process.Contains("HHTo2B2G") ) {
 		XSectionMap = &XSectionMap_HHbbgg;
 	} else {
@@ -211,17 +218,16 @@ TGraph * Normalization_8TeV::GetBrGraph()
 
 double Normalization_8TeV::GetBR(double mass) {
 
-   double mass_constant = 125.;
 	for (std::map<double, double>::const_iterator iter = BranchingRatioMap.begin();  iter != BranchingRatioMap.end(); ++iter) {
-		if (mass_constant==iter->first) return iter->second;
-		if (mass_constant>iter->first) {
+		if (mass==iter->first) return iter->second;
+		if (mass>iter->first) {
 			double lowmass = iter->first;
 			double lowbr = iter->second;
 			++iter;
-			if (mass_constant<iter->first) {
+			if (mass<iter->first) {
 				double highmass = iter->first;
 				double highbr = iter->second;
-				double br = (highbr-lowbr)/(highmass-lowmass)*(mass_constant-lowmass)+lowbr;
+				double br = (highbr-lowbr)/(highmass-lowmass)*(mass-lowmass)+lowbr;
 				return br;
 			}
 			--iter;
@@ -271,6 +277,10 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if (HistName.Contains("testTHW")) {
 		XSectionMap = &XSectionMap_testTHW;
+	} else if ( HistName.Contains("4FS_ybyt") ) {
+		XSectionMap = &XSectionMap_bbH_ybyt;
+	} else if ( HistName.Contains("4FS_yb2") ) {
+		XSectionMap = &XSectionMap_bbH_yb2;
 	} else if (HistName.Contains("HHTo2B2G")) {
 		XSectionMap = &XSectionMap_HHbbgg;
 	} else {

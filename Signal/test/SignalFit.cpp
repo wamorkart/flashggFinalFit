@@ -448,6 +448,7 @@ int main(int argc, char *argv[]){
   //referenceProc_="ggh";
   referenceProc_="GG2H";
   referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph";
+  referenceProc_="ttHToGG_M125_13TeV_powheg_pythia8_v2";
   //referenceProcTTH_="tth";
  // referenceProcTTH_="TTH";
 //  referenceTagWV_="UntaggedTag_2"; // histest stats WV is ggh Untagged 3. 
@@ -697,7 +698,8 @@ int main(int argc, char *argv[]){
       continue;
     }
     bool userSkipRV = (nGaussiansRV==-1);
-    bool userSkipWV = (nGaussiansWV==-1);
+ //   bool userSkipWV = (nGaussiansWV==-1);
+    bool userSkipWV = true; // all WV are extremely limited 
 
     cout << "-----------------------------------------------------------------" << endl;
     cout << Form("[INFO] Running fits for proc:%s - cat:%s with nGausRV:%d nGausWV:%d",proc.c_str(),cat.c_str(),nGaussiansRV,nGaussiansWV) << endl;
@@ -728,9 +730,9 @@ int main(int argc, char *argv[]){
       RooDataHist *dataH;  
 
       //  if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str()) << " in in WS " << inWS << std::endl;
-        if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_13TeV_%s",proc.c_str(),cat.c_str()) << " in in WS " << inWS << std::endl;
+        if (verbose_)std::cout << "[INFO] Opening dataset called "<< Form("%s_13TeV_%d_%s",proc.c_str(),mh,cat.c_str()) << " in in WS " << inWS << std::endl;
       //  RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str())));
-        RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_13TeV_%s",proc.c_str(),cat.c_str())));
+        RooDataSet *data0   = reduceDataset((RooDataSet*)inWS->data(Form("%s_13TeV_%d_%s",proc.c_str(),mh,cat.c_str())));
 				if (beamSpotReweigh_){
         data = beamSpotReweigh(intLumiReweigh(data0));
 				} else {
@@ -774,7 +776,7 @@ int main(int argc, char *argv[]){
                         		intLumiReweigh(
                           		reduceDataset(
                           		//	(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
-                          			(RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
+                          			(RooDataSet*)inWS->data(Form("%s_13TeV_%d_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
                               )
                             ), "RV"
                           )
@@ -785,7 +787,7 @@ int main(int argc, char *argv[]){
                         intLumiReweigh(
                           reduceDataset(
                          // (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
-                          (RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
+                          (RooDataSet*)inWS->data(Form("%s_13TeV_%d_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
                          )
                        ), "RV"
                       );
@@ -815,10 +817,13 @@ int main(int argc, char *argv[]){
          //int replacementIndex = getIndexOfReferenceDataset(referenceProcWV_,referenceTagWV_);
          int thisProcCatIndex = getIndexOfReferenceDataset(proc,cat);
           
-          string replancementProc = map_replacement_proc_WV_[thisProcCatIndex];
-          string replancementCat = map_replacement_cat_WV_[thisProcCatIndex];
+         // string replancementProc = map_replacement_proc_WV_[thisProcCatIndex];
+        //  string replancementCat = map_replacement_cat_WV_[thisProcCatIndex];
+          string replancementProc = map_replacement_proc_RV_[thisProcCatIndex];
+          string replancementCat = map_replacement_cat_RV_[thisProcCatIndex];
           int replacementIndex = getIndexOfReferenceDataset(replancementProc,replancementCat);
-          nGaussiansWV= map_nG_wv_[replacementIndex]; 
+         // nGaussiansWV= map_nG_wv_[replacementIndex]; 
+          nGaussiansWV= map_nG_rv_[replacementIndex]; 
         
          //pick the dataset for the replacement proc and cat, reduce it (ie remove pdfWeights etc) ,
          //reweight for lumi and then get the WV events only.
@@ -829,7 +834,7 @@ int main(int argc, char *argv[]){
                           reduceDataset(
                           //(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",referenceProcWV_.c_str(),mh,referenceTagWV_.c_str()))
                           //  (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
-                            (RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
+                            (RooDataSet*)inWS->data(Form("%s_13TeV_%d_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
                          )
                        ), "WV"
                       )
@@ -840,9 +845,10 @@ int main(int argc, char *argv[]){
                           reduceDataset(
                           //(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",referenceProcWV_.c_str(),mh,referenceTagWV_.c_str()))
                           //	(RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
-                          	(RooDataSet*)inWS->data(Form("%s_13TeV_%s",replancementProc.c_str(),replancementCat.c_str()))
+                          	(RooDataSet*)inWS->data(Form("%s_13TeV_%d_%s",replancementProc.c_str(),mh,replancementCat.c_str()))
                          )
-                       ), "WV"
+                     //  ), "WV"
+                       ), "RV"   // we want to use RV because there is no statistics in WV
                       );
 					}
           if (data0Ref) {
@@ -878,24 +884,26 @@ int main(int argc, char *argv[]){
     for (std::map<int,RooDataSet*>::iterator it=FITdatasetsRV.begin(); it!=FITdatasetsRV.end(); ++it){
       if (check=="") {
        TString name=it->second->GetName();
-        check = name.ReplaceAll(TString(Form("%d",it->first)),TString(""));
+       std::cout<<" assertion  "<< check<< "   "<< name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_"))  <<std::endl;
+        check = name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_"));
        } else {
        TString name=it->second->GetName();
-       assert (check ==name.ReplaceAll(TString(Form("%d",it->first)),TString("")) );
+       std::cout<<" assertion " << check<< "   "<< name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_"))  <<std::endl;
+       assert (check ==name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_")) );
        }
     }
     check="";
     for (std::map<int,RooDataSet*>::iterator it=FITdatasetsWV.begin(); it!=FITdatasetsWV.end(); ++it){
       if (check=="") {
        TString name=it->second->GetName();
-        check = name.ReplaceAll(TString(Form("%d",it->first)),TString(""));
+        check = name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_"));
        } else {
        TString name=it->second->GetName();
-       assert (check ==name.ReplaceAll(TString(Form("%d",it->first)),TString("")) );
+       assert (check ==name.ReplaceAll(TString(Form("13TeV_%d",it->first)),TString("13TeV_")) );
        }
     }
       
-      
+     
     //these guys do the interpolation
     //declare them in advnace of the fitting
     map<string,RooSpline1D*> splinesRV;

@@ -45,7 +45,7 @@ class WSTFileWrapper:
    def convertTemplatedName(self,dataName):
         theProcName = ""
         theDataName = ""
-        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"GluGluToHHTo2B2G_node_SM_13TeV_madgraph","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",
+        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"GluGluToHHTo2B2G_node_SM_13TeV_madgraph","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2",
 "GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
         for stxsProc in tpMap:
           if dataName.startswith(stxsProc):
@@ -152,9 +152,9 @@ outFile = open(options.outfilename,'w')
 #procId = {'ggH_hgg':0,'qqH_hgg':-1,'ttH_hgg':-2,'WH_lep_hgg':-2,'ZH_lep_hgg':-3,'WH_had_hgg':-4,'ZH_had_hgg':-5,'bbH_hgg':-6,'tHq_hgg':-7,'tHW_hgg':-8,'bkg_mass':1}
 #bkgProcs = ['bkg_mass','bbH_hgg','tHq_hgg','tHW_hgg'] #what to treat as background
 
-combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8", "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8", 'bkg_mass':'bkg_mass'}
-flashggProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph',"GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8",  "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",'bkg_mass':'bkg_mass'}
-procId = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':0,"GluGluHToGG_M_125_13TeV_powheg_pythia8":2,"VBFHToGG_M_125_13TeV_powheg_pythia8":3,'bkg_mass':1}
+combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8", "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2", 'bkg_mass':'bkg_mass'}
+flashggProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph',"GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8",  "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",'ttHToGG_M125_13TeV_powheg_pythia8_v2':'ttHToGG_M125_13TeV_powheg_pythia8_v2','bkg_mass':'bkg_mass'}
+procId = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':0,"GluGluHToGG_M_125_13TeV_powheg_pythia8":2,"VBFHToGG_M_125_13TeV_powheg_pythia8":3,"ttHToGG_M125_13TeV_powheg_pythia8_v2":4,'bkg_mass':1}
 bkgProcs = ['bkg_mass'] #what to treat as background
 
 #Determine if VH or WZH_hgg
@@ -262,6 +262,7 @@ bkgWS = 'multipdf'
 sigFile = 'CMS-HGG_sigfit_%s_$PROC_$CAT.root'%(file_ext)
 sigFile = 'CMS-HGG_sigfit_%s_$PROC.root'%(file_ext)
 sigFile = 'CMS-HGG_sigfit_data_GluGluToHHTo2B2G_node_SM_13TeV_madgraph.root'
+sigFile = 'CMS-HGG_sigfit_all.root'
 #print "making sigfile " ,sigFile
 sigWS = 'wsig_%dTeV'%(sqrts)
 # file detaisl: for FLashgg always use unbinned signal and multipdf
@@ -290,6 +291,9 @@ else:
   fileDetails['GluGluToHHTo2B2G_node_SM_13TeV_madgraph']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
   fileDetails['GluGluHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_GluGluHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
   fileDetails['VBFHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_VBFHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
+  fileDetails['ttHToGG_M125_13TeV_powheg_pythia8_v2']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_ttHToGG_M125_13TeV_powheg_pythia8_v2_$CHANNEL'%sqrts]
+
+
 
   if splitVH:
     fileDetails['WH_hgg']      =  [sigFile.replace('$PROC',"wh"),sigWS,'hggpdfsmrel_%dTeV_wh_$CHANNEL'%sqrts]

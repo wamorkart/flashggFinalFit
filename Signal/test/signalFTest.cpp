@@ -86,7 +86,7 @@ void OptionParser(int argc, char *argv[]){
 RooAddPdf *buildSumOfGaussians(string name, RooRealVar *mass, RooRealVar *MH, int nGaussians){
   
   int mh=MH->getVal();
-  assert(mh==125);
+//  assert(mh==125);
 	RooArgList *gaussians = new RooArgList();
 	RooArgList *coeffs = new RooArgList();
 	for (int g=0; g<nGaussians; g++){
@@ -213,8 +213,7 @@ int main(int argc, char *argv[]){
 	}
   
   // open input files using WS wrapper.
-	WSTFileWrapper *inWS 
-    = new WSTFileWrapper(filename_,"tagsDumper/cms_hgg_13TeV");
+	WSTFileWrapper *inWS  = new WSTFileWrapper(filename_,"tagsDumper/cms_hgg_13TeV");
   if(verbose_) std::cout << "[INFO] Opened files OK!" << std::endl;
 	RooRealVar *mass = (RooRealVar*)inWS->var("CMS_hgg_mass");
   if(verbose_) std::cout << "[INFO] Got mass variable " << mass << std::endl;
@@ -314,7 +313,7 @@ int main(int argc, char *argv[]){
 			if (isFlashgg_){
 				RooDataSet *data0   = (RooDataSet*)inWS->data(
          // Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()));
-          Form("%s_13TeV_%s",proc.c_str(),flashggCats_[cat].c_str()));
+          Form("%s_13TeV_%d_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()));
         if(verbose_) {
           std::cout << "[INFO] got dataset data0 ? " << data0 << "now make empty clones " << std::endl;
           if (data0) {
