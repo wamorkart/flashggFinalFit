@@ -405,6 +405,7 @@ RooDataSet * beamSpotReweigh(RooDataSet *data0 /*original dataset*/){
 // reweight the events to get a particular intL.
 RooDataSet * intLumiReweigh(RooDataSet *data0 /*original dataset*/){
 		
+  if (verbose_) std::cout << "[INFO] doing Lumi " << std::endl;
   double factor = newIntLumi_/originalIntLumi_; // newIntLumi expressed in 1/fb
 
   if (verbose_) std::cout << "[INFO] Was able to access IntLumi directlly from WS. IntLumi " << intLumi_->getVal() << "pb^{-1}" << std::endl;
@@ -447,7 +448,8 @@ int main(int argc, char *argv[]){
   // need to make this configurable ?! -LC
   //referenceProc_="ggh";
   referenceProc_="GG2H";
-  referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph";
+  referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017";
+  referenceProc_="ttHToGG_M125_13TeV_powheg_pythia8_2017";
   referenceProc_="ttHToGG_M125_13TeV_powheg_pythia8_v2";
   //referenceProcTTH_="tth";
  // referenceProcTTH_="TTH";

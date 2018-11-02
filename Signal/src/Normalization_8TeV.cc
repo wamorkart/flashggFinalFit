@@ -163,7 +163,7 @@ TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 	} else if ( process == "vbfold") {
 		XSectionMap = &XSectionMap_vbfold;
 	//} else if ( process == "wzh") {
-	} else if ( process == "wzh" || process == "vh" || process == "VH" ) {
+	} else if ( process == "wzh" || process == "vh"  || process.Contains("VH")) {
 		XSectionMap = &XSectionMap_wzh;
 	} else if ( process == "tth" || process.Contains("TTH") || process.Contains("ttH") ) {
 		XSectionMap = &XSectionMap_tth;

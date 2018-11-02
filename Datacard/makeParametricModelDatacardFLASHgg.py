@@ -45,7 +45,7 @@ class WSTFileWrapper:
    def convertTemplatedName(self,dataName):
         theProcName = ""
         theDataName = ""
-        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"GluGluToHHTo2B2G_node_SM_13TeV_madgraph","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2",
+        tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"GluGluToHHTo2B2G_node_SM_13TeV_madgraph","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2","VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8","bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo":"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo","bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo":"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo",
 "GG2H":"ggh","VBF":"vbf","TTH":"tth","QQ2HLNU":"wh","QQ2HLL":"zh","WH2HQQ":"wh","ZH2HQQ":"zh","testBBH":"bbh","testTHQ":"th","testTHW":"th"}
         for stxsProc in tpMap:
           if dataName.startswith(stxsProc):
@@ -152,9 +152,9 @@ outFile = open(options.outfilename,'w')
 #procId = {'ggH_hgg':0,'qqH_hgg':-1,'ttH_hgg':-2,'WH_lep_hgg':-2,'ZH_lep_hgg':-3,'WH_had_hgg':-4,'ZH_had_hgg':-5,'bbH_hgg':-6,'tHq_hgg':-7,'tHW_hgg':-8,'bkg_mass':1}
 #bkgProcs = ['bkg_mass','bbH_hgg','tHq_hgg','tHW_hgg'] #what to treat as background
 
-combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8", "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2", 'bkg_mass':'bkg_mass'}
-flashggProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph',"GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8",  "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",'ttHToGG_M125_13TeV_powheg_pythia8_v2':'ttHToGG_M125_13TeV_powheg_pythia8_v2','bkg_mass':'bkg_mass'}
-procId = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':0,"GluGluHToGG_M_125_13TeV_powheg_pythia8":2,"VBFHToGG_M_125_13TeV_powheg_pythia8":3,"ttHToGG_M125_13TeV_powheg_pythia8_v2":4,'bkg_mass':1}
+combProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8", "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttHToGG_M125_13TeV_powheg_pythia8_v2","VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8","bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo":"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo","bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo":"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo", 'bkg_mass':'bkg_mass'}
+flashggProc = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph',"GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8",  "VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8",'ttHToGG_M125_13TeV_powheg_pythia8_v2':'ttHToGG_M125_13TeV_powheg_pythia8_v2',"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8","bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo":"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo","bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo":"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo",'bkg_mass':'bkg_mass'}
+procId = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':0,"GluGluHToGG_M_125_13TeV_powheg_pythia8":2,"VBFHToGG_M_125_13TeV_powheg_pythia8":3,"ttHToGG_M125_13TeV_powheg_pythia8_v2":4,"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":5,"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo":6,"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo":6,'bkg_mass':1}
 bkgProcs = ['bkg_mass'] #what to treat as background
 
 #Determine if VH or WZH_hgg
@@ -256,13 +256,15 @@ print "[INFO] Get Intlumi from file, value : ", intL," pb^{-1}", " sqrts ", sqrt
 file_ext = 'data'
 dataFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
 bkgFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
+dataFile = 'CMS-HGG_multipdf_HHbbgg_data2016_2017_30_10_2018.root'
+bkgFile = 'CMS-HGG_multipdf_HHbbgg_data2016_2017_30_10_2018.root'
 dataWS = 'multipdf'
 bkgWS = 'multipdf'
 #sigFile = 'CMS-HGG_%s_%dTeV_sigfit.root'%(file_ext,sqrts)
 sigFile = 'CMS-HGG_sigfit_%s_$PROC_$CAT.root'%(file_ext)
 sigFile = 'CMS-HGG_sigfit_%s_$PROC.root'%(file_ext)
-sigFile = 'CMS-HGG_sigfit_data_GluGluToHHTo2B2G_node_SM_13TeV_madgraph.root'
-sigFile = 'CMS-HGG_sigfit_all.root'
+sigFile = 'CMS-HGG_sigfit_04_10_2018_deepCSV.root'
+sigFile = 'CMS-HGG_sigfit_30_10_2018_combo.root'
 #print "making sigfile " ,sigFile
 sigWS = 'wsig_%dTeV'%(sqrts)
 # file detaisl: for FLashgg always use unbinned signal and multipdf
@@ -284,6 +286,9 @@ if options.doSTXS:
   fileDetails['GluGluToHHTo2B2G_node_SM_13TeV_madgraph']       = [sigFile.replace('$PROC',"GluGluToHHTo2B2G_node_SM_13TeV_madgraph"),sigWS,'hggpdfsmrel_%dTeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_$CHANNEL'%sqrts]
   fileDetails['GluGluHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile.replace('$PROC',"GluGluHToGG_M_125_13TeV_powheg_pythia8"),sigWS,'hggpdfsmrel_%dTeV_GluGluHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
   fileDetails['VBFHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile.replace('$PROC',"VBFHToGG_M_125_13TeV_powheg_pythia8"),sigWS,'hggpdfsmrel_%dTeV_VBFHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
+  fileDetails['VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8']       = [sigFile.replace('$PROC',"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8"),sigWS,'hggpdfsmrel_%dTeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_$CHANNEL'%sqrts]
+  fileDetails['bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo']       = [sigFile.replace('$PROC',"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo"),sigWS,'hggpdfsmrel_%dTeV_bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo_$CHANNEL'%sqrts]
+  fileDetails['bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo']       = [sigFile.replace('$PROC',"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo"),sigWS,'hggpdfsmrel_%dTeV_bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo_$CHANNEL'%sqrts]
 else:
   fileDetails['ggH_hgg']       = [sigFile.replace('$PROC',"ggh"),sigWS,'hggpdfsmrel_%dTeV_ggh_$CHANNEL'%sqrts]
   fileDetails['qqH_hgg']       = [sigFile.replace('$PROC',"vbf"),sigWS,'hggpdfsmrel_%dTeV_vbf_$CHANNEL'%sqrts]
@@ -292,6 +297,9 @@ else:
   fileDetails['GluGluHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_GluGluHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
   fileDetails['VBFHToGG_M_125_13TeV_powheg_pythia8']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_VBFHToGG_M_125_13TeV_powheg_pythia8_$CHANNEL'%sqrts]
   fileDetails['ttHToGG_M125_13TeV_powheg_pythia8_v2']       = [sigFile,sigWS,'hggpdfsmrel_%dTeV_ttHToGG_M125_13TeV_powheg_pythia8_v2_$CHANNEL'%sqrts]
+  fileDetails['VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8']       = [sigFile.replace('$PROC',"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8"),sigWS,'hggpdfsmrel_%dTeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_$CHANNEL'%sqrts]
+  fileDetails['bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo']       = [sigFile.replace('$PROC',"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo"),sigWS,'hggpdfsmrel_%dTeV_bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo_$CHANNEL'%sqrts]
+  fileDetails['bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo']       = [sigFile.replace('$PROC',"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo"),sigWS,'hggpdfsmrel_%dTeV_bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo_$CHANNEL'%sqrts]
 
 
 
@@ -764,7 +772,7 @@ def printUEPSSyst():
     uepsFiles['PS'] = options.uepsfilename.split(',UEPS,')[1].split(',')
     print uepsFiles['PS']
     
-    tpMap = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8" ,'GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
+    tpMap = {'GluGluToHHTo2B2G_node_SM_13TeV_madgraph':'GluGluToHHTo2B2G_node_SM_13TeV_madgraph', "GluGluHToGG_M_125_13TeV_powheg_pythia8":"GluGluHToGG_M_125_13TeV_powheg_pythia8","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBFHToGG_M_125_13TeV_powheg_pythia8" ,"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":"VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8","bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo":"bbHToGG_M_125_4FS_yb2_13TeV_amcatnlo","bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo":"bbHToGG_M_125_4FS_ybyt_13TeV_amcatnlo",'GG2H':'ggh','VBF':'vbf','TTH':'tth','QQ2HLNU':'wh','QQ2HLL':'zh','WH2HQQ':'wh','ZH2HQQ':'zh','bkg_mass':'bkg_mass'}
     
     lines = {}
 
