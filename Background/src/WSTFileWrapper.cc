@@ -55,6 +55,12 @@ RooRealVar* WSTFileWrapper::var(std::string varName) {
   return wsList[0]->var(varName.c_str());
 }
 
+
+RooAbsReal* WSTFileWrapper::function(std::string funcName) {
+  fileList[0]->cd();
+  return wsList[0]->function(funcName.c_str());
+}
+
 RooAbsData* WSTFileWrapper::data(std::string dataName) {
   RooAbsData* result = 0;
   bool complained_yet = 0;

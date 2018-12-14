@@ -12,6 +12,7 @@ class WSTFileWrapper  {
     WSTFileWrapper(std::string, std::string);
   //    TObject * Get(std::string);
     RooRealVar* var(std::string);
+    RooAbsReal* function(std::string);
     RooAbsPdf* pdf(std::string);
     RooCategory* cat(std::string);
     RooAbsData* data(std::string);

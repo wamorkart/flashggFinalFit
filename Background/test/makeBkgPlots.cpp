@@ -715,6 +715,10 @@ int main(int argc, char* argv[]){
 	double mhvalue_;
 	int isFlashgg_ =1;
 	string flashggCatsStr_;
+	string signalNameStr_;
+	string singleHiggsNamesStr_;
+	vector<string> signalName_;
+	vector<string> singleHiggsNames_;
 	vector<string> flashggCats_;
   double higgsResolution_=0.5;
 
@@ -742,6 +746,8 @@ int main(int argc, char* argv[]){
 		("sqrts,S", po::value<int>(&sqrts)->default_value(8),																"Which centre of mass is this data from?")
 		("isFlashgg",  po::value<int>(&isFlashgg_)->default_value(1),  								    	        "Use Flashgg output ")
 		("flashggCats,f", po::value<string>(&flashggCatsStr_)->default_value("UntaggedTag_0,UntaggedTag_1,UntaggedTag_2,UntaggedTag_3,VBFTag_0,VBFTag_1,VBFTag_2,TTHHadronicTag,TTHLeptonicTag,VHHadronicTag,VHTightTag,VHLooseTag,VHEtTag"),       "Flashgg category names to consider")
+		("signalName", po::value<string>(&signalNameStr_)->default_value("GluGluToHHTo2B2G_node_SM_13TeV_madgraph,GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017"),       "Signal Name")
+		("singleHiggsNames", po::value<string>(&singleHiggsNamesStr_)->default_value("GluGluHToGG_M_125_13TeV_powheg_pythia8,VBFHToGG_M_125_13TeV_powheg_pythia8,ttHToGG_M125_13TeV_powheg_pythia8_v2,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8,GluGluHToGG_M_125_13TeV_powheg_pythia8_2017,VBFHToGG_M125_13TeV_amcatnlo_pythia8_2017,ttHToGG_M125_13TeV_powheg_pythia8_2017,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017"),       "Signal Name")
 		("verbose,v", 																																			"Verbose");
 	;
 	po::variables_map vm;
@@ -759,6 +765,8 @@ int main(int argc, char* argv[]){
 	RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 	RooMsgService::instance().setSilentMode(true);
 	split(flashggCats_,flashggCatsStr_,boost::is_any_of(","));
+	split(singleHiggsNames_,singleHiggsNamesStr_,boost::is_any_of(","));
+	split(signalName_,signalNameStr_,boost::is_any_of(","));
   lumi_13TeV =Form("%.1f fb^{-1}",intLumi);	
 	system(Form("mkdir -p %s",outDir.c_str()));
 	if (makeCrossCheckProfPlots) system(Form("mkdir -p %s/normProfs",outDir.c_str()));
@@ -1062,16 +1070,27 @@ int main(int argc, char* argv[]){
 				RooRealVar *MH = (RooRealVar*)w_sig->var("MH");
 				if (!MH) MH = (RooRealVar*)w_sig->var("CMS_hgg_mass");
 				RooAbsPdf *sigPDF = (RooAbsPdf*)w_sig->pdf(Form("sigpdfrel%s_allProcs",catname.c_str()));
+				RooAbsPdf *sigPDF_bbgg = (RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017_%s",catname.c_str()));
+            double normalization_bbgg = ((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017_%s_norm",catname.c_str())))->getVal()*intLumi*1000.;
+				std::cout << "Normalization VH "<< normalization_bbgg<<std::endl;
 				MH->setVal(mhvalue_);
-				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
+				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),Name(Form("first_%s",catname.c_str())));
 				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
 				std::cout << "[INFO] expected number of events in signal PDF " << sigPDF->expectedEvents(*MH) << std::endl;	
-				//sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal()/*get intlumi (/fb) from ws, and divide by 100 for /pb */,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
+			//	sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal()/*get intlumi (/fb) from ws, and divide by 100 for /pb */,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				//sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal(),RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
+				 
 				sigPDF->plotOn(plotLC,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				TObject *sigLeg = (TObject*)plot->getObject(plot->numItems()-1);
 				leg->AddEntry(sigLeg,Form("Sig model m_{H}=%.1fGeV",MH->getVal()),"L");
+
+				sigPDF_bbgg->plotOn(plot,Normalization(normalization_bbgg,RooAbsReal::NumEvent),LineColor(kRed),LineWidth(3));//,AddTo(Form("first_%s",catname.c_str())));
+				sigPDF_bbgg->plotOn(plotLC,Normalization(normalization_bbgg,RooAbsReal::NumEvent),LineColor(kRed),LineWidth(3));
+		    	TObject *sigLeg_bbgg = (TObject*)plot->getObject(plot->numItems()-1);
+				leg->AddEntry(sigLeg_bbgg,Form("Sig model bbgg m_{H}=%.1fGeV",MH->getVal()),"L");
 				outWS->import(*sigPDF);
+				outWS->import(*sigPDF_bbgg);
+				plot->Print("v");
 			}
 		}
 
