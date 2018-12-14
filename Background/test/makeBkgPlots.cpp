@@ -1070,10 +1070,25 @@ int main(int argc, char* argv[]){
 				RooRealVar *MH = (RooRealVar*)w_sig->var("MH");
 				if (!MH) MH = (RooRealVar*)w_sig->var("CMS_hgg_mass");
 				RooAbsPdf *sigPDF = (RooAbsPdf*)w_sig->pdf(Form("sigpdfrel%s_allProcs",catname.c_str()));
-				RooAbsPdf *sigPDF_bbgg = (RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017_%s",catname.c_str()));
-            double normalization_bbgg = ((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017_%s_norm",catname.c_str())))->getVal()*intLumi*1000.;
-				std::cout << "Normalization VH "<< normalization_bbgg<<std::endl;
+				double normalization_singleHiggs = 0.;
+				vector<double> normalizations_singleHiggs ;
+				double normalization_signal = 0.;
+				vector<double> normalizations_signal;
+ 				vector<RooAbsPdf*> singleHiggsPDFs;
+ 				vector<RooAbsPdf*> signalPDFs;
+				for (int pdf_num=0;pdf_num<singleHiggsNames_.size();pdf_num++):{
+					singleHiggsPDFs.push_back((RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_%s_%s",singleHiggsNames[pdf_num],catname.c_str())));
+					normalizations_singleHiggs.push_back(((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_%s_%s_norm",singleHiggsNames[pdf_num],catname.c_str())))->getVal()*intLumi*1000.)
+				}
+				for (int pdf_num=0;pdf_num<signalNames_.size();pdf_num++):{
+					signalPDFs.push_back((RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_%s_%s",signalNames[pdf_num],catname.c_str())));
+					normalizations_signal.push_back(((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_%s_%s_norm",signalNames[pdf_num],catname.c_str())))->getVal()*intLumi*1000.)
+				}
 				MH->setVal(mhvalue_);
+				RooAddPdf* modelSingleHiggs(Form("modelSingleHiggs_%s",catname.c_str()),"modelSingleHiggs_%s",catname.c_str()),RooArgList(sig,bkg),RooArgList(n_s,Nbkg));
+
+model2 = ROOT.RooAddPdf("model2","model with less signal",ROOT.RooArgList(sig,bkg),ROOT.RooArgList(fsig2))
+
 				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),Name(Form("first_%s",catname.c_str())));
 				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
 				std::cout << "[INFO] expected number of events in signal PDF " << sigPDF->expectedEvents(*MH) << std::endl;	
