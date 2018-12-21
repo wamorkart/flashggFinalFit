@@ -656,8 +656,13 @@ void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCatego
 		data->plotOn(plot,Binning(80));
 	}
 
-	TLegend *leg = new TLegend(0.6,0.4,0.92,0.92);
+	TLegend *leg = new TLegend(0.6,0.45,0.92,0.92);
 	leg->SetFillColor(0);
+	leg->SetFillStyle(-1);
+	leg->SetBorderSize(0);
+	leg->SetLineColor(0);
+	leg->SetTextFont(42);
+	leg->SetTextSize(0.025);
 	leg->SetLineColor(0);
 
 	int color[10] = {kBlue,kOrange,kGreen,kRed,kMagenta,kPink,kViolet,kCyan,kYellow,kBlack};
@@ -1069,43 +1074,43 @@ int main(int argc, char* argv[]){
 			else {
 				RooRealVar *MH = (RooRealVar*)w_sig->var("MH");
 				if (!MH) MH = (RooRealVar*)w_sig->var("CMS_hgg_mass");
-				RooAbsPdf *sigPDF = (RooAbsPdf*)w_sig->pdf(Form("sigpdfrel%s_allProcs",catname.c_str()));
-				double normalization_singleHiggs = 0.;
-				vector<double> normalizations_singleHiggs ;
-				double normalization_signal = 0.;
-				vector<double> normalizations_signal;
- 				vector<RooAbsPdf*> singleHiggsPDFs;
- 				vector<RooAbsPdf*> signalPDFs;
-				for (int pdf_num=0;pdf_num<singleHiggsNames_.size();pdf_num++):{
-					singleHiggsPDFs.push_back((RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_%s_%s",singleHiggsNames[pdf_num],catname.c_str())));
-					normalizations_singleHiggs.push_back(((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_%s_%s_norm",singleHiggsNames[pdf_num],catname.c_str())))->getVal()*intLumi*1000.)
-				}
-				for (int pdf_num=0;pdf_num<signalNames_.size();pdf_num++):{
-					signalPDFs.push_back((RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_%s_%s",signalNames[pdf_num],catname.c_str())));
-					normalizations_signal.push_back(((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_%s_%s_norm",signalNames[pdf_num],catname.c_str())))->getVal()*intLumi*1000.)
-				}
 				MH->setVal(mhvalue_);
-				RooAddPdf* modelSingleHiggs(Form("modelSingleHiggs_%s",catname.c_str()),"modelSingleHiggs_%s",catname.c_str()),RooArgList(sig,bkg),RooArgList(n_s,Nbkg));
+				RooAbsPdf *sigPDF = (RooAbsPdf*)w_sig->pdf(Form("sigpdfrel%s_allProcs",catname.c_str()));
+				RooAbsPdf *sigPDF_bbgg = (RooAbsPdf*)w_sig->pdf(Form("extendhggpdfsmrel_13TeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_%s",catname.c_str()));
+            double normalization_bbgg = 0.;
+				double normalization_singleHiggs = 0.;
+				double scaleSignal = 10. ; //times to increase and SM xsec BR
+				double scaleSignal_SM = 33.49*0.58*0.00227*2; //times to increase and SM xsec BR
+		//		double scaleSignal = 1.; //times to increase and SM xsec BR
+				normalization_bbgg += ((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017_%s_norm",catname.c_str())))->getVal()*41.5*1000.;
+				std::cout << "Normalization bbgg "<< normalization_bbgg<<std::endl;
+				normalization_bbgg += ((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_GluGluToHHTo2B2G_node_SM_13TeV_madgraph_%s_norm",catname.c_str())))->getVal()*35.9*1000.;
+				std::cout << "Normalization bbgg "<< normalization_bbgg<<std::endl;
+				for (unsigned int pdf_num=0;pdf_num<singleHiggsNames_.size();pdf_num++) {
+					double intLumiYear = 35.9;
+				   if (singleHiggsNames_[pdf_num].find("2017") != string::npos) intLumiYear=41.5;  
+					double singleHiggs_norm_term = ((RooAbsReal *)w_sig->function(Form("hggpdfsmrel_13TeV_%s_%s_norm",singleHiggsNames_[pdf_num].c_str(),catname.c_str())))->getVal()*intLumiYear*1000.;
+					normalization_singleHiggs+=singleHiggs_norm_term;
+				 	std::cout << "Normalization single Higgs "<< singleHiggsNames_[pdf_num].c_str() << singleHiggs_norm_term<<"  "<<intLumiYear << std::endl;
+				}
+					
 
-model2 = ROOT.RooAddPdf("model2","model with less signal",ROOT.RooArgList(sig,bkg),ROOT.RooArgList(fsig2))
-
-				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),Name(Form("first_%s",catname.c_str())));
-				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
+			////	sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),Name(Form("first_%s",catname.c_str())));
+				sigPDF->plotOn(plot,Normalization(normalization_singleHiggs,RooAbsReal::NumEvent),LineColor(kBlue),LineWidth(3));
+				sigPDF->plotOn(plot,Normalization(normalization_singleHiggs,RooAbsReal::NumEvent),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
+				sigPDF->plotOn(plotLC,Normalization(normalization_singleHiggs,RooAbsReal::NumEvent),LineColor(kBlue),LineWidth(3));
 				std::cout << "[INFO] expected number of events in signal PDF " << sigPDF->expectedEvents(*MH) << std::endl;	
 			//	sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal()/*get intlumi (/fb) from ws, and divide by 100 for /pb */,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				//sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal(),RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
-				 
-				sigPDF->plotOn(plotLC,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				TObject *sigLeg = (TObject*)plot->getObject(plot->numItems()-1);
-				leg->AddEntry(sigLeg,Form("Sig model m_{H}=%.1fGeV",MH->getVal()),"L");
+				leg->AddEntry(sigLeg,Form("Single Higgs m_{H}=%.1fGeV",MH->getVal()),"L");
 
-				sigPDF_bbgg->plotOn(plot,Normalization(normalization_bbgg,RooAbsReal::NumEvent),LineColor(kRed),LineWidth(3));//,AddTo(Form("first_%s",catname.c_str())));
-				sigPDF_bbgg->plotOn(plotLC,Normalization(normalization_bbgg,RooAbsReal::NumEvent),LineColor(kRed),LineWidth(3));
+				sigPDF_bbgg->plotOn(plot,Normalization(normalization_bbgg*scaleSignal*scaleSignal_SM,RooAbsReal::NumEvent),LineColor(kViolet),LineWidth(3));//,AddTo(Form("first_%s",catname.c_str())));
+				sigPDF_bbgg->plotOn(plotLC,Normalization(normalization_bbgg*scaleSignal*scaleSignal_SM,RooAbsReal::NumEvent),LineColor(kViolet),LineWidth(3));
 		    	TObject *sigLeg_bbgg = (TObject*)plot->getObject(plot->numItems()-1);
-				leg->AddEntry(sigLeg_bbgg,Form("Sig model bbgg m_{H}=%.1fGeV",MH->getVal()),"L");
+				leg->AddEntry(sigLeg_bbgg,Form("Signal SM x %.0f",scaleSignal),"L");
 				outWS->import(*sigPDF);
 				outWS->import(*sigPDF_bbgg);
-				plot->Print("v");
 			}
 		}
 
@@ -1132,6 +1137,10 @@ model2 = ROOT.RooAddPdf("model2","model with less signal",ROOT.RooArgList(sig,bk
 
 		if (unblind) plot->SetMinimum(0.0001);
 		plot->GetYaxis()->SetTitleOffset(1.3);
+		plot->GetXaxis()->SetLabelSize(0.0);
+		plot->GetYaxis()->SetTitle("Events / GeV");
+    //  plot->GetYaxis()->SetTitleSize(0.1);
+	//	plot->GetYaxis()->SetLabelSize(0.1);
 		canv->Modified();
 		canv->Update();
   ///start extra bit for ratio plot///
@@ -1167,9 +1176,11 @@ model2 = ROOT.RooAddPdf("model2","model with less signal",ROOT.RooArgList(sig,bk
   hdummy->SetMaximum(hdatasub->GetHistogram()->GetMaximum()+1);
   hdummy->SetMinimum(hdatasub->GetHistogram()->GetMinimum()-1);
   hdummy->GetYaxis()->SetTitle("data - best fit PDF");
-  hdummy->GetYaxis()->SetTitleSize(0.12);
   hdummy->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-  hdummy->GetXaxis()->SetTitleSize(0.12);
+  hdummy->GetXaxis()->SetTitleSize(0.1);
+  hdummy->GetXaxis()->SetLabelSize(0.1);
+  hdummy->GetYaxis()->SetTitleSize(0.1);
+  hdummy->GetYaxis()->SetLabelSize(0.1);
   hdummy->Draw("HIST");
 	if (doBands) twoSigmaBand_r->Draw("L3 SAME");
 	if (doBands) oneSigmaBand_r->Draw("L3 SAME");

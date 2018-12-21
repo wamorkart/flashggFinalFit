@@ -266,8 +266,10 @@ print "[INFO] Get Intlumi from file, value : ", intL," pb^{-1}", " sqrts ", sqrt
 file_ext = 'data'
 dataFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
 bkgFile = 'CMS-HGG_%s_%dTeV_multipdf.root'%(file_ext,sqrts)
-dataFile = 'CMS-HGG_multipdf_HHbbgg_data2016_2017_13_12_2018.root'
-bkgFile = 'CMS-HGG_multipdf_HHbbgg_data2016_2017_13_12_2018.root'
+#dataFile = 'CMS-HGG_multipdf_HHbbgg_data2016_2017_13_12_2018.root'
+#dataFile = 'CMS-HGG_multipdf_HHbbgg_data2017_only_13_12_2018.root'
+dataFile = 'CMS-HGG_multipdf_HHbbgg_data2016_only_13_12_2018.root'
+bkgFile = dataFile 
 dataWS = 'multipdf'
 bkgWS = 'multipdf'
 #sigFile = 'CMS-HGG_%s_%dTeV_sigfit.root'%(file_ext,sqrts)

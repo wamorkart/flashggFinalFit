@@ -512,12 +512,18 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   //std::cout << " [RESOLUTION CHECK] Ta/Procg " << data->GetName() << ", Mass " << mass->getVal() << " sigmaEff=" << 0.5*(semax-semin) << " , FWMH=" << (fwmax-fwmin)/2.35 << "" << std::endl;
 
   //TLatex lat1(0.65,0.85,"#splitline{CMS Simulation}{}");
-  TLatex  lat1(.129+0.03+offset,0.85,"H#rightarrow#gamma#gamma");
+  
+  TString newtitle = "H#rightarrow#gamma#gamma";
+  if (title.find("GluGluToHHTo2B2G_node_SM_13TeV_madgraph") != std::string::npos) newtitle = "HH SM : H#rightarrow bb H#rightarrow#gamma#gamma"; 
+  TLatex  lat1(.129+0.03+offset,0.85,newtitle);
   lat1.SetNDC(1);
   lat1.SetTextSize(0.047);
 
   TString catLabel_humanReadable  = title;
-  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","HH SM");
+//  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017","H#rightarrow bb H#rightarrow#gamma#gamma");
+//  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","H#rightarrow bb H#rightarrow#gamma#gamma");
+  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017","");
+  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","");
   catLabel_humanReadable.ReplaceAll("GluGluToHToGG","GF Tag");
   catLabel_humanReadable.ReplaceAll("_"," ");
   catLabel_humanReadable.ReplaceAll("UntaggedTag","Untagged");
@@ -528,7 +534,7 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   catLabel_humanReadable.ReplaceAll("VH","VH Tag");
   catLabel_humanReadable.ReplaceAll("TTHHadronicTag","TTH Hadronic Tag");
   catLabel_humanReadable.ReplaceAll("all","All Categories");
-  catLabel_humanReadable.ReplaceAll("DoubleHTag","MVA");
+  catLabel_humanReadable.ReplaceAll("DoubleHTag","CAT");
 
   TLatex lat2(0.93,0.88,catLabel_humanReadable);
   lat2.SetTextAlign(33);

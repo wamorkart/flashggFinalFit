@@ -14,12 +14,12 @@ wsname = 'wsig_13TeV'
 wsname_bkg = 'multipdf'
 
 num_cat = 12
-#lumi_2016=35.9*1000
-#lumi_2017=41.5*1000
-lumi_2016=10000.
-lumi_2017=10000.
-#SMsignal=33.49*0.58*0.00227*2
-SMsignal=1
+lumi_2016=35.9*1000
+lumi_2017=41.5*1000
+SMsignal=33.49*0.58*0.00227*2
+#lumi_2016=1000.
+#lumi_2017=1000.
+#SMsignal=1
 #names='GluGluToHHTo2B2G_node_SM_13TeV_madgraph,GluGluHToGG_M_125_13TeV_powheg_pythia8,VBFHToGG_M_125_13TeV_powheg_pythia8,ttHToGG_M125_13TeV_powheg_pythia8_v2,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8,GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017,GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_2017,VBFHToGG_M125_13TeV_amcatnlo_pythia8_2017,ttHToGG_M125_13TeV_powheg_pythia8_2017,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017'.split(',')
 names='GluGluToHHTo2B2G_node_SM_13TeV_madgraph,GluGluHToGG_M_125_13TeV_powheg_pythia8,VBFHToGG_M_125_13TeV_powheg_pythia8,ttHToGG_M125_13TeV_powheg_pythia8_v2,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8,GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017,GluGluHToGG_M_125_13TeV_powheg_pythia8_2017,VBFHToGG_M125_13TeV_amcatnlo_pythia8_2017,ttHToGG_M125_13TeV_powheg_pythia8_2017,VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017'.split(',')
 tpMap = {"GluGluToHHTo2B2G_node_SM_13TeV_madgraph":"HHbbgg_2016","GluGluHToGG_M_125_13TeV_powheg_pythia8":"GF_2016","VBFHToGG_M_125_13TeV_powheg_pythia8":"VBF_2016","ttHToGG_M125_13TeV_powheg_pythia8_v2":"ttH_2016","VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8":"VH_2016","GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017":"HHbbgg_2017","GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_2017":"GF_2017","GluGluHToGG_M_125_13TeV_powheg_pythia8_2017":"GF_2017","VBFHToGG_M125_13TeV_amcatnlo_pythia8_2017":"VBF_2017","ttHToGG_M125_13TeV_powheg_pythia8_2017":"ttH_2017","VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_2017":"VH_2017"}
@@ -39,19 +39,16 @@ for name in names:
 	entries_per_cat[tpMap[name]] = [] 
 	for cat in range(0,num_cat):
 		ws_name = 'hggpdfsmrel_13TeV_%s_DoubleHTag_%d_norm'%(name,cat)
-		print ws_name
 		var = (ws.var('MH'))
-		var.setVal(130)
+		var.setVal(125.)
 		entries = (ws.function(ws_name).getVal())
-		print entries
 		sum_entries[name] = entries
 		count = entries*lumi
-		print count
 		if 'HHbbgg' in tpMap[name] : count*=SMsignal
 		sum+=count
 		entries_per_cat[tpMap[name]].append(count)
 	#	print '%.2f\t'%(count),
-		print '%.4f\t'%(count),
+		print '%.4f\t'%(count),'&',
 	print '%.2f'%sum
 
 
@@ -68,8 +65,8 @@ for cat in range(0,num_cat):
 	sum_entries_bkg[name] = entries
 	sum_bkg+=entries
 	entries_per_cat[dataname].append(entries)
-	print '%.2f\t'%(entries),
-print '%.2f'%sum_bkg
+	print '%d\t'%(entries),'&',
+print '%d'%sum_bkg
 
 ########################
 #filename_bkg_2016 = '/afs/cern.ch/work/n/nchernya/ETH/DiHiggs/root_file/02_11_2018/2016/output_DoubleEG_micheli-ReMiniAOD2016.root'
@@ -91,11 +88,11 @@ for num,name in enumerate([filename_bkg_2016,filename_bkg_2017,filename_bkg_tota
 		entries = ws_bkg.data(catname).sumEntries()
 		sum_entries_bkg[catname] = entries
 		sum_bkg+=entries
-		print '%.2f\t'%(entries),
+		print '%d\t'%(entries),'&',
 		entries_per_cat['Data'+years[num]].append(entries)
-	print '%.2f\t'%(sum_bkg)
+	print '%d\t'%(sum_bkg)
 
 
 
-result = open("full_yields_13_12_2018.txt","w")
+result = open("full_yields_18_12_2018.txt","w")
 result.write(json.dumps(entries_per_cat))
