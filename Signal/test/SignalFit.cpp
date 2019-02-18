@@ -33,6 +33,7 @@
 #include "boost/algorithm/string/classification.hpp"
 #include "boost/algorithm/string/predicate.hpp"
 
+
 using namespace std;
 using namespace RooFit;
 using namespace boost;
@@ -43,6 +44,7 @@ typedef map<pair<string,string>, std::pair<parlist_t,parlist_t> > parmap_t;
 typedef map<pair<string,string>,map<string,RooSpline1D*> > clonemap_t;
 
 string filenameStr_;
+string dirnameStr_;
 vector<string> filename_;
 
 string outfilename_;
@@ -111,6 +113,8 @@ string referenceProcWV_="GG2H";
 string referenceProcTTH_="TTH";
 string referenceTagWV_="UntaggedTag_2";
 string referenceTagRV_="UntaggedTag_2";
+string optReferenceProc_ = "";
+string optReferenceTag_ = "";
 vector<string> map_proc_;
 vector<string> map_cat_;
 vector<string> map_replacement_proc_RV_;
@@ -130,6 +134,7 @@ void OptionParser(int argc, char *argv[]){
 	desc1.add_options()
 		("help,h",                                                                                			"Show help")
 		("infilename,i", po::value<string>(&filenameStr_),                                           			"Input file name")
+		("indir", po::value<string>(&dirnameStr_),                                           			"Input file dir name")
 		("outfilename,o", po::value<string>(&outfilename_)->default_value("CMS-HGG_sigfit.root"), 			"Output file name")
 		("merge,m", po::value<string>(&mergefilename_)->default_value(""),                               	        "Merge the output with the given workspace")
 		("datfilename,d", po::value<string>(&datfilename_)->default_value("dat/newConfig.dat"),      			"Configuration file")
@@ -162,7 +167,10 @@ void OptionParser(int argc, char *argv[]){
 		("useDCBplusGaus",	po::value<bool>(&useDCBplusGaus_)->default_value(false),														"Use Double Crystal Ball plus 1 Gaussian to do fits instead of a sum of Gaussians")
       ("split", po::value<string>(&splitStr_)->default_value(""), "do just one tag,proc ")
 		("changeIntLumi",	po::value<float>(&newIntLumi_)->default_value(0),														"If you want to specify an intLumi other than the one in the file. The event weights and rooRealVar IntLumi are both changed accordingly. (Specify new intlumi in fb^{-1})")
-		("flashggCats,f", po::value<string>(&flashggCatsStr_)->default_value("UntaggedTag_0,UntaggedTag_1,UntaggedTag_2,UntaggedTag_3,UntaggedTag_4,VBFTag_0,VBFTag_1,VBFTag_2,TTHHadronicTag,TTHLeptonicTag,VHHadronicTag,VHTightTag,VHLooseTag,VHEtTag"),       "Flashgg categories if used")
+    ("refProc", po::value<		string>(&optReferenceProc_)->default_value(""),            			"reference proc for replacement")
+    ("refTag", po::value<		string>(&optReferenceTag_)->default_value(""),            			"reference tag for replacement")
+//`		("flashggCats,f", po::value<string>(&flashggCatsStr_)->default_value("UntaggedTag_0,UntaggedTag_1,UntaggedTag_2,UntaggedTag_3,UntaggedTag_4,VBFTag_0,VBFTag_1,VBFTag_2,TTHHadronicTag,TTHLeptonicTag,VHHadronicTag,VHTightTag,VHLooseTag,VHEtTag"),       "Flashgg categories if used")
+		("flashggCats,f", po::value<string>(&flashggCatsStr_)->default_value("DoubleHTag_0,DoubleHTag_1,DoubleHTag_2,DoubleHTag_3,DoubleHTag_4,DoubleHTag_5,DoubleHTag_6,DoubleHTag_7,DoubleHTag_8,DoubleHTag_9,DoubleHTag_10,DoubleHTag_11"),       "Flashgg categories if used")
 		;                                                                                             		
 	po::options_description desc("Allowed options");
 	desc.add(desc1);
@@ -220,6 +228,24 @@ void OptionParser(int argc, char *argv[]){
 	split(flashggCats_,flashggCatsStr_,boost::is_any_of(","));
 	split(filename_,filenameStr_,boost::is_any_of(","));
   split(split_,splitStr_,boost::is_any_of(",")); // proc,cat
+	vector<string> massListVector_;
+	split(massListVector_,massListStr_,boost::is_any_of(","));
+
+   vector<string> dirfilename_;
+   string fullFilename_ = "";
+	if( !(dirnameStr_.empty()) ){
+      for (int iname =0 ; iname < filename_.size() ; iname++){
+			for (int mass_num = 0; mass_num < massListVector_.size(); mass_num++) {
+        		dirfilename_.push_back(dirnameStr_+"/"+filename_[iname]+"_"+massListVector_[mass_num]+".root");
+			}
+	   }
+      for (int iname =0 ; iname < dirfilename_.size() ; iname++){
+        if (iname<(dirfilename_.size()-1)) fullFilename_=fullFilename_+dirfilename_[iname]+",";
+        if (iname==dirfilename_.size()-1) fullFilename_=fullFilename_+dirfilename_[iname];
+		}
+	}
+	filenameStr_ = fullFilename_;
+
 
 }
 
@@ -447,18 +473,26 @@ int main(int argc, char *argv[]){
   // reference details for low stats cats
   // need to make this configurable ?! -LC
   //referenceProc_="ggh";
-  referenceProc_="GG2H";
   referenceProc_="GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017";
   referenceProc_="ttHToGG_M125_13TeV_powheg_pythia8_2017";
   referenceProc_="ttHToGG_M125_13TeV_powheg_pythia8_v2";
-  //referenceProcTTH_="tth";
- // referenceProcTTH_="TTH";
-//  referenceTagWV_="UntaggedTag_2"; // histest stats WV is ggh Untagged 3. 
- // referenceTagRV_="UntaggedTag_2"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
+  referenceProc_="GluGluToHHTo2B2G_node_0_13TeV_madgraph";
+  referenceProc_=procs_[0] ;
+  if( !(optReferenceProc_.empty()) ){
+    referenceProc_ = optReferenceProc_;
+  }
+  std::cout<<"referenceProc_ "<<referenceProc_<<std::endl;
+
   referenceTagWV_="DoubleHTag_1"; // histest stats WV is ggh Untagged 3. 
   referenceTagRV_="DoubleHTag_1"; // fairly low resolution tag even for ggh, more approprioate as te default than re-using the original tag.
   // are WV which needs to borrow should be taken from here
-  
+  if ( !(optReferenceTag_.empty()) ){
+    referenceTagWV_ = optReferenceTag_;
+    referenceTagRV_ = optReferenceTag_;
+  }
+ 
+
+ 
   // isFlashgg should now be the only option.
 	if (isFlashgg_){ 
     nCats_= flashggCats_.size();

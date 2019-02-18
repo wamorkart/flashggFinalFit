@@ -84,6 +84,9 @@ parser.add_option("--massList",default="120,125,130")
 parser.add_option("-f","--flashggCats",default=None)
 parser.add_option("--bs",default=5.14)
 parser.add_option("--expected",type="int",default=None)
+parser.add_option("--refProc",default="",help="ref replacement process")
+parser.add_option("--refTag",default="",help="ref replacement tag ")
+parser.add_option("--indir",default="",help="infile directory ")
 (opts,args) = parser.parse_args()
 
 defaults = copy(opts)
@@ -96,10 +99,21 @@ def system(exec_line):
 def writePreamble(sub_file):
   #print "[INFO] writing preamble"
   sub_file.write('#!/bin/bash\n')
-  sub_file.write('sleep $[ ( $RANDOM % 10 )  + 1 ]s\n')
+  if (opts.batch == "T3CH"):
+      sub_file.write('set -x\n')
   sub_file.write('touch %s.run\n'%os.path.abspath(sub_file.name))
   sub_file.write('cd %s\n'%os.getcwd())
+  if (opts.batch == "T3CH"):
+      sub_file.write('source $VO_CMS_SW_DIR/cmsset_default.sh\n')
+      sub_file.write('source /mnt/t3nfs01/data01/swshare/glite/external/etc/profile.d/grid-env.sh\n')
+      sub_file.write('export SCRAM_ARCH=slc6_amd64_gcc481\n')
+      sub_file.write('export LD_LIBRARY_PATH=/swshare/glite/d-cache/dcap/lib/:$LD_LIBRARY_PATH\n')
+      sub_file.write('set +x\n') 
   sub_file.write('eval `scramv1 runtime -sh`\n')
+  if (opts.batch == "T3CH"):
+      sub_file.write('set -x\n') 
+  if (opts.batch == "T3CH" ) : 
+      sub_file.write('cd $TMPDIR\n')
   sub_file.write('number=$RANDOM\n')
   sub_file.write('mkdir -p scratch_$number\n')
   sub_file.write('cd scratch_$number\n')
@@ -128,6 +142,8 @@ def writePostamble(sub_file, exec_line):
     system('rm -f %s.log'%os.path.abspath(sub_file.name))
     system('rm -f %s.err'%os.path.abspath(sub_file.name))
     if (opts.batch == "LSF") : system('bsub -q %s -o %s.log %s'%(opts.queue,os.path.abspath(sub_file.name),os.path.abspath(sub_file.name)))
+    if (opts.batch == "T3CH") : 
+      system('qsub -q %s -o %s.log -e %s.err %s'%(opts.queue,os.path.abspath(sub_file.name),os.path.abspath(sub_file.name),os.path.abspath(sub_file.name)))
     if (opts.batch == "IC") : 
       system('qsub -q %s -l h_rt=0:20:0 -o %s.log -e %s.err %s'%(opts.queue,os.path.abspath(sub_file.name),os.path.abspath(sub_file.name),os.path.abspath(sub_file.name)))
       #print "system(",'qsub -q %s -o %s.log -e %s.err %s '%(opts.queue,os.path.abspath(sub_file.name),os.path.abspath(sub_file.name),os.path.abspath(sub_file.name)),")"
@@ -141,6 +157,17 @@ def writePostamble(sub_file, exec_line):
 system('mkdir -p %s/SignalFitJobs/outputs'%opts.outDir)
 print ('mkdir -p %s/SignalFitJobs/outputs'%opts.outDir)
 counter=0
+refProcOpt = ""
+refTagOpt = ""
+indirOpt = ""
+
+if opts.refProc:
+    refProcOpt = " --refProc "+str(opts.refProc)
+if opts.refTag:
+    refTagOpt = " --refTagWV "+str(opts.refTag)
+if opts.indir:
+    indirOpt = " --indir "+str(opts.indir)
+
 for proc in  opts.procs.split(","):
   for cat in opts.flashggCats.split(","):
     print "job ", counter , " - ", proc, " - ", cat
@@ -152,7 +179,7 @@ for proc in  opts.procs.split(","):
       bsRW=0
     else:
       bsRW=1
-    exec_line = "%s/bin/SignalFit --verbose 0 -i %s -d %s/%s  --mhLow=%s --mhHigh=%s -s %s/%s --procs %s -o  %s/%s -p %s/%s -f %s --changeIntLumi %s --binnedFit 1 --nBins 320 --split %s,%s --beamSpotReweigh %d --dataBeamSpotWidth %f --massList %s --useDCBplusGaus %s --useSSF %s -C -1" %(os.getcwd(), opts.infile,os.getcwd(),opts.datfile,opts.mhLow, opts.mhHigh, os.getcwd(),opts.systdatfile, opts.procs,os.getcwd(),opts.outfilename.replace(".root","_%s_%s.root"%(proc,cat)), os.getcwd(),opts.outDir, opts.flashggCats ,opts.changeIntLumi, proc,cat,bsRW,float(opts.bs), opts.massList, opts.useDCB_1G, opts.useSSF)
+    exec_line = "%s/bin/SignalFit --verbose 0 -i %s -d %s/%s  --mhLow=%s --mhHigh=%s -s %s/%s --procs %s -o  %s/%s -p %s/%s -f %s --changeIntLumi %s --binnedFit 1 --nBins 320 --split %s,%s --beamSpotReweigh %d --dataBeamSpotWidth %f --massList %s --useDCBplusGaus %s --useSSF %s %s %s %s" %(os.getcwd(), opts.infile,os.getcwd(),opts.datfile,opts.mhLow, opts.mhHigh, os.getcwd(),opts.systdatfile, opts.procs,os.getcwd(),opts.outfilename.replace(".root","_%s_%s.root"%(proc,cat)), os.getcwd(),opts.outDir, opts.flashggCats ,opts.changeIntLumi, proc,cat,bsRW,float(opts.bs), opts.massList, opts.useDCB_1G, opts.useSSF,refProcOpt,refTagOpt,indirOpt)
     #print exec_line
     writePostamble(file,exec_line)
 
