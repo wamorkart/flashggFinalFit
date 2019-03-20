@@ -1,7 +1,7 @@
 flashggFinalFit for H-->aa-->4gamma analysis
 =======
 
-How to run flashgg final fit package for the H-->aa-->4gamma analysis
+How to run flashgg final fit package for the H-->aa-->4gamma analysis (currently working on 2016 samples and data)
 
 #### The most recent branch is Tanvi_H4G
 
@@ -54,4 +54,6 @@ Any special instructions needed to run on the H4gamma analysis will also be spec
 
 Once the workspaces are created, we can proceed with building the signal model.
 `Issue: flashggfinalfit requires several mass points in order to create a signal model, and then it proceeds with interpolating between the different mass points`
-How do we get around this?
+How do we get around this? :confused:
+
+* First step is to determine the number of gaussians needed to fit the higgs mass distribution, in both the right vertex (RV) and the wrong vertex (WV) case (this is determined by a `dZ < 1` cut)
