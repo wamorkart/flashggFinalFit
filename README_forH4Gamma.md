@@ -46,3 +46,6 @@ Moving on...
 The package contains different folder to create the background model and signal model, generate the datacards and run "combine " for performing the statistical interpretation.
 Instructions for each of the steps are available in the readme section of the respective folders.
 Any special instructions needed to run on the H4gamma analysis will also be specified.
+
+## Signal Model
+We have several mass points in the H4Gamma analysis i.e, several values of m(a). We want to scan the values of m(a) and for each value, fit the m(h) distribution. The way we do this (may need to be revised in the future) is by performing a Gaussian fit to the average diphoton mass distribution, acquiring the mean and sigma of the fit, and apply a selection of higgs mass s.t we only look at m(a) in a 2 sigma window. We do this for each m(a), thereby scanning the m(a) values. The script that does this fitting and produces workspaces for signal MC is here __https://github.com/wamorkart/flashgg/blob/Tanvi_H4G/FitTools/mkSignalWS.py__
