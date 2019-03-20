@@ -41,3 +41,8 @@ make
 cd ${CMSSW_BASE}/src/flashggFinalFit/Signal
 make
 ```
+Moving on...
+## Flashggfinalfit details
+The package contains different folder to create the background model and signal model, generate the datacards and run "combine " for performing the statistical interpretation.
+Instructions for each of the steps are available in the readme section of the respective folders.
+Any special instructions needed to run on the H4gamma analysis will also be specified.
