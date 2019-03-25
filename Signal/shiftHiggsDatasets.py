@@ -2,7 +2,6 @@ import ROOT
 from ROOT import *
 import argparse
 import optparse
-# from optparse import OptionParser, make_option
 import sys
 import os
 
@@ -17,21 +16,25 @@ print "pseudoscalar mass =",mass
 
 inputFiles = []
 for m in mass:
-    inputFiles.append('/eos/cms/store/user/twamorka/NTuples_17Feb2019/Test_SignalWS/w_signal_'+str(m))#+'.root')
+    inputFiles.append('/eos/cms/store/user/twamorka/NTuples_17Feb2019/Test_SignalWS/w_signal_'+str(m))
 
-values = [-5.,0.,5.]
-higgs_mass = 125.
+values = [-5,0,5]
+higgs_mass = 125
 
-ws_name = 'tagsDumper/cms_h4g_13TeV_4photons'
-dataset_name = 'Data_13TeV_4photons'
+# ws_name = 'tagsDumper/cms_h4g_13TeV_4photons'
+# dataset_name = 'Data_13TeV_4photons'
+ws_name = 'tagsDumper/cms_h4g_13TeV'
+dataset_name = 'h4g_13TeV_4photons'
 
 for fi, f in enumerate(inputFiles):
     print "Looking at ", f
     temp_ws = TFile(f+'.root').Get(ws_name)
+    temp_ws.Print()
     for value in values:
         shift = value + higgs_mass
         # temp_ws.Print()
-        dataset = (temp_ws.data(dataset_name)).Clone(dataset_name+'_'+str(value))
+        # dataset = (temp_ws.data(dataset_name)).Clone(dataset_name+'_'+str(shift))
+        dataset = (temp_ws.data(dataset_name)).Clone('h4g_'+str(shift)+'_13TeV_4photons')
         dataset.Print()
         dataset.changeObservableName('tp_mass','tp_mass_old')
         higgs_old = dataset.get()['tp_mass_old']
@@ -39,10 +42,10 @@ for fi, f in enumerate(inputFiles):
         dataset.addColumn(higgs_new).setRange(100,180)
         dataset.Print()
 
-        output = TFile(f+'_'+str(value)+'.root','RECREATE')
+        output = TFile(f+'_'+str(shift)+'.root','RECREATE')
         output.mkdir("tagsDumper")
         output.cd("tagsDumper")
-        ws_new = ROOT.RooWorkspace("cms_h4g_13TeV_4photons")#,'cms_h4g_13TeV_4photons')
+        ws_new = ROOT.RooWorkspace("cms_h4g_13TeV_4photons")
         getattr(ws_new,'import')(dataset,RooCmdArg())
         ws_new.Write()
         output.Close()
