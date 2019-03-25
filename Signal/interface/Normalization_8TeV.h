@@ -22,7 +22,7 @@ class Normalization_8TeV {
 	Normalization_8TeV();
 
 	int Init(int sqrtS);
-	
+
 	double GetBR(double);
 	// double GetBR(int);
 	double GetXsection(double,TString);
@@ -34,13 +34,13 @@ class Normalization_8TeV {
 	TString GetProcess(int);
 	void CheckNorm(double,double,double,TString);
 	void FillSignalTypes();
-	void PlotExpected(double ,double);	
-	void PlotBR(double ,double);	
-	void PlotXS(double ,double);	
+	void PlotExpected(double ,double);
+	void PlotBR(double ,double);
+	void PlotXS(double ,double);
 
 	TGraph * GetSigmaGraph(TString process);
 	TGraph * GetBrGraph();
-	
+
 	std::map<int,std::pair<TString,double > > & SignalType() { return SignalTypeMap; }
  private:
 	std::map<double,double> BranchingRatioMap;
@@ -63,9 +63,10 @@ class Normalization_8TeV {
 	std::map<double,double> XSectionMap_testBBH;
 	std::map<double,double> XSectionMap_testTHQ;
 	std::map<double,double> XSectionMap_testTHW;
+  std::map<double,double> XSectionMap_testH4gamma;
 
 	std::map<int,std::pair<TString,double > > SignalTypeMap;
-	
+
 	bool is2011_;
 
 };

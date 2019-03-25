@@ -22,7 +22,7 @@ int Normalization_8TeV::Init(int sqrtS){
 			return 0;
     }
     TPython::Eval(Form("buildSMHiggsSignalXSBR.Init%dTeV()", sqrtS));
-    
+
     for (double mH=120;mH<=135.0;mH+=0.1){ // Do we need this up to 250 ?
 	double valBR    =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getBR(%f)",mH));
 	double valXSggH =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ggH"));
@@ -32,23 +32,26 @@ int Normalization_8TeV::Init(int sqrtS){
 	double valXSZH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ZH"));
 	double valXSbbH  =  (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"bbH"));
 	BranchingRatioMap[mH]	= valBR;
-        XSectionMap_ggh[mH]	= valXSggH; 	
-        XSectionMap_vbf[mH]	= valXSqqH; 	
-        XSectionMap_tth[mH]	= valXSttH; 	
-        XSectionMap_wh[mH]	= valXSWH; 	
-        XSectionMap_zh[mH]	= valXSZH;	
-        XSectionMap_wzh[mH]	= valXSWH+valXSZH;	
+        XSectionMap_ggh[mH]	= valXSggH;
+        XSectionMap_vbf[mH]	= valXSqqH;
+        XSectionMap_tth[mH]	= valXSttH;
+        XSectionMap_wh[mH]	= valXSWH;
+        XSectionMap_zh[mH]	= valXSZH;
+        XSectionMap_wzh[mH]	= valXSWH+valXSZH;
 
-        XSectionMap_QQ2HLNU[mH]	= valXSWH*(3.*10.86*0.01)/*3xBR(W to lv)*/;	
-        XSectionMap_QQ2HLL[mH]	= valXSZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;	
-        XSectionMap_VH2HQQ[mH]	= valXSWH*(67.41*0.01)/*BR(W to hadrons)*/ + valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;	
+        XSectionMap_QQ2HLNU[mH]	= valXSWH*(3.*10.86*0.01)/*3xBR(W to lv)*/;
+        XSectionMap_QQ2HLL[mH]	= valXSZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;
+        XSectionMap_VH2HQQ[mH]	= valXSWH*(67.41*0.01)/*BR(W to hadrons)*/ + valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;
         XSectionMap_WH2HQQ[mH]	= valXSWH*(67.41*0.01)/*BR(W to hadrons)*/;
-        XSectionMap_ZH2HQQ[mH]	= valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;	
+        XSectionMap_ZH2HQQ[mH]	= valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;
 
         XSectionMap_testBBH[mH]	= valXSbbH;
         XSectionMap_testTHQ[mH]	= 0.074;
         XSectionMap_testTHW[mH]	= 0.015;
-	
+
+        XSectionMap_testH4gamma[mH]	= 0.001; //__FIX : for h4gamma process
+
+
     }
 
     //Graviton X-Sections - assume the same as SM
@@ -68,7 +71,7 @@ void Normalization_8TeV::FillSignalTypes(){
   SignalTypeMap[-78]=std::make_pair<TString,double>("vbf",126);
   SignalTypeMap[-80]=std::make_pair<TString,double>("wzh",126);
   SignalTypeMap[-79]=std::make_pair<TString,double>("tth",126);
-  
+
   SignalTypeMap[-57]=std::make_pair<TString,double>("ggh",123);
   SignalTypeMap[-58]=std::make_pair<TString,double>("vbf",123);
   SignalTypeMap[-60]=std::make_pair<TString,double>("wzh",123);
@@ -184,6 +187,8 @@ TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if ( process.Contains("testTHW") ) {
 		XSectionMap = &XSectionMap_testTHW;
+  } else if ( process.Contains("testH4gamma") ) {
+    XSectionMap = &XSectionMap_testH4gamma;
 	} else {
 		std::cout << "[WARNING] Warning ggh, vbf, wh, zh, wzh, tth or grav or STXS proc not found in histname!!!!" << std::endl;
 		//exit(1);
@@ -266,6 +271,8 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
 		XSectionMap = &XSectionMap_testTHQ;
 	} else if (HistName.Contains("testTHW")) {
 		XSectionMap = &XSectionMap_testTHW;
+  } else if ( HistName.Contains("testH4gamma") ) {
+    XSectionMap = &XSectionMap_testH4gamma;
 	} else {
 		std::cout << "[WARNING] Warning ggh, vbf, wh, zh, wzh, tth or grav or STXS proc not found in " << HistName << std::endl;
 		//exit(1);
@@ -299,7 +306,7 @@ double Normalization_8TeV::GetVBFCorrection(double mass) {
 
 // Simple accessors
 TString Normalization_8TeV::GetProcess(int ty){
-	if (ty < -7999){  // We dont go below 80 GeV and Spin samples in the 100 range 
+	if (ty < -7999){  // We dont go below 80 GeV and Spin samples in the 100 range
 		int process = -ty % 1000;
 		if (process == 0 ) return "ggh";
 		else if (process == 10 ) return "ggh_minlo";
@@ -325,7 +332,7 @@ TString Normalization_8TeV::GetProcess(int ty){
 double Normalization_8TeV::GetMass(int ty){
 	if (ty < -7999){  // We dont go below 80 GeV and Spin samples in the 100 range
 		return double(-ty/1000);
-	}	 
+	}
 	else return SignalTypeMap[ty].second;
 }
 
@@ -422,7 +429,7 @@ void Normalization_8TeV::PlotXS(double Min, double Max){
 		vbf->SetPoint(i,mH,GetXsection(mH,"vbf"));
 		wh->SetPoint(i,mH,GetXsection(mH,"wh"));
 		zh->SetPoint(i,mH,GetXsection(mH,"zh"));
-		tth->SetPoint(i,mH,GetXsection(mH,"tth"));	
+		tth->SetPoint(i,mH,GetXsection(mH,"tth"));
 		i++;
 	}
 	can->SetLogy();
@@ -451,7 +458,7 @@ void Normalization_8TeV::PlotBR(double Min, double Max){
 	ggh->SetLineWidth(3);
 	int i=0;
 	for(double mH = Min;mH<=Max;mH+=0.5){
-		ggh->SetPoint(i,mH,GetBR(mH));	
+		ggh->SetPoint(i,mH,GetBR(mH));
 		i++;
 	}
 	can->SetLogy();
@@ -505,5 +512,3 @@ void Normalization_8TeV::PlotExpected(double Min, double Max){
 	if (is2011_)	can->SaveAs("signalnormalization_7TeV.pdf");
 	else		can->SaveAs("signalnormalization_8TeV.pdf");
 }
-
-
