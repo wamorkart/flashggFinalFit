@@ -54,6 +54,13 @@ Any special instructions needed to run on the H4gamma analysis will also be spec
    * It reads a signal ntuple (output of the H4Gamma tagger of flashgg); the ntuples are currently stored here **/eos/cms/store/user/twamorka/NTuples_17Feb2019/Signal/**
    * Sample ntuple for m(a) = 60 GeV  is stored here **/afs/cern.ch/work/t/twamorka/public/forBadder/signal_m_60.root**  (would need to change the input file location in the script)
    * How to run? `python mkSignalWS_h4g.py --mass 60`
+   * Sample output file **/afs/cern.ch/work/t/twamorka/public/forBadder/w_signal_60.root**
+2. flashggfinalfit requires several mass points in order to create a signal model, and then it proceeds with interpolating between the different mass points. We get around this by creating    "fake" signal points at m(h) = 120 and 130 GeV. We do this by copying the roodataset for m(h) = 125 GeV, and shifting all points up and down by 5 GeV.
+  * The script for that is here __https://github.com/wamorkart/flashggFinalFit/blob/Tanvi_H4G/Signal/shiftHiggsDatasets.py__
+  * This takes an input the signal WS that was produced in step 1 and produces three WS's as output, one each for m(h) value at 120, 125, 130 GeV.
+  * How to run? `python shiftHiggsDatasets.py --mass 60`
+  * Sample input file **/afs/cern.ch/work/t/twamorka/public/forBadder/w_signal_60.root**
+  * Sample output files **/afs/cern.ch/work/t/twamorka/public/forBadder/w_signal_60_120.root**, **/afs/cern.ch/work/t/twamorka/public/forBadder/w_signal_60_125.root** and **/afs/cern.ch/work/t/twamorka/public/forBadder/w_signal_60_130.root**
 
 Once the workspaces are created, we can proceed with building the signal model.
 `Issue: flashggfinalfit requires several mass points in order to create a signal model, and then it proceeds with interpolating between the different mass points`
