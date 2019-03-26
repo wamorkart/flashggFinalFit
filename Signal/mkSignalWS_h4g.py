@@ -1,4 +1,5 @@
 import ROOT
+from ROOT import *
 import optparse
 import argparse
 
@@ -22,8 +23,8 @@ mean =  fitResultPtr.GetParams()[1]
 sigma = fitResultPtr.GetParams()[2]
 
 # print "mean =",mean, " ", "mean + 2sigma =", mean + 2*sigma, " ", "mean - 2sigma =", mean - 2*sigma
-
-name_root_file_with_workspace = "w_signal_"+ str(mass) +".root"
+outputLoc = "/eos/cms/store/user/twamorka/NTuples_17Feb2019/Test_SignalWS/"
+name_root_file_with_workspace = outputLoc + "w_signal_"+ str(mass) +".root"
 
 root_file_with_workspace = ROOT.TFile (name_root_file_with_workspace, "RECREATE")
 root_file_with_workspace.mkdir("tagsDumper")
@@ -51,6 +52,6 @@ wsVars.add(w.var("tp_mass"))
 data_RooDataSet = ROOT.RooDataSet( "h4g_13TeV_4photons", "h4g_13TeV_4photons", chain, wsVars )
 data_reduced_RooDataSet = data_RooDataSet.reduce("avg_dp_mass >"+ str (mean - 2*sigma) + " && avg_dp_mass <"+ str (mean + 2*sigma) )
 
-getattr(w,'import')(data_reduced_RooDataSet)
+getattr(w,'import')(data_reduced_RooDataSet,RooCmdArg())
 
 w.Write()
