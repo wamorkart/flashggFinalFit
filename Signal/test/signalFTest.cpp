@@ -335,7 +335,9 @@ int main(int argc, char *argv[]){
             weight0->setVal(data0->weight() ); // <--- is this correct?
             dZ->setVal(data0->get(i)->getRealValue("dZ"));
             data->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
-            if (dZ->getVal() <1.){
+            // if (dZ->getVal() <1.){
+						Double_t vertex_z = dZ->getVal();
+						if (fabs(vertex_z) <1.){
             dataRV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
             } else{
             dataWV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
