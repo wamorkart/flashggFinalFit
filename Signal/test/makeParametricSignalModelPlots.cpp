@@ -200,22 +200,23 @@ pair<double,double> getEffSigmaData(RooRealVar *mass, RooDataHist *dataHist, dou
   TStopwatch sw;
   sw.Start();
   double point=wmin;
-  double weight=0; 
+  double weight=0;
   vector<pair<double,double> > points;
   //std::cout << " dataHist " << *dataHist << std::endl;
   double thesum = dataHist->sumEntries();
   for (int i=0 ; i<dataHist->numEntries() ; i++){
-    double mass = dataHist->get(i)->getRealValue("CMS_hgg_mass");
-    weight += dataHist->weight(); 
+    // double mass = dataHist->get(i)->getRealValue("CMS_hgg_mass");
+    double mass = dataHist->get(i)->getRealValue("tp_mass");
+    weight += dataHist->weight();
     //std::cout << " mass " << mass << " cumulative weight " << weight/thesum << std::endl;
     if (weight > epsilon){
-      points.push_back(pair<double,double>(mass,weight/thesum)); 
+      points.push_back(pair<double,double>(mass,weight/thesum));
     }
   }
   //while (point <= wmax){
     //mass->setVal(point);
     //if (pdf->getVal() > epsilon){
-    //  points.push_back(pair<double,double>(point,cdf->getVal())); 
+    //  points.push_back(pair<double,double>(point,cdf->getVal()));
     //}
     //point+=step;
   //}
@@ -254,7 +255,7 @@ pair<double,double> getEffSigma(RooRealVar *mass, RooAbsPdf *pdf, double wmin=11
   while (point <= wmax){
     mass->setVal(point);
     if (pdf->getVal() > epsilon){
-      points.push_back(pair<double,double>(point,cdf->getVal())); 
+      points.push_back(pair<double,double>(point,cdf->getVal()));
     }
     point+=step;
   }
@@ -313,7 +314,7 @@ pair<double,double> getEffSigBinned(RooRealVar *mass, RooAbsPdf *pdf, double wmi
       }
     }
   }
-  cout << "Took: "; sw.Print(); 
+  cout << "Took: "; sw.Print();
   // narrow down result
   int thisStepSize=32;
   cout << "Narrowing....." << endl;
@@ -375,7 +376,7 @@ vector<double> getFWHM(RooRealVar *mass, RooAbsPdf *pdf, RooDataSet *data, doubl
 void performClosure(RooRealVar *mass, RooAbsPdf *pdf, RooDataSet *data, string closurename, double wmin=110., double wmax=130., double slow=110., double shigh=130., double step=0.002) {
 
   // plot to perform closure test
-  cout << "Performing closure test... for " << closurename << endl; 
+  cout << "Performing closure test... for " << closurename << endl;
   double nbins = (wmax-wmin)/step;
   TH1F *h = new TH1F("h","h",int(floor(nbins+0.5)),wmin,wmax);
   if (data){
@@ -403,7 +404,7 @@ void performClosure(RooRealVar *mass, RooAbsPdf *pdf, RooDataSet *data, string c
   ca->SetTickx(); ca->SetTicky();
   if (data){
     plot = (mass->frame(Bins(binning_),Range("higgsRange")));
-    plot->addTH1(h,"hist"); 
+    plot->addTH1(h,"hist");
     plot->addTH1(copy,"same f");
     if (data) data->plotOn(plot);
     pdf->plotOn(plot,Normalization(h->Integral(),RooAbsReal::NumEvent),NormRange("higgsRange"),Range("higgsRange"),LineWidth(1),LineColor(kRed),LineStyle(kDashed));
@@ -442,7 +443,8 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   plot->SetMinimum(0.0);
   plotchi2->SetMinimum(0.0);
   if (markNegativeBins_){
-  TH1F *rdh = (TH1F*) data->createHistogram("CMS_hgg_mass",*mass,Binning(binning_,105,140));
+  // TH1F *rdh = (TH1F*) data->createHistogram("CMS_hgg_mass",*mass,Binning(binning_,105,140));
+  TH1F *rdh = (TH1F*) data->createHistogram("tp_mass",*mass,Binning(binning_,105,140));
     for(unsigned int iBin =0 ; iBin < rdh->GetNbinsX() ; iBin++){
       float content = rdh->GetBinContent(iBin);
       float center = rdh->GetBinCenter(iBin);
@@ -456,10 +458,12 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   double offset =0.05;
   if (data) data->plotOn(plot,Invisible());
   if (data) data->plotOn(plotchi2,Invisible());
-  std::cout << " LC DEBIG A : data content: " << data->sumEntries() << std::endl;
-  data->Print();
-
+  cout << "[TANVI ] HERE 1 " << endl;
+  // std::cout << " LC DEBIG A : data content: " << data->sumEntries() << std::endl;
+  // data->Print();
+  cout << "[TANVI ] HERE 2 " << endl;
   pdf->plotOn(plot,NormRange("higgsRange"),Range(semin,semax),FillColor(19),DrawOption("F"),LineWidth(2),FillStyle(1001),VLines(),LineColor(15));
+  cout << "[TANVI ] HERE 3 " << endl;
   TObject *seffLeg = plot->getObject(int(plot->numItems()-1));
   pdf->plotOn(plot,NormRange("higgsRange"),Range(semin,semax),LineColor(15),LineWidth(2),FillStyle(1001),VLines());
   pdf->plotOn(plot,NormRange("higgsRange"),Range("higgsRange"),LineColor(kBlue),LineWidth(2),FillStyle(0));
@@ -473,7 +477,7 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   while((datavar=(RooAbsReal*)vIter->Next())) {
     if (datavar) {
     if (!datavar->InheritsFrom("RooSpline1D")) {
-    
+
     std::cout << " This datavar was skipped " << datavar->GetName() << std::endl;
     continue;
     }
@@ -508,21 +512,33 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   fwhmText->SetLineColor(kWhite);
   fwhmText->SetTextSize(0.037);
   fwhmText->AddText(Form("FWHM = %1.2f GeV",(fwmax-fwmin)));
-  std::cout << " [FOR TABLE] Tag " << data->GetName() << "=, Mass " << mass->getVal() << " sigmaEff=" << 0.5*(semax-semin) << "= , FWMH=" << (fwmax-fwmin)/2.35 << "=" << std::endl;
+  // std::cout << " [FOR TABLE] Tag " << data->GetName() << "=, Mass " << mass->getVal() << " sigmaEff=" << 0.5*(semax-semin) << "= , FWMH=" << (fwmax-fwmin)/2.35 << "=" << std::endl;
   //std::cout << " [RESOLUTION CHECK] Ta/Procg " << data->GetName() << ", Mass " << mass->getVal() << " sigmaEff=" << 0.5*(semax-semin) << " , FWMH=" << (fwmax-fwmin)/2.35 << "" << std::endl;
 
   //TLatex lat1(0.65,0.85,"#splitline{CMS Simulation}{}");
-  TLatex  lat1(.129+0.03+offset,0.85,"H#rightarrow#gamma#gamma");
+
+  TString newtitle = "H#rightarrow#gamma#gamma";
+  if (title.find("GluGluToHHTo2B2G_node_SM_13TeV_madgraph") != std::string::npos) newtitle = "HH SM : H#rightarrow bb H#rightarrow#gamma#gamma";
+  TLatex  lat1(.129+0.03+offset,0.85,newtitle);
   lat1.SetNDC(1);
   lat1.SetTextSize(0.047);
 
   TString catLabel_humanReadable  = title;
+//  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017","H#rightarrow bb H#rightarrow#gamma#gamma");
+//  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","H#rightarrow bb H#rightarrow#gamma#gamma");
+  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph_2017","");
+  catLabel_humanReadable.ReplaceAll("GluGluToHHTo2B2G_node_SM_13TeV_madgraph","");
+  catLabel_humanReadable.ReplaceAll("GluGluToHToGG","GF Tag");
   catLabel_humanReadable.ReplaceAll("_"," ");
   catLabel_humanReadable.ReplaceAll("UntaggedTag","Untagged");
   catLabel_humanReadable.ReplaceAll("VBFTag","VBF Tag");
+  catLabel_humanReadable.ReplaceAll("VBF","VBF Tag");
   catLabel_humanReadable.ReplaceAll("TTHLeptonicTag","TTH Leptonic Tag");
+  catLabel_humanReadable.ReplaceAll("ttH","TTH Tag");
+  catLabel_humanReadable.ReplaceAll("VH","VH Tag");
   catLabel_humanReadable.ReplaceAll("TTHHadronicTag","TTH Hadronic Tag");
   catLabel_humanReadable.ReplaceAll("all","All Categories");
+  catLabel_humanReadable.ReplaceAll("DoubleHTag","CAT");
 
   TLatex lat2(0.93,0.88,catLabel_humanReadable);
   lat2.SetTextAlign(33);
@@ -545,7 +561,7 @@ void Plot(RooRealVar *mass, RooDataSet *data, RooAbsPdf *pdf, pair<double,double
   lat2.Draw("same");
   lat1.Draw("same");
   leg->Draw("same");
-  TLatex *chi2ndof_latex = new TLatex();	
+  TLatex *chi2ndof_latex = new TLatex();
   chi2ndof_latex->SetTextSize(0.035);
   chi2ndof_latex->SetTextAlign(33);
   chi2ndof_latex->SetNDC();
@@ -589,7 +605,7 @@ int main(int argc, char *argv[]){
   split(flashggCats_,flashggCatsStr_,boost::is_any_of(","));
   if (isFlashgg_){
     ncats_ =flashggCats_.size();
-    // Ensure that the loop over the categories does not go out of scope. 
+    // Ensure that the loop over the categories does not go out of scope.
     std::cout << "[INFO] consider "<< ncats_ <<" tags/categories" << std::endl;
   }
 
@@ -607,11 +623,13 @@ int main(int argc, char *argv[]){
     exit(1);
   }
 
-  RooRealVar *mass= (RooRealVar*)hggWS->var("CMS_hgg_mass");
+  // RooRealVar *mass= (RooRealVar*)hggWS->var("CMS_hgg_mass");
+  RooRealVar *mass= (RooRealVar*)hggWS->var("tp_mass");
 
   RooRealVar *mh = (RooRealVar*)hggWS->var("MH");
   mh->setVal(m_hyp_);
   mass->setRange("higgsRange",m_hyp_-20.,m_hyp_+15.);
+  // mass->setRange("higgsRange",105,140);
 
   map<string,RooDataSet*> dataSets;
   map<string,RooDataSet*> dataSetsGranular;
@@ -626,7 +644,7 @@ int main(int argc, char *argv[]){
   }
   else {
     dataSets = getGlobeData(hggWS,ncats_,m_hyp_);
-    pdfs = getGlobePdfs(hggWS,ncats_); 
+    pdfs = getGlobePdfs(hggWS,ncats_);
   }
 
   //  printInfo(dataSets,pdfs);
@@ -678,4 +696,3 @@ int main(int argc, char *argv[]){
   hggFile->Close();
 
 }
-
