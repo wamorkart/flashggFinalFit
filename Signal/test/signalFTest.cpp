@@ -72,11 +72,11 @@ void OptionParser(int argc, char *argv[]){
 		("isFlashgg",	po::value<bool>(&isFlashgg_)->default_value(true),													"Use flashgg format")
 		("verbose",	po::value<bool>(&verbose_)->default_value(false),													"Use flashgg format")
 		("flashggCats,f", po::value<string>(&flashggCatsStr_)->default_value("UntaggedTag_0,UntaggedTag_1,UntaggedTag_2,UntaggedTag_3,UntaggedTag_4,VBFTag_0,VBFTag_1,VBFTag_2,TTHHadronicTag,TTHLeptonicTag,VHHadronicTag,VHTightTag,VHLooseTag,VHEtTag"),       "Flashgg category names to consider")
-		("considerOnly", po::value<string>(&considerOnlyStr_)->default_value("All"), 
+		("considerOnly", po::value<string>(&considerOnlyStr_)->default_value("All"),
     "If you wish to only consider a subset cat in the list, list them as separated by commas. ")
 		("analysis",	po::value<string>(&analysis_)->default_value(""),  	"analysis. Ex: HHWWgg")
-		("analysis_type",	po::value<string>(&analysis_type_)->default_value(""),  	"analysis type. Ex: Res, EFT, NMSSM") 
-		("FinalState_",	po::value<string>(&FinalState_)->default_value(""),  	"HHWWgg final state. Ex: qqlnu, lnulnu, qqqq") 
+		("analysis_type",	po::value<string>(&analysis_type_)->default_value(""),  	"analysis type. Ex: Res, EFT, NMSSM")
+		("FinalState_",	po::value<string>(&FinalState_)->default_value(""),  	"HHWWgg final state. Ex: qqlnu, lnulnu, qqqq")
 		;
 
 	po::options_description desc("Allowed options");
@@ -91,7 +91,7 @@ void OptionParser(int argc, char *argv[]){
 }
 
 RooAddPdf *buildSumOfGaussians(string name, RooRealVar *mass, RooRealVar *MH, int nGaussians){
-  
+
   int mh=MH->getVal();
   assert(mh==125);
 	RooArgList *gaussians = new RooArgList();
@@ -157,7 +157,7 @@ double getMyNLL(RooRealVar *var, RooAbsPdf *pdf, RooDataHist *data){
 
 void fTest(string analysis_, string filename, string outdir_, vector<string> procs, string procString_, int nBins, float rangeLow, float rangeHigh, string website, string datfilename_){
 
-	WSTFileWrapper *inWS 
+	WSTFileWrapper *inWS
     = new WSTFileWrapper(filename,"tagsDumper/cms_hgg_13TeV");
   if(verbose_) std::cout << "[INFO] Opened files OK!" << std::endl;
 	RooRealVar *mass = (RooRealVar*)inWS->var("CMS_hgg_mass");
@@ -168,19 +168,19 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 	std::cout << "outdir_: " << outdir_ << endl;
   	// string outdir_Original = outdir_;
 
-	// if HHWWgg, customize outdir for each mass point 
+	// if HHWWgg, customize outdir for each mass point
 	if(analysis_ == "HHWWgg"){
 
-		// get Res, EFT, or NMSSM flag 
+		// get Res, EFT, or NMSSM flag
 
-	// 	// Get HHWWgg label from file name 
+	// 	// Get HHWWgg label from file name
 		if(analysis_type_ == "Res"){
 			vector<string> tmpV;
-			split(tmpV,filename,boost::is_any_of("/"));	
-			unsigned int N = tmpV.size();  
+			split(tmpV,filename,boost::is_any_of("/"));
+			unsigned int N = tmpV.size();
 			string endPath = tmpV[N-1];
 			vector<string> tmpV2;
-			split(tmpV2,endPath,boost::is_any_of("_"));	 
+			split(tmpV2,endPath,boost::is_any_of("_"));
 			string mass_str = tmpV2[0];
 			HHWWgg_Label = Form("%s_WWgg_%sgg",mass_str.c_str(),FinalState_.c_str());
 			// HHWWgg_Label = Form("%s_HHWWgg_qqlnu",mass_str.c_str());
@@ -188,14 +188,14 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		else if (analysis_type_ == "EFT"){
 			// File name format: nodeX_HHWWgg_<FinalState>
 			// RooAbsData name format: GluGluToHHTo_WWgg_<FinalState>_nodeX_13TeV_HHWWggTag_Y
-			// proc = GluGluToHHTo, 13TeV_HHWWggTag_Y already included 
+			// proc = GluGluToHHTo, 13TeV_HHWWggTag_Y already included
 			// HHWWgg_Label = WWgg_<FinalState>_nodeX
 			vector<string> tmpV;
-			split(tmpV,filename,boost::is_any_of("/"));	
-			unsigned int N = tmpV.size();  
+			split(tmpV,filename,boost::is_any_of("/"));
+			unsigned int N = tmpV.size();
 			string endPath = tmpV[N-1];
 			vector<string> tmpV2;
-			split(tmpV2,endPath,boost::is_any_of("_"));	 
+			split(tmpV2,endPath,boost::is_any_of("_"));
 			string node_str = tmpV2[0];
 			HHWWgg_Label = Form("WWgg_%s_%s",FinalState_.c_str(),node_str.c_str());
 		}
@@ -203,18 +203,18 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 			// file name format: MX<massX>_MY<massY>_HHWWgg_<FinalState>.root
 			// RooAbsData name format: NMSSM_XYHWWgg<FinalState>_MX<massX>_MY<massY>_13TeV_HHWWggTag_Y
 			vector<string> tmpV;
-			split(tmpV,filename,boost::is_any_of("/"));	
-			unsigned int N = tmpV.size();  
+			split(tmpV,filename,boost::is_any_of("/"));
+			unsigned int N = tmpV.size();
 			string endPath = tmpV[N-1];
 			vector<string> tmpV2;
-			split(tmpV2,endPath,boost::is_any_of("_"));	 
-			string XmassString = tmpV2[0]; 
-			string YmassString = tmpV2[1]; 
+			split(tmpV2,endPath,boost::is_any_of("_"));
+			string XmassString = tmpV2[0];
+			string YmassString = tmpV2[1];
 			HHWWgg_Label = Form("XYHWWgg%s_%s_%s",FinalState_.c_str(),XmassString.c_str(),YmassString.c_str());
 			cout << "Going to look for: " << HHWWgg_Label.c_str() << endl;
 		}
 
-		
+
 
 	// 	outdir_ = outdir_Original;
 	// 	outdir_.append("_");
@@ -235,13 +235,13 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 	MH->setBins(nBins);
 	MH->setRange(rangeLow,rangeHigh);
 
-  // record chosen nGaussians... 
+  // record chosen nGaussians...
   // This is really a bit useless: we are still picking the nGaussians by eye.
 	map<string,pair<int,int> > choices;
 	map<string,vector<RooPlot*> > plots;
 	map<string,vector<RooPlot*> > plotsRV;
 	map<string,vector<RooPlot*> > plotsWV;
-  
+
   // declare temporary Plots/Frames, one for each proc and cat to consider.
   if(verbose_) std::cout << "[INFO] start looping through nProcs " << procs.size() << " to book rooPlots " <<  std::endl;
 	for (unsigned int p=0; p<procs.size(); p++){
@@ -271,7 +271,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		plotsRV.insert(pair<string,vector<RooPlot*> >(procs[p],tempRV));
 		plotsWV.insert(pair<string,vector<RooPlot*> >(procs[p],tempWV));
 	}
-  
+
   // decide what color to make the fits in output plots...
 	vector<int> colors;
 	colors.push_back(kBlue);
@@ -287,7 +287,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
 		if ( (considerOnly_[0]).compare("All") != 0 ){
 			for (unsigned int j =0; j <considerOnly_.size() ; j++){
-				if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) { 
+				if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) {
 					std::cout << " [INFO] skipping " <<  flashggCats_[cat] << std::endl;
 					continueFlag=1;
 				}
@@ -295,26 +295,26 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		}
 
 		if (continueFlag){ continueFlag=0; continue;}
-    
+
   if(verbose_) std::cout << "[INFO] on cat " << flashggCats_[cat] <<  " start looping through procs  " << procs.size() << " to get datasets " <<std::endl;
     // now main loop through processes...
 		for (unsigned int p=0; p<procs.size(); p++){
-      
+
       // get desired proc
 			string proc = procs[p];
 
       //declare the datasets to use
-			RooDataSet *data;  
+			RooDataSet *data;
 			RooDataSet *dataRV;
-			RooDataSet *dataWV; 
-      
+			RooDataSet *dataWV;
+
       // We want to reduce our datasets, so just get the most important vars.
 	    RooRealVar *mass = (RooRealVar*)inWS->var("CMS_hgg_mass");
 	    //RooRealVar *dZ = (RooRealVar*)inWS->var("dZ");
 	    RooRealVar *weight0 = new RooRealVar("weight","weight",-100000,1000000);
 	    RooRealVar *dZ = new RooRealVar("dZ","dZ",-100000,1000000);
       if (verbose_) std::cout << "[INFO] got roorealvars from ws ? mass " << mass << " dz " << dZ << std::endl;
-      
+
       // access dataset and immediately reduce it!
 			if (isFlashgg_){
 				RooDataSet *data0;
@@ -322,13 +322,13 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
 					if(verbose_) {
 						std::cout << "HHWWgg label: " << HHWWgg_Label << endl;
-						std::cout << "dataset to look for: " << Form("%s_%s_13TeV_%s",proc.c_str(),HHWWgg_Label.c_str(),flashggCats_[cat].c_str()) << endl;				
+						std::cout << "dataset to look for: " << Form("%s_%s_13TeV_%s",proc.c_str(),HHWWgg_Label.c_str(),flashggCats_[cat].c_str()) << endl;
 					}
 
 					RooDataSet *data00;
 
 					if(analysis_type_ == "NMSSM"){
-						data00   = (RooDataSet*)inWS->data(Form("NMSSM_%s_13TeV_%s",HHWWgg_Label.c_str(),flashggCats_[cat].c_str())); // HHWWgg NMSSM form 
+						data00   = (RooDataSet*)inWS->data(Form("NMSSM_%s_13TeV_%s",HHWWgg_Label.c_str(),flashggCats_[cat].c_str())); // HHWWgg NMSSM form
 					}
 
 					else{
@@ -346,8 +346,19 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 					// delete tmpV2; ggF_SM_WWgg_qqlnugg_13TeV_HHWWggTag_0
 				}
 
+				else if (analysis_ == "H4G"){
+					if(verbose_){
+						cout << "H4G analysis" << endl;
+						cout << "Dataset to look for: " << Form("%s_%s",proc.c_str(),flashggCats_[cat].c_str()) << endl;
+					}
+					RooDataSet *data00;
+					data00 = (RooDataSet*)inWS->data(Form("%s_%s",proc.c_str(),flashggCats_[cat].c_str()));
+					// RooDataSet *data00   = (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()));
+					data0 = data00;
+				}
+
 				else{
-					RooDataSet *data00 = (RooDataSet*)inWS->data( Form("%d%s",mass_,proc.c_str()), 
+					RooDataSet *data00 = (RooDataSet*)inWS->data( Form("%d%s",mass_,proc.c_str()),
 						Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()));
 					// RooDataSet *data00   = (RooDataSet*)inWS->data(Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()));
 					data0 = data00;
@@ -363,7 +374,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
             exit (1);
           }
         }
-        
+
         data = (RooDataSet*) data0->emptyClone()->reduce(RooArgSet(*mass, *dZ));
         dataRV = (RooDataSet*) data0->emptyClone()->reduce(RooArgSet(*mass, *dZ));
         dataWV = (RooDataSet*) data0->emptyClone()->reduce(RooArgSet(*mass, *dZ));
@@ -381,27 +392,27 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
             }
         }
 
-        //print out contents, if you want... 
+        //print out contents, if you want...
         // FIXME: no need for this
         /*if (verbose_) {
 					std::cout << "[INFO] Workspace contains : " << std::endl;
 					std::list<RooAbsData*> data =  (inWS->allData()) ;
-					for (std::list<RooAbsData*>::const_iterator 
+					for (std::list<RooAbsData*>::const_iterator
             iterator = data.begin(), end = data.end();
             iterator != end;
             ++iterator) {
 						  std::cout << **iterator << std::endl;
 					}
         }
-        
+
         //more verbosity
 				if (verbose_) {
-          std::cout 
-            << "[INFO] Retrieved combined RV/WV data " 
-            << Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str()) 
+          std::cout
+            << "[INFO] Retrieved combined RV/WV data "
+            << Form("%s_%d_13TeV_%s",proc.c_str(),mass_,flashggCats_[cat].c_str())
             << "? "<< data<<std::endl;
         }*/
-        
+
         // now split RV/WV scenarios
         // this method of reducing the dataset is not safe, I think it ignores
         // events with negative weights entirely!
@@ -414,14 +425,14 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 				if (verbose_) std::cout << "[INFO] Retrieved reducedWV data"<< *dataWV  << std::endl;
 
 			} else { // not flash!
-      
+
         std::cout << "[ERROR] Sorry, only use flashgg input with this script."
           << " Exit." << std::endl;
         exit(1);
 			}
-			
+
       data->plotOn(plots[proc][cat]);
-      
+
       // which nGaussians do we want to choose?
 			int rvChoice=0;
 			int wvChoice=0;
@@ -439,8 +450,8 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 			float rv_prob_limit =999;
 
 			dataRV->plotOn(plotsRV[proc][cat]);
-			while (prob<rv_prob_limit && order <5){ 
-			  
+			while (prob<rv_prob_limit && order <5){
+
         // build sum of gaussians of correct order
         RooAddPdf *pdf = buildSumOfGaussians(
           Form("cat%d_g%d",cat,order),mass,MH,order);
@@ -449,7 +460,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 				RooFitResult *fitRes = pdf->fitTo(*dataRV,Save(true),
           RooFit::Minimizer("Minuit","minimize"),
           SumW2Error(true),Verbose(false),Range(mass_-10,mass_+10));
-			  
+
         //get NLL
         double myNll=0.;
 				thisNll = fitRes->minNll();
@@ -463,10 +474,10 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 				//plot(Form("plots/fTest/%s_cat%d_g%d_rv",proc.c_str(),cat,order),
         //  mass_,mass,dataRV,pdf);
 				chi2 = 2.*(prevNll-thisNll);
-				
+
         // alternative, simpler chi2... but assumed high stats?
         float chi2_bis= (plotsRV[proc][cat])->chiSquare();
-        
+
         // plot this order
 				pdf->plotOn(plotsRV[proc][cat],LineColor(colors[order-1]));
 
@@ -478,11 +489,11 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 				prob = TMath::Prob(chi2_bis,2*order+(order-1));
 
 				//Wilk's theorem
-				cout << "[INFO] \t RV: proc " << proc << " cat " 
-          << flashggCats_[cat] << " order " << order << " diffinDof " 
-          << diffInDof << " prevNll " << prevNll << " this Nll " << thisNll 
-          << " myNll " << myNll << " chi2 " << chi2 << " chi2_bis " 
-          << chi2_bis<<  " prob_old " << prob_old << ", prob_new " 
+				cout << "[INFO] \t RV: proc " << proc << " cat "
+          << flashggCats_[cat] << " order " << order << " diffinDof "
+          << diffInDof << " prevNll " << prevNll << " this Nll " << thisNll
+          << " myNll " << myNll << " chi2 " << chi2 << " chi2_bis "
+          << chi2_bis<<  " prob_old " << prob_old << ", prob_new "
           <<  prob << endl;
 
 				rv_results.push_back(std::make_pair(order,prob));
@@ -518,7 +529,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 			dataWV->plotOn(plotsWV[proc][cat]);
 
       //see comments in the RV section above.
-			while (prob<wv_prob_limit && order <4){ 
+			while (prob<wv_prob_limit && order <4){
 				RooAddPdf *pdf = buildSumOfGaussians(
         Form("cat%d_g%d",cat,order),mass,MH,order);
 				RooFitResult *fitRes = pdf->fitTo(*dataWV,
@@ -547,11 +558,11 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 				prob  = TMath::Prob(chi2_bis,2*order+(order-1));
 
 				//Wilk's theorem
-				cout << "[INFO] \t WV: proc " << proc <<" cat " 
-          << flashggCats_[cat] << " order " << order << " diffinDof " 
-          << diffInDof << " prevNll " << prevNll << " thosNll " 
-          << thisNll << " myNll" << myNll << " chi2" << chi2 << " chi2 bis " 
-          << chi2_bis << " prob_old " << prob_old << " prob_new " 
+				cout << "[INFO] \t WV: proc " << proc <<" cat "
+          << flashggCats_[cat] << " order " << order << " diffinDof "
+          << diffInDof << " prevNll " << prevNll << " thosNll "
+          << thisNll << " myNll" << myNll << " chi2" << chi2 << " chi2 bis "
+          << chi2_bis << " prob_old " << prob_old << " prob_new "
           << prob <<  endl;
 
 				wv_results.push_back(std::make_pair(order,prob));
@@ -571,7 +582,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 			}else {
 				wvChoice=cache_order;
 			}
-      
+
       // insert final choices!
 			choices.insert(pair<string,pair<int,int> >(
         //Form("%s %d",proc.c_str(),cat),make_pair(rvChoice,wvChoice)));
@@ -579,7 +590,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
         //let's see if this works..
         Form("%s %s",proc.c_str(),flashggCats_[cat].c_str()),
           make_pair(rvChoice,wvChoice)));
-		} 
+		}
 	}
 
   // now make the plots! Start with legend
@@ -611,8 +622,8 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		  for (int cat=0; cat<ncats_; cat++){
 		    if ( (considerOnly_[0]).compare("All") != 0 ){
 			    for (unsigned int j =0; j <considerOnly_.size() ; j++){
-				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) { 
-					    //std::cout << " [INFO] skipping " 
+				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) {
+					    //std::cout << " [INFO] skipping "
               //  <<  flashggCats_[cat] << std::endl;
 					    continueFlag=1;
 				}
@@ -621,7 +632,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
     //only make plots we asked for...
 		if (continueFlag){ continueFlag=0; continue;}
-      
+
       //actual plotting
 			RooPlot *plot = plotIt->second.at(cat);
 			plot->Draw();
@@ -634,9 +645,9 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
       //legend
 			leg->Draw();
-      
+
       //catname
-      TLatex *latex = new TLatex();	
+      TLatex *latex = new TLatex();
       latex->SetTextSize(0.038);
       latex->SetNDC();
       latex->DrawLatex(0.16,0.78,Form("#splitline{%s}{%s}",proc.c_str(),flashggCats_[cat].c_str()));
@@ -664,8 +675,8 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		  for (int cat=0; cat<ncats_; cat++){
 		    if ( (considerOnly_[0]).compare("All") != 0 ){
 			    for (unsigned int j =0; j <considerOnly_.size() ; j++){
-				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) { 
-              //std::cout << " [INFO] skipping " 
+				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) {
+              //std::cout << " [INFO] skipping "
               //  <<  flashggCats_[cat] << std::endl;
 					    continueFlag=1;
 				    }
@@ -677,14 +688,14 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
           //cms style
           string sim="Simulation";
-          CMS_lumi( canv, 0,0 , sim); // out of frame (0,0) 
+          CMS_lumi( canv, 0,0 , sim); // out of frame (0,0)
                                      //looks nicer than corner (0,16)
 
           //legend
 			    leg->Draw();
-      
+
           //catname
-          TLatex *latex = new TLatex();	
+          TLatex *latex = new TLatex();
           latex->SetTextSize(0.038);
           latex->SetNDC();
           latex->DrawLatex(0.16,0.78,Form("#splitline{%s}{%s}",proc.c_str(),flashggCats_[cat].c_str()));
@@ -698,10 +709,10 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 			canv->Print(Form("%s/wv_%s_%s_%s.png",website.c_str(),proc.c_str(),
         	flashggCats_[cat].c_str(),HHWWgg_Label.c_str()));
 			canv->Print(Form("%s/wv_%s_%s_%s.pdf",website.c_str(),proc.c_str(),
-        	flashggCats_[cat].c_str(),HHWWgg_Label.c_str()));			
+        	flashggCats_[cat].c_str(),HHWWgg_Label.c_str()));
 		 }
 	}
-  
+
   // and the combined plots.
 	for (map<string,vector<RooPlot*> >::iterator plotIt=plots.begin();
     plotIt!=plots.end();
@@ -710,8 +721,8 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 		  for (int cat=0; cat<ncats_; cat++){
 		    if ( (considerOnly_[0]).compare("All") != 0 ){
 			    for (unsigned int j =0; j <considerOnly_.size() ; j++){
-				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) { 
-					    //std::cout << " [INFO] skipping " 
+				    if ( (considerOnly_[j]).compare(flashggCats_[cat]) != 0) {
+					    //std::cout << " [INFO] skipping "
               //  <<  flashggCats_[cat] << std::endl;
 					    continueFlag=1;
 				}
@@ -720,7 +731,7 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
     //only make plots we asked for...
 		if (continueFlag){ continueFlag=0; continue;}
-      
+
       //actual plotting
 			RooPlot *plot = plotIt->second.at(cat);
 			plot->Draw();
@@ -733,9 +744,9 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
       //legend
 			leg->Draw();
-      
+
       //catname
-      TLatex *latex = new TLatex();	
+      TLatex *latex = new TLatex();
       latex->SetTextSize(0.038);
       latex->SetNDC();
       latex->DrawLatex(0.16,0.78,Form("#splitline{%s}{%s}",proc.c_str(),flashggCats_[cat].c_str()));
@@ -755,14 +766,14 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
   //no memory leaks please!
 	delete canv;
-  
+
   //finally, rpint otu recommended options. This is kinda useless right now..
 	cout << "[INFO] Recommended options" << endl;
 	ofstream output_datfile;
 
   //write them to a file, I guess..
 
-	// if HHWWgg, customize datfilename for mass point 
+	// if HHWWgg, customize datfilename for mass point
 	// if(analysis_ == "HHWWgg"){
 	// 	datfilename_ = datfilename_Original;
 	// 	datfilename_.erase(datfilename_.end()-4,datfilename_.end());
@@ -770,9 +781,9 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 	// 	datfilename_.append(HHWWgg_Label);
 	// 	datfilename_.append(".dat");
 	// }
-	
+
 	output_datfile.open ((datfilename_).c_str());
-	if (verbose_) std::cout << "[INFO] Writing to datfilename_ " 
+	if (verbose_) std::cout << "[INFO] Writing to datfilename_ "
     << datfilename_ << std::endl;
 	output_datfile << "#proc cat nGausRV nGausWV" << std::endl;
 	int p =0;
@@ -780,15 +791,15 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 	for (map<string,pair<int,int> >::iterator it=choices.begin();
     it!=choices.end();
     it++){
-      
+
       //print to screen
-		  cout << "[INFO] \t "  <<" "<< it->first 
-        << " " << it->second.first << " " 
+		  cout << "[INFO] \t "  <<" "<< it->first
+        << " " << it->second.first << " "
         << it->second.second << endl;
 
       //print to file
-		  output_datfile<< it->first 
-        << " " << it->second.first 
+		  output_datfile<< it->first
+        << " " << it->second.first
         << " " << it->second.second << endl;
 		  p++; // what is p doing ?
 	}
@@ -799,11 +810,11 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
 
 int main(int argc, char *argv[]){
 
-	string website = "/eos/user/a/atishelm/www/HHWWgg/fggfinalfit"; // in addition to local direc, put output pngs here 
+	string website = "/eos/user/a/atishelm/www/HHWWgg/fggfinalfit"; // in addition to local direc, put output pngs here
 
 	OptionParser(argc,argv);
 	// datfilename_Original = datfilename_;
-	
+
 	if (verbose_) {
     std::cout << "[INFO] datfilename_	" << datfilename_ << std::endl;
   }
@@ -815,7 +826,7 @@ int main(int argc, char *argv[]){
   }
  	TStopwatch sw;
 	sw.Start();
- 
+
   //make nice plots in ~correct style.
   setTDRStyle();
   writeExtraText = true;       // if extra text
@@ -829,12 +840,14 @@ int main(int argc, char *argv[]){
   // set range to be the same as SigfitPlots
   // want quite a large range otherwise don't
   // see crazy bins on the sides
-  float rangeLow = 115;
-  float rangeHigh = 135;
+  // float rangeLow = 115;
+  // float rangeHigh = 135;
+	float rangeLow = 105;
+  float rangeHigh = 140;
 
   //want binning of \0.5GeV
-  //int   nBins    = 2* int(rangeHigh -rangeLow); 
-  int   nBins    = 2* int(rangeHigh -rangeLow); 
+  //int   nBins    = 2* int(rangeHigh -rangeLow);
+  int   nBins    = 2* int(rangeHigh -rangeLow);
 
   // silence roofit
 	RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
@@ -846,14 +859,14 @@ int main(int argc, char *argv[]){
 	split(procs,procString_,boost::is_any_of(","));
 	split(flashggCats_,flashggCatsStr_,boost::is_any_of(","));
 	split(considerOnly_,considerOnlyStr_,boost::is_any_of(","));
-  
+
   // automatically determine nCats from flashggCats input
 	if (isFlashgg_){
 		ncats_ =flashggCats_.size();
-		// Ensure that the loop over the categories does not go out of scope. 
+		// Ensure that the loop over the categories does not go out of scope.
 	} else {
-    std::cout 
-    << "[ERROR] Sorry, script not compatible with non-flashgg input! Exit." 
+    std::cout
+    << "[ERROR] Sorry, script not compatible with non-flashgg input! Exit."
     << std::endl;
     exit (1);
   }
@@ -862,32 +875,32 @@ int main(int argc, char *argv[]){
 	for (unsigned int j =0; j <considerOnly_.size() ; j++){
 			std::cout << " [INFO] considering only " << considerOnly_[j]<<std::endl;
 	}
-  
+
 	fTest(analysis_,filename_,outdir_,procs,procString_,nBins,rangeLow,rangeHigh,website,datfilename_);
 
   // open input files using WS wrapper.
 
-  // If running HHWWgg analysis, need to do this once per file because each mass point has a different datasetName 
+  // If running HHWWgg analysis, need to do this once per file because each mass point has a different datasetName
 
 	// if(analysis_ == "HHWWgg"){
 
 	// 	vector<string> files;
-	// 	split(files,filename_,boost::is_any_of(","));	
+	// 	split(files,filename_,boost::is_any_of(","));
 
 	// 	for (unsigned int fi = 0; fi < files.size(); fi++){
 	// 		string filePath = files[fi];
 	// 		std::cout << "on file: " << filePath << endl;
 
-	// 		// // Get HHWWgg label from file name 
+	// 		// // Get HHWWgg label from file name
 	// 		// vector<string> tmpV;
-	// 		// split(tmpV,filePath,boost::is_any_of("/"));	
-	// 		// unsigned int N = tmpV.size();  
+	// 		// split(tmpV,filePath,boost::is_any_of("/"));
+	// 		// unsigned int N = tmpV.size();
 	// 		// string endPath = tmpV[N-1];
 	// 		// vector<string> tmpV2;
-	// 		// split(tmpV2,endPath,boost::is_any_of("_"));	 
+	// 		// split(tmpV2,endPath,boost::is_any_of("_"));
 	// 		// HHWWgg_Label = tmpV2[0];
 	// 		// std::cout << "HHWWgg label: " << HHWWgg_Label << endl;
-			
+
 	// 		fTest(analysis_,filePath,outdir_,procs,procString_,nBins,rangeLow,rangeHigh,website);
 	// 	}
 
