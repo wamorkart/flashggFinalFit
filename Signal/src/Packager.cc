@@ -17,7 +17,7 @@
 using namespace std;
 using namespace RooFit;
 
-Packager::Packager(WSTFileWrapper *ws, RooWorkspace *wsSave  , vector<string> procs, int nCats, int mhLow, int mhHigh, vector<int> skipMasses, int sqrts, int year, bool skipPlots, string outDir, 
+Packager::Packager(WSTFileWrapper *ws, RooWorkspace *wsSave  , vector<string> procs, int nCats, int mhLow, int mhHigh, vector<int> skipMasses, int sqrts, int year, bool skipPlots, string outDir,
 		   RooWorkspace *wsMerge, const vector<int>& cats, const vector<string>& flashggCats, string FinalState):
   WS(ws),
   mergeWS(wsMerge),
@@ -69,10 +69,13 @@ void Packager::packageOutput(bool split, string process , string tag){
                                 }
         if( (mh!=125) && (*proc=="testBBH" || *proc=="testTHQ" || *proc=="testTHW") ) continue; //FIXME
 				RooDataSet *tempData = 0;
-				if( merge ) { 
+				if( merge ) {
 					tempData = (RooDataSet*)mergeWS->data(Form("sig_%s_mass_m%d_%s",proc->c_str(),mh,catname.c_str()));
 					if(tempData && !saveWS->data(Form("sig_%s_mass_m%d_%s",proc->c_str(),mh,catname.c_str())))  saveWS->import(*tempData); //FIXME
 				} else {
+					std::cout << "proc: " << proc->c_str() << std::endl;
+					std::cout << "mh: " << mh << std::endl;
+					std::cout << "catname.c_str(): " << catname.c_str() << std::endl;
 					tempData = (RooDataSet*)WS->data(Form("sig_%s_mass_m%d_%s",proc->c_str(),mh,catname.c_str()));
 					if(tempData && !saveWS->data(Form("sig_%s_mass_m%d_%s",proc->c_str(),mh,catname.c_str())))  saveWS->import(*tempData); //FIXME
 				}
@@ -81,7 +84,7 @@ void Packager::packageOutput(bool split, string process , string tag){
 					expectedObjectsNotFound.push_back(Form("sig_%s_mass_m%d_%s",proc->c_str(),mh,catname.c_str()));
 					continue;
 				}
-		 std::cout << "merge = " << merge << std::endl;				
+		 std::cout << "merge = " << merge << std::endl;
          std::cout << "ED DEBUG printing tempData" << std::endl;
          tempData->Print();
          //std::cout << "ED DEBUG allDataThisMass" << std::endl;
@@ -142,7 +145,7 @@ void Packager::packageOutput(bool split, string process , string tag){
 			}
 			else {
         for (int m =120; m<131; m=m+5){
-				MH->setVal(m);norm->getVal(); 
+				MH->setVal(m);norm->getVal();
         }
 				runningNormSum->add(*norm);
         runningNormSumVal+= norm->getVal();
@@ -228,7 +231,7 @@ void Packager::packageOutput(bool split, string process , string tag){
 				//effAccGraph->SetPoint(p,mh,norm->getVal()/(XS_value*normalization->GetBR(mh)));
 			 //std::cout << " [INFO] eff*acc " << norm->getVal()/(XS_value*normalization->GetBR(mh)) << std::endl;
 				p++;
-			} 
+			}
         string extension="";
         if (split_){
         extension=Form("_%s_%s",process.c_str(),tag.c_str());

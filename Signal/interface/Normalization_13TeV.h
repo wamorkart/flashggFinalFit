@@ -118,7 +118,7 @@ class Normalization_13TeV {
     std::map<double,double> XSectionMap_TTH_FWDH;
     std::map<double,double> XSectionMap_TTH_PTH_0_60;
     std::map<double,double> XSectionMap_TTH_PTH_60_120;
-    std::map<double,double> XSectionMap_TTH_PTH_120_200; 
+    std::map<double,double> XSectionMap_TTH_PTH_120_200;
     std::map<double,double> XSectionMap_TTH_PTH_200_300;
     std::map<double,double> XSectionMap_TTH_PTH_GT300;
     std::map<double,double> XSectionMap_BBH_FWDH;
@@ -127,7 +127,8 @@ class Normalization_13TeV {
     std::map<double,double> XSectionMap_THQ;
     std::map<double,double> XSectionMap_THW_FWDH;
     std::map<double,double> XSectionMap_THW;
-    std::map<double,double> XSectionMap_HHWWgg; // HHWWgg 
+    std::map<double,double> XSectionMap_HHWWgg; // HHWWgg
+    std::map<double,double> XSectionMap_H4G; // H4G
 
 
 };

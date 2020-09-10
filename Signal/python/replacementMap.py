@@ -4,22 +4,24 @@
 # WRONG VERTEX FITS:
 #  > shape of mgg in WV ~identical across tags, therefore use single replacement
 
-# Replacement proc for WV fit: 
+# Replacement proc for WV fit:
 replacementProcWV = {
   "hig-16-040":"GG2H",
   "stage1":"GG2H_0J",
   "stage1_1":"GG2H_0J_PTH_GT10",
   "stage1_2":"GG2H_0J_PTH_GT10",
   # "HHWWgg":"ggF",
-  "HHWWgg":"GluGluToHHTo"
+  "HHWWgg":"GluGluToHHTo",
+  "H4G":"H4G"
 }
-# Replacement cat for WV fit: 
+# Replacement cat for WV fit:
 replacementCatWV = {
   "hig-16-040":"UntaggedTag_2",
   "stage1":"RECO_0J_Tag1",
   "stage1_1":"RECO_0J_PTH_GT10_Tag1",
   "stage1_2":"RECO_0J_PTH_GT10_Tag1",
-  "HHWWgg":"HHWWggTag_0"
+  "HHWWgg":"HHWWggTag_0",
+  "H4G":"H4G_Cat0"
   # "HHWWgg":"HHWWggTag_1"
   # "HHWWgg_qqlnu" : "HHWWggTag_0",
   # "HHWWgg_qqqq" : "HHWWggTag_2"
@@ -53,6 +55,14 @@ replacementProcRVMap = {
 
   "HHWWgg":[
     "HHWWggTag_0:HHWWggTag_0"
+  ],
+
+  "H4G":[
+    "H4G_Cat0:H4G",
+    "H4G_Cat1:H4G",
+    "H4G_Cat2:H4G",
+    "H4G_Cat3:H4G",
+    "H4G_Cat4:H4G"
   ],
 
   # STXS stage 1 categorisation (HIG-18-029)
@@ -208,6 +218,14 @@ replacementCatRVMap = {
   "HHWWgg":[
     "HHWWggTag_0:HHWWggTag_0"
   ],
+  "H4G":[
+    "H4G_Cat0:H4G_Cat0",
+    "H4G_Cat1:H4G_Cat0",
+    "H4G_Cat2:H4G_Cat0",
+    "H4G_Cat3:H4G_Cat0",
+    "H4G_Cat4:H4G_Cat0",
+
+  ],
 
   # STXS stage 1 categorisation (HIG-18-029)
   "stage1":[
@@ -247,7 +265,7 @@ replacementCatRVMap = {
   ],
 
   # STXS stage 1.1 categorisation
-  "stage1_1":[ 
+  "stage1_1":[
     "RECO_0J_PTH_GT10_Tag0:RECO_0J_PTH_GT10_Tag0",
     "RECO_0J_PTH_GT10_Tag1:RECO_0J_PTH_GT10_Tag1",
     "RECO_0J_PTH_0_10_Tag0:RECO_0J_PTH_0_10_Tag0",
@@ -265,7 +283,7 @@ replacementCatRVMap = {
     "RECO_GE2J_PTH_60_120_Tag0:RECO_GE2J_PTH_60_120_Tag0",
     "RECO_GE2J_PTH_60_120_Tag1:RECO_GE2J_PTH_60_120_Tag1",
     "RECO_GE2J_PTH_0_60_Tag0:RECO_GE2J_PTH_0_60_Tag0",
-    "RECO_GE2J_PTH_0_60_Tag1:RECO_GE2J_PTH_0_60_Tag1",   
+    "RECO_GE2J_PTH_0_60_Tag1:RECO_GE2J_PTH_0_60_Tag1",
     "RECO_VBFTOPO_BSM:RECO_VBFTOPO_BSM",
     "RECO_VBFTOPO_JET3VETO_Tag0:RECO_VBFTOPO_JET3VETO_Tag0",
     "RECO_VBFTOPO_JET3VETO_Tag1:RECO_VBFTOPO_JET3VETO_Tag1",
@@ -336,5 +354,3 @@ replacementCatRVMap = {
     "RECO_ZH_LEP:RECO_ZH_LEP"
   ]
 }
-
-

@@ -120,8 +120,12 @@ for num,f in enumerate(input_files):
          small = ntuple.CopyTree(common_cut+'&&'+cut_list[icat])
          treename_tmp = treelist[tree_i].replace('tagsDumper/trees/','')
          print "on tree: ",treename_tmp, " Cat#: ", icat
-         small.SetName(treename_tmp+'_Cat'+str(icat))
-         small.SetTitle(treename_tmp+'_Cat'+str(icat))
+         treename_tmp = treename_tmp.replace('H4GTag_0','H4GTag_0_Cat'+str(icat))
+         print treename_tmp
+         # treename_tmp = treelist[tree_i].replace('tagsDumper/trees/','')
+         small.SetName(treename_tmp)
+         small.SetTitle(treename_tmp)
+         # print treename_tmp+'_Cat'+str(icat)
  # f_out.mkdir('tagsDumper/trees')
  # f_out.cd('tagsDumper/trees')
 f_out.Write()

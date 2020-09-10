@@ -158,7 +158,7 @@ for direction in ["Up","Down"]:
 
 Cats = ['Cat0','Cat1','Cat2','Cat3','Cat4']
 for num,f in enumerate(input_files):
- print 'input file: ',f
+ # print 'input file: ',f
  tfile = ROOT.TFile(opt.inp_dir+f+'.root')
  datasets = []
  datahists = []
@@ -174,11 +174,12 @@ for num,f in enumerate(input_files):
             if syst != "":
                systLabel += '_' + syst
             if (opt.year == '2016'):
-                treename = "SUSYGluGluToHToAA_AToGG_M_"+opt.m+"_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"+systLabel+'_'+cat
+                treename = "SUSYGluGluToHToAA_AToGG_M_"+opt.m+"_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0_"+cat+systLabel
             elif (opt.year == '2017'):
-               treename = "SUSYGluGluToHToAA_AToGG_M_"+opt.m+"_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"+systLabel+'_'+cat
+               treename = "SUSYGluGluToHToAA_AToGG_M_"+opt.m+"_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0_"+cat+systLabel
             elif (opt.year == '2018'):
-               treename = "HAHMHToAA_AToGG_MA_"+opt.m+"GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"+systLabel+'_'+cat
+               treename = "HAHMHToAA_AToGG_MA_"+opt.m+"GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0_"+cat+systLabel
+            # print treename
             treelist.append(treename)
      else:
          treename = "Data_13TeV_H4GTag_0"+'_'+cat
@@ -187,30 +188,33 @@ for num,f in enumerate(input_files):
  for tree_i, tree in enumerate(treelist):
      # print  tree
      newname = ''
-     if ('H4GTag_0_Cat' in tree):
+     if ('sigma' in tree):
         data = pd.DataFrame(tree2array(tfile.Get(tree)))
      #    print treelist[0]
-        print tree, "  # of events: ", tfile.Get(tree).GetEntries()
+        # print tree, "  # of events: ", tfile.Get(tree).GetEntries()
         # newname = ''
+
         if (opt.option == 'signal' and opt.year == '2016'):
             newname = tree.replace('SUSYGluGluToHToAA_AToGG_M_'+opt.m+'_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0','H4G')
         elif (opt.option == 'signal' and opt.year == '2017'):
             newname = tree.replace('SUSYGluGluToHToAA_AToGG_M_'+opt.m+'_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0','H4G')
         elif (opt.option == 'signal' and opt.year == '2018'):
+            # HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0_Cat0
             newname = tree.replace('HAHMHToAA_AToGG_MA_'+opt.m+'GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0','H4G')
-        print newname
-        datasets += add_dataset_to_workspace(data,ws,newname)
+        # print "newname", newname
+        datahists += add_datahist_to_workspace(data,ws,newname)
      else:
-         print "here ", tree
+         # print "here ", tree
          data = pd.DataFrame(tree2array(tfile.Get(tree)))
          if (opt.option == 'signal' and opt.year == '2016'):
             newname = tree.replace('SUSYGluGluToHToAA_AToGG_M_'+opt.m+'_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0','H4G')
          elif (opt.option == 'signal' and opt.year == '2017'):
             newname = tree.replace('SUSYGluGluToHToAA_AToGG_M_'+opt.m+'_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0','H4G')
          elif (opt.option == 'signal' and opt.year == '2018'):
+             # HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0_SigmaEOverEShiftUp01sigma_Cat0
             newname = tree.replace('HAHMHToAA_AToGG_MA_'+opt.m+'GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0','H4G')
-         print newname
-         datahists += add_datahist_to_workspace(data,ws,newname)
+         # print "newname", newname
+         datasets += add_dataset_to_workspace(data,ws,newname)
 
 
  dZ = ws.var('dZ_bdtVtx').clone('dZ')
@@ -218,12 +222,12 @@ for num,f in enumerate(input_files):
  CMS_hgg_mass = ws.var('tp_mass').clone('CMS_hgg_mass')
  getattr(ws, 'import')(CMS_hgg_mass, ROOT.RooFit.Silence())
  for dataset in datasets:
-     print dataset
+     # print dataset
      ws.data(dataset).changeObservableName('dZ_bdtVtx','dZ')
      ws.data(dataset).changeObservableName('tp_mass','CMS_hgg_mass')
 
  for datahist in datahists:
-    print datahist
+    # print datahist
     ws.data(datahist).changeObservableName('tp_mass','CMS_hgg_mass')
 
 

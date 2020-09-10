@@ -17,9 +17,9 @@ int Normalization_13TeV::Init(int sqrtS, string FinalState){
         return 0;
     }
     TPython::Eval(Form("buildSMHiggsSignalXSBR.Init%dTeV()", sqrtS));
-    
+
     for (double mH=120;mH<130.05;mH+=0.1){ // breaks when extended beyond 130
-        double valBR           = 1.; 
+        double valBR           = 1.;
 
         // FinalState used for HHWWgg
         if(FinalState=="qqlnu") valBR = 0.44;
@@ -37,19 +37,19 @@ int Normalization_13TeV::Init(int sqrtS, string FinalState){
         double valXStHq        = (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"tHq"));
         double valXStHW        = (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"tHW"));
         double valXSggZH       = (double)TPython::Eval(Form("buildSMHiggsSignalXSBR.getXS(%f,'%s')",mH,"ggZH"));
-        double valXSQQ2HLNU    = valXSWH*(3.*10.86*0.01)/*3xBR(W to lv)*/;  
-        double valXSQQ2HLL     = valXSZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;  
-        double valXSGG2HLL     = valXSggZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;  
+        double valXSQQ2HLNU    = valXSWH*(3.*10.86*0.01)/*3xBR(W to lv)*/;
+        double valXSQQ2HLL     = valXSZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;
+        double valXSGG2HLL     = valXSggZH*(3*3.3658*0.01 + 20.00*0.01)/*BR(Z to ll) + BR(Z to invisible)*/;
         double valXSWH2HQQ     = valXSWH*(67.41*0.01)/*BR(W to hadrons)*/;
-        double valXSZH2HQQ     = valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;  
+        double valXSZH2HQQ     = valXSZH*(69.91*0.01)/*BR(Z to hadrons)*/;
 
         BranchingRatioMap[mH] = valBR;
 
-        XSectionMap_ggh[mH] = valXSggH;   
-        XSectionMap_vbf[mH] = valXSqqH;   
-        XSectionMap_tth[mH] = valXSttH;   
-        XSectionMap_wh[mH]  = valXSWH;  
-        XSectionMap_zh[mH]  = valXSZH;  
+        XSectionMap_ggh[mH] = valXSggH;
+        XSectionMap_vbf[mH] = valXSqqH;
+        XSectionMap_tth[mH] = valXSttH;
+        XSectionMap_wh[mH]  = valXSWH;
+        XSectionMap_zh[mH]  = valXSZH;
 
         XSectionMap_QQ2HLNU[mH] = valXSQQ2HLNU;
         XSectionMap_QQ2HLL[mH]  = valXSQQ2HLL;
@@ -74,7 +74,7 @@ int Normalization_13TeV::Init(int sqrtS, string FinalState){
         XSectionMap_GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25[mH] = 0.0064 * valXSggH;
         XSectionMap_GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25[mH] = 0.0081 * valXSggH;
         XSectionMap_GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25[mH] = 0.0030 * valXSggH;
-        XSectionMap_GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25[mH] = 0.0033 * valXSggH;       
+        XSectionMap_GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25[mH] = 0.0033 * valXSggH;
 
         XSectionMap_VBF_FWDH[mH] = 0.0698 * valXSqqH;
         XSectionMap_VBF_0J[mH] = 0.0653 * valXSqqH;
@@ -154,6 +154,7 @@ int Normalization_13TeV::Init(int sqrtS, string FinalState){
 
         // HHWWgg 
         XSectionMap_HHWWgg[mH] = 0.001; // arbitrary, same as one used in flashgg
+        XSectionMap_H4G[mH] = 0.001; // arbitrary, same as one used in flashgg
 
     }
 }
@@ -344,15 +345,19 @@ TGraph * Normalization_13TeV::GetSigmaGraph(TString process)
     XSectionMap = &XSectionMap_WH2HQQ;
   } else if ( process=="ZH2HQQ" ) {
     XSectionMap = &XSectionMap_ZH2HQQ;
-  } 
+  }
     // HHWWgg
     else if ( process=="ggF" ) {
-    XSectionMap = &XSectionMap_HHWWgg; 
+    XSectionMap = &XSectionMap_HHWWgg;
   }
-  
+
     else if ( process=="GluGluToHHTo" ) {
-    XSectionMap = &XSectionMap_HHWWgg; 
+    XSectionMap = &XSectionMap_HHWWgg;
   }
+  else if ( process=="H4G" ) {
+  XSectionMap = &XSectionMap_H4G;
+}
+
 
   else {
     std::cout << "[WARNING] Normalization_13TeV: No known process found in the name!!" << std::endl;
@@ -590,15 +595,18 @@ double Normalization_13TeV::GetXsection(double mass, TString HistName) {
     XSectionMap = &XSectionMap_THQ;
   } else if ( HistName.Contains("THW") ) {
     XSectionMap = &XSectionMap_THW;
-  } 
+  }
     // HHWWgg
     else if ( HistName.Contains("ggF") ) {
-    XSectionMap = &XSectionMap_HHWWgg; 
+    XSectionMap = &XSectionMap_HHWWgg;
   }
-  
+
     else if ( HistName.Contains("GluGluToHHTo") ) {
-    XSectionMap = &XSectionMap_HHWWgg; 
+    XSectionMap = &XSectionMap_HHWWgg;
   }
+  else if ( HistName.Contains("H4G") ) {
+  XSectionMap = &XSectionMap_H4G;
+}
 
     else {
     std::cout << "[WARNING] Normalization_13TeV: No known process found in the name!!" << HistName << std::endl;
