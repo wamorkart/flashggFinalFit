@@ -24,9 +24,9 @@ using namespace std;
 
 void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t precision) {
 // void optimize_cats_H4G(const int NCAT, TString year) {
-
-	TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/Training_CombinedMass_PerYear/";
-	TString outpath="/eos/user/t/twamorka/www/H4G_Training_CombinedMass_PerYear/";
+  TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
+	// TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/Training_CombinedMass_PerYear/";
+	TString outpath="/eos/user/t/twamorka/www/";
 
 	TString what_to_opt = "bdt";
 	double xmin = -1.0;
@@ -89,23 +89,29 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
  }
  else{
 	 cout << "Full run2 categorization" << endl;
-	file_s->Add(path+s.Format("signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	file_s->Add(path+s.Format("signal_m_45_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_35_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_25_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_15_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+	file_s->Add(path+s.Format("CatTrain_Standard_60_2016/signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
 
-	file_s->Add(path+s.Format("signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	file_s->Add(path+s.Format("signal_m_45_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_35_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_25_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_15_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	file_s->Add(path+s.Format("CatTrain_Standard_60_2017/signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
 
-	file_s->Add(path+s.Format("signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	file_s->Add(path+s.Format("signal_m_45_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_45GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_35_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_35GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_25_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_25GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	file_s->Add(path+s.Format("signal_m_15_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_15GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ 	file_s->Add(path+s.Format("CatTrain_Standard_60_2018/signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+
+	// file_s->Add(path+s.Format("signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+ 	// file_s->Add(path+s.Format("signal_m_45_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_35_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_25_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_15_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+	//
+	// file_s->Add(path+s.Format("signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+ 	// file_s->Add(path+s.Format("signal_m_45_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_35_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_25_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_15_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+	//
+	// file_s->Add(path+s.Format("signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+ 	// file_s->Add(path+s.Format("signal_m_45_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_45GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_35_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_35GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_25_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_25GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ 	// file_s->Add(path+s.Format("signal_m_15_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_15GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
  }
 
 
@@ -124,9 +130,9 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 	else {
 		cout << "Full run2 categorization" << endl;
 		// tree_bg->Add(path+s.Format("data_mix_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
-		tree_bg->Add(path+s.Format("data_mix_2016.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_2017.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_2018.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2016/data_mix_2016_transform.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2017/data_mix_2017_transform.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2018/data_mix_2018_transform.root/Data_13TeV_H4GTag_0"));
 	}
 
 	TChain *tree_data =  new TChain("tree_data");
@@ -139,9 +145,9 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 		cout << "Full run2 categorization" << endl;
 		// tree_data->Add(path+s.Format("data_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
 
-		tree_data->Add(path+s.Format("data_2016.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("data_2017.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("data_2018.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_60_2016/data_2016.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_60_2017/data_2017.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_60_2018/data_2018.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
 	}
 
 
@@ -321,7 +327,7 @@ std::vector<double> significance_scans3;
 		data_sideband_n[0] = hist_D_sideband->Integral(1,hist_D_sideband->FindBin(start_n[0])-1);
 		if (bkg_n[0]!=0) max_n[0]=pow(sig_n[0],2)/bkg_n[0];
 		start_n[1]=start_n[0]+precision;
-
+    // cout << "start_n[1] " << start_n[1] << endl;
 		bkg_sideband_n[1] = hist_B_sideband->Integral(hist_B_sideband->FindBin(start_n[0]),hist_B_sideband->GetNbinsX()+1);
 		data_sideband_n[1] = hist_D_sideband->Integral(hist_D_sideband->FindBin(start_n[0]),hist_D_sideband->GetNbinsX()+1);
 		// cout << "#1 BIN " << start_n[0] << endl;
@@ -340,6 +346,8 @@ std::vector<double> significance_scans3;
 			bkg_sideband_n[1] = hist_B_sideband->Integral(hist_B_sideband->FindBin(start_n[0]),hist_B_sideband->FindBin(start_n[1])-1);
 			data_sideband_n[1] = hist_D_sideband->Integral(hist_D_sideband->FindBin(start_n[0]),hist_D_sideband->FindBin(start_n[1])-1);
 			// cout << "#2 BIN " << start_n[0] << endl;
+			// cout <<  "  sig_n[1] " << sig_n[1] <<   "  bkg_n[1] " << bkg_n[1] << endl;
+			// cout <<  "  bkg_n[1] " << bkg_n[1] << endl;
 			if (bkg_n[1]!=0) max_n[1]=pow(sig_n[1],2)/bkg_n[1];
 
 			start_n[2]=start_n[1]+precision;
@@ -351,12 +359,13 @@ std::vector<double> significance_scans3;
 					bkg_sideband_n[2] = 1;
 					data_n[2] = 1;
 					data_sideband_n[2] = 1;
+					// cout << "NCAT<=2 " << sig_n[2] << endl;
 				} else {
 					sig_n[2] = hist_S->Integral(hist_S->FindBin(start_n[1]),hist_S->FindBin(start_n[2])-1);
 					bkg_n[2] = hist_B->Integral(hist_B->FindBin(start_n[1]),hist_B->FindBin(start_n[2])-1);
 					bkg_sideband_n[2] = hist_B_sideband->Integral(hist_B_sideband->FindBin(start_n[1]),hist_B_sideband->FindBin(start_n[2])-1);
 					data_sideband_n[2] = hist_D_sideband->Integral(hist_D_sideband->FindBin(start_n[1]),hist_D_sideband->FindBin(start_n[2])-1);
-					// cout << "#3 BIN " << start_n[1] << endl;
+					// cout << "NCAT<=2 " << sig_n[2] << endl;
 				}
 				if (bkg_n[2]!=0) max_n[2]=pow(sig_n[2],2)/bkg_n[2];
 
@@ -373,7 +382,7 @@ std::vector<double> significance_scans3;
 						bkg_n[3] = hist_B->Integral(hist_B->FindBin(start_n[2]),hist_B->FindBin(start_n[3])-1);
 						bkg_sideband_n[3] = hist_B_sideband->Integral(hist_B_sideband->FindBin(start_n[2]),hist_B_sideband->FindBin(start_n[3])-1);
 						data_sideband_n[3] = hist_D_sideband->Integral(hist_D_sideband->FindBin(start_n[2]),hist_D_sideband->FindBin(start_n[3])-1);
-						// cout << "#4 BIN " << start_n[2] << endl;
+						// cout << "NCAT<=3 " << sig_n[3] << endl;
 					}
 					if (bkg_n[3]!=0) max_n[3]=pow(sig_n[3],2)/bkg_n[3];
 
@@ -383,12 +392,13 @@ std::vector<double> significance_scans3;
                   bkg_n[4] = 1.;
                   bkg_sideband_n[4] = 1.;
 									data_sideband_n[4] = 1.;
+									// cout << "NCAT<=4 " << sig_n[4] << endl;
                } else {
 						sig_n[4] = hist_S->Integral(hist_S->FindBin(start_n[3]),hist_S->GetNbinsX()+1);
 						bkg_n[4] = hist_B->Integral(hist_B->FindBin(start_n[3]),hist_B->GetNbinsX()+1);
 						bkg_sideband_n[4] = hist_B_sideband->Integral(hist_B_sideband->FindBin(start_n[3]),hist_B_sideband->GetNbinsX()+1);
 						data_sideband_n[4] = hist_D_sideband->Integral(hist_D_sideband->FindBin(start_n[3]),hist_D_sideband->GetNbinsX()+1);
-						// cout << "#5 BIN " << start_n[3] << endl;
+						// cout << "NCAT<=4 " << sig_n[4] << endl;
                }
 					if (bkg_n[4]!=0) max_n[4]=pow(sig_n[4],2)/bkg_n[4];
 
