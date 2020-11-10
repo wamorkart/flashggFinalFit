@@ -18,16 +18,17 @@
 #include "TGraph.h"
 #include <algorithm>    // std::min_element, std::max_element
 
+
 using namespace std;
 
 //g++ optimize_cats.C -g -o opt `root-config --cflags --glibs` -lMLP -lXMLIO
 
-void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t precision) {
+void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t precision, TString path, TString outpath ) {
 // void optimize_cats_H4G(const int NCAT, TString year) {
   // TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
-  TString path = "/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied/PerMass_FullRun2_DataMix_v8_SignalDataMix_NormalizedToDataSideband/";
+  // TString path = "/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied/PerMass_FullRun2_DataMix_v8_SignalDataMix_NormalizedToDataSideband/";
 	// TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/Training_CombinedMass_PerYear/";
-	TString outpath="/eos/user/t/twamorka/www/";
+	// TString outpath="/eos/user/t/twamorka/www/";
 
 	TString what_to_opt = "bdt";
 	double xmin = -1.0;
@@ -40,7 +41,7 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
   TString binWidth_str = to_string(bin_width);
 
   // TString outDir = "/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
-  TString outDir = "/eos/user/t/twamorka/www/";
+  // TString outDir = "/eos/user/t/twamorka/www/";
 
 	// Double_t precision=0.02;
 	// Double_t precision=0.01;
@@ -56,21 +57,18 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 
 	TString s; TString sel;
 
-	// TString selection_sig = s.Format("weight*%s*(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1 && tp_mass > 110 && tp_mass < 180 )",lumi.Data());
   TString selection_sig = s.Format("weight*(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1 && tp_mass > 110 && tp_mass < 180 )");
-
-
 	TString selection_bg = "(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1  && tp_mass > 110 && tp_mass < 180  )";
 	TString selection_data = "(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1  && tp_mass > 110 && tp_mass < 180 )  ";
 
 	TString outstr = "";
 	double minevents = 8; //
 
-	TString date = "29_09_2020";
+	TString date = "10_11_2020";
 	// TString s; TString sel;
 	TString outnameborder = s.Format("output_SB_%s_cat%d_mineventborders%.0f_borders_%s_%s_%s_%f",what_to_opt.Data(),NCATS,minevents,date.Data(),year.Data(),mass.Data(),precision);
-	TString outname = s.Format("output_SB_%s_cat%d_minevents%.0f%s_%s_%s_%s_%f",what_to_opt.Data(),NCATS,minevents,outstr.Data(),date.Data(),year.Data(),mass.Data(),precision);
-
+	// TString outname = s.Format("output_SB_%s_cat%d_minevents%.0f%s_%s_%s_%s_%f",what_to_opt.Data(),NCATS,minevents,outstr.Data(),date.Data(),year.Data(),mass.Data(),precision);
+  TString outname = s.Format("output_SB_%s_cat%d_minevents%.0f%s_%s_%s_%f",what_to_opt.Data(),NCATS,minevents,outstr.Data(),date.Data(),year.Data(),precision);
 	TChain *file_s = new TChain("file_s");
   TChain *file_s_2016 = new TChain("file_s_2016");
   TChain *file_s_2017 = new TChain("file_s_2017");
@@ -195,9 +193,9 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
     // tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_mix_weight_v4_genMass_60_2016.root/Data_13TeV_H4GTag_0"));
 		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_mix_weight_v4_genMass_60_2017.root/Data_13TeV_H4GTag_0"));
 		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_mix_weight_v4_genMass_60_2018.root/Data_13TeV_H4GTag_0"));
-    tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2016.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2017.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2018.root/Data_13TeV_H4GTag_0"));
+    tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2016.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2017.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2018.root/Data_13TeV_H4GTag_0"));
 	}
 
 	TChain *tree_data =  new TChain("tree_data");
@@ -270,13 +268,13 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 	cout<<"start = "<<START<<" , end = "<<END<<endl;
 
 
-	hist_S->SetFillStyle(4050);
+	// hist_S->SetFillStyle(4050);
 	hist_S->SetLineColor(kRed);
-	hist_S->SetFillColor(kRed-7);
+	// hist_S->SetFillColor(kRed-7);
 	hist_S->SetLineWidth(2);
-	hist_B->SetFillStyle(4050);
+	// hist_B->SetFillStyle(4050);
 	hist_B->SetLineColor(kBlue+1);
-	hist_B->SetFillColor(kBlue-10);
+	// hist_B->SetFillColor(kBlue-10);
 	hist_B->SetLineWidth(2);
 
 	TH1F *hist_B2 = (TH1F*)hist_B->Clone("b_new");
@@ -655,20 +653,20 @@ std::vector<double> significance_scans3;
 
 	// Get Total Significance for each category
 	ofstream catSigOut;
-	catSigOut.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+	catSigOut.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
   // catSigOut.open("Test.txt");
-  cout << "[ " << s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()) << "]" << endl;
+  cout << "[ " << s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()) << "]" << endl;
 	ofstream catSigOut_p1Bin;
-	catSigOut_p1Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_p1Bin.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+	catSigOut_p1Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_p1Bin.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
 
 	ofstream catSigOut_m1Bin;
-	catSigOut_m1Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_m1Bin.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+	catSigOut_m1Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_m1Bin.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
 
 	ofstream catSigOut_p2Bin;
-	catSigOut_p2Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_p2Bin.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+	catSigOut_p2Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_p2Bin.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
 
 	ofstream catSigOut_m2Bin;
-	catSigOut_m2Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_m2Bin.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+	catSigOut_m2Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_m2Bin.txt",outpath.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
 
 
 	double cat_min, cat_max, cat_min_p1Bin, cat_max_p1Bin, cat_min_m1Bin, cat_max_m1Bin,cat_min_p2Bin, cat_max_p2Bin, cat_min_m2Bin, cat_max_m2Bin  = 0.;
@@ -846,7 +844,7 @@ std::vector<double> significance_scans3;
 	// Shaded_Area->Fill(0.00001,canvas_ymax);
 	// Shaded_Area->Draw("hist same");
 
-	sig_c->SaveAs(outDir + "Significance_" + scaleOpt + "_xmin-" + xmin_str + "_binWidth-" + binWidth_str + ".png");
+	sig_c->SaveAs(outpath + "Significance_" + scaleOpt + "_xmin-" + xmin_str + "_binWidth-" + binWidth_str + ".png");
 
 	TCanvas * sig_c_log = new TCanvas("sig_c_log","sig_c_log",800,600);
 	sig_c_log->cd();
@@ -871,7 +869,7 @@ std::vector<double> significance_scans3;
 
 	// Shaded_Area->SetBinContent(1,100);
 	// Shaded_Area->Draw("hist same");
-	sig_c_log->SaveAs(outDir + "Significance_" + scaleOpt + "_xmin-" + xmin_str + "_binWidth-" + binWidth_str + "_log.png");
+	sig_c_log->SaveAs(outpath + "Significance_" + scaleOpt + "_xmin-" + xmin_str + "_binWidth-" + binWidth_str + "_log.png");
 
 
   //======================================================
