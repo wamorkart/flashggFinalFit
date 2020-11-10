@@ -24,7 +24,8 @@ using namespace std;
 
 void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t precision) {
 // void optimize_cats_H4G(const int NCAT, TString year) {
-  TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
+  // TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
+  TString path = "/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied/PerMass_FullRun2_DataMix_v8_SignalDataMix_NormalizedToDataSideband/";
 	// TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/Training_CombinedMass_PerYear/";
 	TString outpath="/eos/user/t/twamorka/www/";
 
@@ -38,8 +39,8 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
   TString xmin_str = to_string(xcutoff);
   TString binWidth_str = to_string(bin_width);
 
-  TString outDir = "/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
-
+  // TString outDir = "/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
+  TString outDir = "/eos/user/t/twamorka/www/";
 
 	// Double_t precision=0.02;
 	// Double_t precision=0.01;
@@ -111,9 +112,12 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
    // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
    // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
    // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
-   file_s_2016->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
-   file_s_2017->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
-   file_s_2018->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+   // file_s_2016->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+   // file_s_2017->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+   // file_s_2018->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+   file_s_2016->Add(path+s.Format("signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+   file_s_2017->Add(path+s.Format("signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+   file_s_2018->Add(path+s.Format("signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
 
 	// file_s->Add(path+s.Format("CatTrain_Standard_60_2016/signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
 
@@ -188,9 +192,12 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2016/data_mix_2016_transform.root/Data_13TeV_H4GTag_0"));
 		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2017/data_mix_2017_transform.root/Data_13TeV_H4GTag_0"));
 		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2018/data_mix_2018_transform.root/Data_13TeV_H4GTag_0"));
-    tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_mix_weight_v4_genMass_60_2016.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_mix_weight_v4_genMass_60_2017.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_mix_weight_v4_genMass_60_2018.root/Data_13TeV_H4GTag_0"));
+    // tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_mix_weight_v4_genMass_60_2016.root/Data_13TeV_H4GTag_0"));
+		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_mix_weight_v4_genMass_60_2017.root/Data_13TeV_H4GTag_0"));
+		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_mix_weight_v4_genMass_60_2018.root/Data_13TeV_H4GTag_0"));
+    tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2016.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2017.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2018.root/Data_13TeV_H4GTag_0"));
 	}
 
 	TChain *tree_data =  new TChain("tree_data");
@@ -203,9 +210,12 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 		cout << "Full run2 categorization" << endl;
 		// tree_data->Add(path+s.Format("data_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
 
-		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_60_2016.root/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_60_2017.root/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_60_2018.root/Data_13TeV_H4GTag_0"));
+		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_60_2016.root/Data_13TeV_H4GTag_0"));
+		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_60_2017.root/Data_13TeV_H4GTag_0"));
+		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_60_2018.root/Data_13TeV_H4GTag_0"));
+    tree_data->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
 	}
 
 
@@ -331,14 +341,21 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 	double bin=0.;
 	double s1=0; double b1=0;
 	int i=0;
-	float max_all=0;
-		do	{
-			s1=hist_S2->GetBinContent(i+1);
-			b1=hist_B2->GetBinContent(i+1);
-			bin=(double) hist_S2->GetBinCenter(i+1+1);
-			if ((b1)!=0) max_all += pow(s1,2)/(b1);
-			i++;
-		} while (bin < END);
+  float TOTAL_S2OB = 0;
+	// float max_all=0;
+	// 	do	{
+	// 		s1=hist_S2->GetBinContent(i+1);
+	// 		b1=hist_B2->GetBinContent(i+1);
+	// 		// bin=(double) hist_S2->GetBinCenter(i+1+1);
+	// 		// if ((b1)!=0) max_all += pow(s1,2)/(b1);
+	// 		i++;
+	// 	} while (bin < END);
+  for(int i = 0; i < (int) hist_S2->GetEntries(); i++){
+		s1 = hist_S2->GetBinContent(i+1); // +1 to skip underflow bin
+		b1 = hist_B2->GetBinContent(i+1);
+		// if(b1 != 0) TOTAL_S2OB += pow(s1,2) / (b1);
+		if(b1 != 0) TOTAL_S2OB += ((2*(s1+b1)*log(1+(s1/b1))) - 2*s1);
+	}
 
 
 
@@ -503,7 +520,7 @@ std::vector<double> significance_scans3;
 	ofstream out;
 	out.open(s.Format("%s%s_%s.txt",outpath.Data(),outname.Data(),what_to_opt.Data()));
 	// out<<"subcategory : "<<subcategory<<endl;
-	out<<"S2/B over all bins, sqrt : "<<max_all<<"  , "<<sqrt(max_all)<<endl;
+	// out<<"S2/B over all bins, sqrt : "<<max_all<<"  , "<<sqrt(max_all)<<endl;
 	out<<endl;
 	out<<"S**2/B total over the chosen categories : "<<max_total<<"  ,S/sqrt(B) =  "<<sqrt(max_total)<<endl;
 	out<<endl;
@@ -638,8 +655,9 @@ std::vector<double> significance_scans3;
 
 	// Get Total Significance for each category
 	ofstream catSigOut;
-	// catSigOut.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
-  catSigOut.open("Test.txt");
+	catSigOut.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
+  // catSigOut.open("Test.txt");
+  cout << "[ " << s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()) << "]" << endl;
 	ofstream catSigOut_p1Bin;
 	catSigOut_p1Bin.open(s.Format("%s%s_%s_xmin-%s_binWidth-%s_CatSignificances_p1Bin.txt",outDir.Data(),outname.Data(),scaleOpt.Data(),xmin_str.Data(),binWidth_str.Data()));
 
