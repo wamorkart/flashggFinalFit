@@ -45,7 +45,9 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 
 	TString s; TString sel;
 
-	TString selection_sig = s.Format("weight*%s*(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1 && tp_mass > 110 && tp_mass < 180 )",lumi.Data());
+	// TString selection_sig = s.Format("weight*%s*(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1 && tp_mass > 110 && tp_mass < 180 )",lumi.Data());
+
+  TString selection_sig = s.Format("weight*(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1 && tp_mass > 110 && tp_mass < 180 )");
 
 
 	TString selection_bg = "(pho1_pt > 30 && pho2_pt > 18 && pho3_pt > 15 && pho4_pt > 15 && abs(pho1_eta) < 2.5 && abs(pho2_eta) < 2.5 && abs(pho3_eta) < 2.5 && abs(pho4_eta) < 2.5 && (abs(pho1_eta) < 1.4442 || abs(pho1_eta) > 1.566) && (abs(pho2_eta) < 1.4442 || abs(pho2_eta) > 1.566) && (abs(pho3_eta) < 1.4442 || abs(pho3_eta) > 1.566) && (abs(pho4_eta) < 1.4442 || abs(pho4_eta) > 1.566) && pho1_electronveto==1 && pho2_electronveto==1 && pho3_electronveto==1 && pho4_electronveto==1  && tp_mass > 110 && tp_mass < 180  )";
@@ -60,6 +62,10 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 	TString outname = s.Format("output_SB_%s_cat%d_minevents%.0f%s_%s_%s_%s_%f",what_to_opt.Data(),NCAT,minevents,outstr.Data(),date.Data(),year.Data(),mass.Data(),precision);
 
 	TChain *file_s = new TChain("file_s");
+  TChain *file_s_2016 = new TChain("file_s_2016");
+  TChain *file_s_2017 = new TChain("file_s_2017");
+  TChain *file_s_2018 = new TChain("file_s_2018");
+
 	TString H4G_Label_1; 	TString H4G_Label_2;
 
 	if (year!="Run2")
@@ -81,46 +87,55 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 		H4G_Label_1 = "HAHMHToAA_AToGG_MA_";
 		H4G_Label_2 = "GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0";
 	}
-	file_s->Add(path+s.Format("signal_m_60_%s.root/tagsDumper/trees/%s60%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	file_s->Add(path+s.Format("signal_m_45_%s.root/tagsDumper/trees/%s45%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	file_s->Add(path+s.Format("signal_m_35_%s.root/tagsDumper/trees/%s35%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	file_s->Add(path+s.Format("signal_m_25_%s.root/tagsDumper/trees/%s25%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	file_s->Add(path+s.Format("signal_m_15_%s.root/tagsDumper/trees/%s15%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
+	// file_s->Add(path+s.Format("signal_m_60_%s.root/tagsDumper/trees/%s60%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
+  file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+  file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+  file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+
+	// file_s->Add(path+s.Format("signal_m_45_%s.root/tagsDumper/trees/%s45%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
+	// file_s->Add(path+s.Format("signal_m_35_%s.root/tagsDumper/trees/%s35%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
+	// file_s->Add(path+s.Format("signal_m_25_%s.root/tagsDumper/trees/%s25%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
+	// file_s->Add(path+s.Format("signal_m_15_%s.root/tagsDumper/trees/%s15%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
  }
  else{
 	 cout << "Full run2 categorization" << endl;
-	file_s->Add(path+s.Format("CatTrain_Standard_60_2016/signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
 
- 	file_s->Add(path+s.Format("CatTrain_Standard_60_2017/signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+   file_s_2016->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
+   file_s_2017->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
+   file_s_2018->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
 
- 	file_s->Add(path+s.Format("CatTrain_Standard_60_2018/signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
 
-	// file_s->Add(path+s.Format("signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
-	//
-	// file_s->Add(path+s.Format("signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
-	//
-	// file_s->Add(path+s.Format("signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_45GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_35GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_25GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_15GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
  }
 
+  TH1F *hist_S_2016 = new TH1F("hist_S_2016","hist_S_2016",int((xmax-xmin)/precision),xmin,xmax);
 
-	TH1F *hist_S = new TH1F("hist_S","hist_S",int((xmax-xmin)/precision),xmin,xmax);
-
-  s.Form("%s>>hist_S",what_to_opt.Data());
+  s.Form("%s>>hist_S_2016",what_to_opt.Data());
   sel.Form("%s",(selection_sig+Mgg_window).Data());
-	file_s->Draw(s,sel,"goff");
+	file_s_2016->Draw(s,sel,"goff");
 
+  TH1F *hist_S_2017 = new TH1F("hist_S_2017","hist_S_2017",int((xmax-xmin)/precision),xmin,xmax);
+
+  s.Form("%s>>hist_S_2017",what_to_opt.Data());
+  sel.Form("%s",(selection_sig+Mgg_window).Data());
+	file_s_2017->Draw(s,sel,"goff");
+
+  TH1F *hist_S_2018 = new TH1F("hist_S_2018","hist_S_2018",int((xmax-xmin)/precision),xmin,xmax);
+
+  s.Form("%s>>hist_S_2018",what_to_opt.Data());
+  sel.Form("%s",(selection_sig+Mgg_window).Data());
+	file_s_2018->Draw(s,sel,"goff");
+
+  hist_S_2016->Scale(35.9);
+  hist_S_2017->Scale(41.5);
+  hist_S_2018->Scale(54.38);
+
+  hist_S_2016->Add(hist_S_2017);
+  hist_S_2016->Add(hist_S_2018);
+
+  TH1F *hist_S = (TH1F*)hist_S_2016->Clone("hist_S");
 
 	TChain *tree_bg =  new TChain("tree_bg");
 	if (year!="Run2"){
@@ -130,9 +145,12 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 	else {
 		cout << "Full run2 categorization" << endl;
 		// tree_bg->Add(path+s.Format("data_mix_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
-		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2016/data_mix_2016_transform.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2017/data_mix_2017_transform.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("CatTrain_Standard_60_2018/data_mix_2018_transform.root/Data_13TeV_H4GTag_0"));
+		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2016/data_mix_2016_transform.root/Data_13TeV_H4GTag_0"));
+		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2017/data_mix_2017_transform.root/Data_13TeV_H4GTag_0"));
+		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2018/data_mix_2018_transform.root/Data_13TeV_H4GTag_0"));
+    tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_mix_weight_v4_genMass_60_2016.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_mix_weight_v4_genMass_60_2017.root/Data_13TeV_H4GTag_0"));
+		tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_mix_weight_v4_genMass_60_2018.root/Data_13TeV_H4GTag_0"));
 	}
 
 	TChain *tree_data =  new TChain("tree_data");
@@ -145,9 +163,9 @@ void optimize_cats_H4G(const int NCAT, TString year, TString mass, Double_t prec
 		cout << "Full run2 categorization" << endl;
 		// tree_data->Add(path+s.Format("data_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
 
-		tree_data->Add(path+s.Format("CatTrain_Standard_60_2016/data_2016.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("CatTrain_Standard_60_2017/data_2017.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("CatTrain_Standard_60_2018/data_2018.root/tagsDumper/trees/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_60_2016.root/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_60_2017.root/Data_13TeV_H4GTag_0"));
+		tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_60_2018.root/Data_13TeV_H4GTag_0"));
 	}
 
 
