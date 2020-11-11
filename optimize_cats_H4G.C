@@ -23,7 +23,8 @@ using namespace std;
 
 //g++ optimize_cats.C -g -o opt `root-config --cflags --glibs` -lMLP -lXMLIO
 
-void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t precision, TString path, TString outpath ) {
+void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t precision, TString path, TString outpath, int Normalization ) {
+	gROOT->SetBatch(kTRUE);
 // void optimize_cats_H4G(const int NCAT, TString year) {
   // TString path="/eos/user/t/twamorka/h4g_fullRun2/withSystematics/";
   // TString path = "/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied/PerMass_FullRun2_DataMix_v8_SignalDataMix_NormalizedToDataSideband/";
@@ -36,7 +37,7 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
   TString scaleOpt = "withSidebandScale";
 
   double xcutoff = -1.0;
-  Double_t bin_width = 0.01;
+  Double_t bin_width = 0.02;
   TString xmin_str = to_string(xcutoff);
   TString binWidth_str = to_string(bin_width);
 
@@ -99,55 +100,58 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
   file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
   file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
 
-	// file_s->Add(path+s.Format("signal_m_45_%s.root/tagsDumper/trees/%s45%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	// file_s->Add(path+s.Format("signal_m_35_%s.root/tagsDumper/trees/%s35%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	// file_s->Add(path+s.Format("signal_m_25_%s.root/tagsDumper/trees/%s25%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
-	// file_s->Add(path+s.Format("signal_m_15_%s.root/tagsDumper/trees/%s15%s",year.Data(),H4G_Label_1.Data(),H4G_Label_2.Data()));
  }
  else{
 	 cout << "Full run2 categorization" << endl;
 
-   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
-   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
-   // file_s->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
-   // file_s_2016->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
-   // file_s_2017->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
-   // file_s_2018->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
    file_s_2016->Add(path+s.Format("signal_m_60_2016.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
    file_s_2017->Add(path+s.Format("signal_m_60_2017.root/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
    file_s_2018->Add(path+s.Format("signal_m_60_2018.root/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ }
 
-	// file_s->Add(path+s.Format("CatTrain_Standard_60_2016/signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+ TChain *tree_bg =  new TChain("tree_bg");
+ TChain *tree_bg_2016 =  new TChain("tree_bg_2016");
+ TChain *tree_bg_2017 =  new TChain("tree_bg_2017");
+ TChain *tree_bg_2018 =  new TChain("tree_bg_2018");
 
- 	// file_s->Add(path+s.Format("CatTrain_Standard_60_2017/signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+ if (year!="Run2"){
+   cout << "Per year categorization" << endl;
+   tree_bg->Add(path+s.Format("data_mix_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
+ }
+ else {
+   cout << "Full run2 categorization" << endl;
+   tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2016.root/Data_13TeV_H4GTag_0"));
+   tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2017.root/Data_13TeV_H4GTag_0"));
+   tree_bg->Add(path+s.Format("data_mix_weight_v8_60_2018.root/Data_13TeV_H4GTag_0"));
 
- 	// file_s->Add(path+s.Format("CatTrain_Standard_60_2018/signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
+   tree_bg_2016->Add(path+s.Format("data_mix_weight_v8_60_2016.root/Data_13TeV_H4GTag_0"));
+   tree_bg_2017->Add(path+s.Format("data_mix_weight_v8_60_2017.root/Data_13TeV_H4GTag_0"));
+   tree_bg_2018->Add(path+s.Format("data_mix_weight_v8_60_2018.root/Data_13TeV_H4GTag_0"));
+ }
 
-	// file_s->Add(path+s.Format("signal_m_60_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2016.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCUETP8M1_13TeV_pythia8_13TeV_H4GTag_0"));
-	//
-	// file_s->Add(path+s.Format("signal_m_60_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_60_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_45_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_35_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_25_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2017.root/tagsDumper/trees/SUSYGluGluToHToAA_AToGG_M_15_TuneCP5_13TeV_pythia8_13TeV_H4GTag_0"));
-	//
-	// file_s->Add(path+s.Format("signal_m_60_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_60GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));//,mass.Data(),mass.Data()));
- 	// file_s->Add(path+s.Format("signal_m_45_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_45GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_35_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_35GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_25_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_25GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
- 	// file_s->Add(path+s.Format("signal_m_15_2018.root/tagsDumper/trees/HAHMHToAA_AToGG_MA_15GeV_TuneCP5_PSweights_13TeV_madgraph_pythia8_13TeV_H4GTag_0"));
+ TChain *tree_data =  new TChain("tree_data");
+ TChain *tree_data_2016 =  new TChain("tree_data_2016");
+ TChain *tree_data_2017 =  new TChain("tree_data_2017");
+ TChain *tree_data_2018 =  new TChain("tree_data_2018");
+
+ if (year!="Run2")
+ {
+   cout << "Per year categorization" << endl;
+ tree_data->Add(path+s.Format("data_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
+ }
+ else {
+   cout << "Full run2 categorization" << endl;
+   tree_data->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
+   tree_data->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
+   tree_data->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
+
+   tree_data_2016->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
+   tree_data_2017->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
+   tree_data_2018->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
  }
 
 
-	// TH1F *hist_S = new TH1F("hist_S","hist_S",int((xmax-xmin)/precision),xmin,xmax);
-  //
-  // s.Form("%s>>hist_S",what_to_opt.Data());
-  // sel.Form("%s",(selection_sig+Mgg_window).Data());
-	// file_s->Draw(s,sel,"goff");
+
   TH1F *hist_S_2016 = new TH1F("hist_S_2016","hist_S_2016",int((xmax-xmin)/precision),xmin,xmax);
 
   s.Form("%s>>hist_S_2016",what_to_opt.Data());
@@ -166,58 +170,22 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
   sel.Form("%s",(selection_sig+Mgg_window).Data());
 	file_s_2018->Draw(s,sel,"goff");
 
+  TH1F *hist_D_sideband_2016 = new TH1F("hist_D_sideband_2016","hist_D_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+  s.Form("%s>>hist_D_sideband_2016",what_to_opt.Data());
+  sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  tree_data_2016->Draw(s,sel,"goff");
 
-  hist_S_2016->Scale(35.9);
-  hist_S_2017->Scale(41.5);
-  hist_S_2018->Scale(54.38);
+  TH1F *hist_D_sideband_2017 = new TH1F("hist_D_sideband_2017","hist_D_sideband_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+  s.Form("%s>>hist_D_sideband_2017",what_to_opt.Data());
+  sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  tree_data_2017->Draw(s,sel,"goff");
 
-  hist_S_2016->Add(hist_S_2017);
-  hist_S_2016->Add(hist_S_2018);
+  TH1F *hist_D_sideband_2018 = new TH1F("hist_D_sideband_2018","hist_D_sideband_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+  s.Form("%s>>hist_D_sideband_2018",what_to_opt.Data());
+  sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  tree_data_2018->Draw(s,sel,"goff");
 
-  TH1F *hist_S = (TH1F*)hist_S_2016->Clone("hist_S");
-
-
-
-
-	TChain *tree_bg =  new TChain("tree_bg");
-	if (year!="Run2"){
-		cout << "Per year categorization" << endl;
-	  tree_bg->Add(path+s.Format("data_mix_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
-	}
-	else {
-		cout << "Full run2 categorization" << endl;
-		// tree_bg->Add(path+s.Format("data_mix_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
-		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2016/data_mix_2016_transform.root/Data_13TeV_H4GTag_0"));
-		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2017/data_mix_2017_transform.root/Data_13TeV_H4GTag_0"));
-		// tree_bg->Add(path+s.Format("CatTrain_Standard_60_2018/data_mix_2018_transform.root/Data_13TeV_H4GTag_0"));
-    // tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_mix_weight_v4_genMass_60_2016.root/Data_13TeV_H4GTag_0"));
-		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_mix_weight_v4_genMass_60_2017.root/Data_13TeV_H4GTag_0"));
-		// tree_bg->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_mix_weight_v4_genMass_60_2018.root/Data_13TeV_H4GTag_0"));
-    tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2016.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2017.root/Data_13TeV_H4GTag_0"));
-		tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2018.root/Data_13TeV_H4GTag_0"));
-	}
-
-	TChain *tree_data =  new TChain("tree_data");
-	if (year!="Run2")
-	{
-		cout << "Per year categorization" << endl;
-	tree_data->Add(path+s.Format("data_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
-  }
-	else {
-		cout << "Full run2 categorization" << endl;
-		// tree_data->Add(path+s.Format("data_m_%s_Run2.root/tagsDumper/trees/Data_13TeV_H4GTag_0",mass.Data()));
-
-		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2016/data_60_2016.root/Data_13TeV_H4GTag_0"));
-		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2017/data_60_2017.root/Data_13TeV_H4GTag_0"));
-		// tree_data->Add(path+s.Format("CatTrain_Standard_M60_Run2_2018/data_60_2018.root/Data_13TeV_H4GTag_0"));
-    tree_data->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
-		tree_data->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
-	}
-
-
-	// Get the scale factor; the data mix needs to be scaled by this factor to match data sideband
+  // Get the scale factor; the data mix needs to be scaled by this factor to match data sideband
 
 	TH1F* hist_datamix_sideband = new TH1F("hist_datamix_sideband","hist_datamix_sideband",100,0,1000000);
 	TH1F* hist_data_sideband = new TH1F("hist_data_sideband","hist_data_sideband",100,0,1000000);
@@ -237,30 +205,246 @@ void optimize_cats_H4G(const int NCATS, TString year, TString mass, Double_t pre
 	// scale = hist_data->Integral() ;
 	cout << "Scale: " << scale << endl;
 
-	TH1F *hist_B = new TH1F("hist_B","hist_B",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
 
-   s.Form("%s>>hist_B",what_to_opt.Data());
-   sel.Form("%s",(selection_bg+Mgg_window).Data());
-	tree_bg->Draw(s,sel,"goff");
-	hist_B->Scale(scale);
-	cout<<"BG integral under Mgg "<<hist_B->Integral()<<endl;
+  if (Normalization == 1 || Normalization == 2 || Normalization == 5)
 
-	TH1F *hist_B_sideband = new TH1F("hist_B_sideband","hist_B_sideband",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+  {
+  hist_S_2016->Scale(35.9);
+  hist_S_2017->Scale(41.5);
+  hist_S_2018->Scale(54.38);
+  }
 
-   s.Form("%s>>hist_B_sideband",what_to_opt.Data());
-   sel.Form("%s",(selection_bg+Mgg_sideband).Data());
-	tree_bg->Draw(s,sel,"goff");
-	hist_B_sideband->Scale(scale);
-	cout<<"BG integral sidebands "<<hist_B_sideband->Integral()<<endl;
+  if (Normalization == 3 || Normalization == 4)
+  {
+    hist_S_2016->Scale(hist_D_sideband_2016->Integral()/hist_S_2016->Integral());
+    hist_S_2017->Scale(hist_D_sideband_2017->Integral()/hist_S_2017->Integral());
+    hist_S_2018->Scale(hist_D_sideband_2018->Integral()/hist_S_2018->Integral());
+  }
+  hist_S_2016->Add(hist_S_2017);
+  hist_S_2016->Add(hist_S_2018);
+
+  if (Normalization == 3)
+  {
+    hist_S_2016->Scale(scale);
+  }
 
 
+  TH1F *hist_S = (TH1F*)hist_S_2016->Clone("hist_S");
 
-	TH1F *hist_D_sideband = new TH1F("hist_D_sideband","hist_D_sideband",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+	// TChain *tree_bg =  new TChain("tree_bg");
+  // TChain *tree_bg_2016 =  new TChain("tree_bg_2016");
+  // TChain *tree_bg_2017 =  new TChain("tree_bg_2017");
+  // TChain *tree_bg_2018 =  new TChain("tree_bg_2018");
+	// if (year!="Run2"){
+	// 	cout << "Per year categorization" << endl;
+	//   tree_bg->Add(path+s.Format("data_mix_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
+	// }
+	// else {
+	// 	cout << "Full run2 categorization" << endl;
+  //   tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2016.root/Data_13TeV_H4GTag_0"));
+	// 	tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2017.root/Data_13TeV_H4GTag_0"));
+	// 	tree_bg->Add(path+s.Format("data_mix_weight_v4_60_2018.root/Data_13TeV_H4GTag_0"));
+  //
+  //   tree_bg_2016->Add(path+s.Format("data_mix_weight_v4_60_2016.root/Data_13TeV_H4GTag_0"));
+	// 	tree_bg_2017->Add(path+s.Format("data_mix_weight_v4_60_2017.root/Data_13TeV_H4GTag_0"));
+	// 	tree_bg_2018->Add(path+s.Format("data_mix_weight_v4_60_2018.root/Data_13TeV_H4GTag_0"));
+	// }
+  //
+	// TChain *tree_data =  new TChain("tree_data");
+  // TChain *tree_data_2016 =  new TChain("tree_data_2016");
+  // TChain *tree_data_2017 =  new TChain("tree_data_2017");
+  // TChain *tree_data_2018 =  new TChain("tree_data_2018");
+  //
+	// if (year!="Run2")
+	// {
+	// 	cout << "Per year categorization" << endl;
+	// tree_data->Add(path+s.Format("data_%s.root/tagsDumper/trees/Data_13TeV_H4GTag_0",year.Data()));
+  // }
+	// else {
+	// 	cout << "Full run2 categorization" << endl;
+  //   tree_data->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
+	// 	tree_data->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
+	// 	tree_data->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
+  //
+  //   tree_data_2016->Add(path+s.Format("data_60_2016.root/Data_13TeV_H4GTag_0"));
+	// 	tree_data_2017->Add(path+s.Format("data_60_2017.root/Data_13TeV_H4GTag_0"));
+	// 	tree_data_2018->Add(path+s.Format("data_60_2018.root/Data_13TeV_H4GTag_0"));
+	// }
 
-   s.Form("%s>>hist_D_sideband",what_to_opt.Data());
-   sel.Form("%s",(selection_data+Mgg_sideband).Data());
+
+	// // Get the scale factor; the data mix needs to be scaled by this factor to match data sideband
+  //
+	// TH1F* hist_datamix_sideband = new TH1F("hist_datamix_sideband","hist_datamix_sideband",100,0,1000000);
+	// TH1F* hist_data_sideband = new TH1F("hist_data_sideband","hist_data_sideband",100,0,1000000);
+  //
+	// s.Form("tp_mass >> hist_datamix_sideband");
+	// sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+	// tree_bg->Draw(s,sel,"goff");
+  //
+	// s.Form("tp_mass >> hist_data_sideband");
+	// sel.Form("%s",(selection_data+Mgg_sideband).Data());
+	// tree_data->Draw(s,sel,"goff");
+  //
+	// cout << "Background sideband Integral: " << hist_datamix_sideband->Integral() << endl;
+	// cout << "Data sideband Integral: " << hist_data_sideband->Integral() << endl;
+	// double scale = 1;
+	// scale = hist_data_sideband->Integral() / hist_datamix_sideband->Integral();
+	// // scale = hist_data->Integral() ;
+	// cout << "Scale: " << scale << endl;
+
+  TH1F *hist_D_sideband = new TH1F("hist_D_sideband","hist_D_sideband",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+  s.Form("%s>>hist_D_sideband",what_to_opt.Data());
+  sel.Form("%s",(selection_data+Mgg_sideband).Data());
 	tree_data->Draw(s,sel,"goff");
 	cout<<"Data integral sidebands "<<hist_D_sideband->Integral()<<endl;
+
+  TH1F *hist_B_2016 = new TH1F("hist_B_2016","hist_B_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+  TH1F *hist_B_sideband_2016 = new TH1F("hist_B_sideband_2016","hist_B_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+
+  if (Normalization == 1)
+  {
+	// TH1F *hist_B_2016 = new TH1F("hist_B_2016","hist_B_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+  s.Form("%s>>hist_B_2016",what_to_opt.Data());
+  sel.Form("%s",(selection_bg+Mgg_window).Data());
+	tree_bg->Draw(s,sel,"goff");
+	hist_B_2016->Scale(scale);
+	// cout<<"BG integral under Mgg "<<hist_B->Integral()<<endl;
+
+	// TH1F *hist_B_sideband_2016 = new TH1F("hist_B_sideband_2016","hist_B_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+  s.Form("%s>>hist_B_sideband_2016",what_to_opt.Data());
+  sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+	tree_bg->Draw(s,sel,"goff");
+	hist_B_sideband_2016->Scale(scale);
+	// cout<<"BG integral sidebands "<<hist_B_sideband->Integral()<<endl;
+
+	// TH1F *hist_D_sideband = new TH1F("hist_D_sideband","hist_D_sideband",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+  // s.Form("%s>>hist_D_sideband",what_to_opt.Data());
+  // sel.Form("%s",(selection_data+Mgg_sideband).Data());
+	// tree_data->Draw(s,sel,"goff");
+	// cout<<"Data integral sidebands "<<hist_D_sideband->Integral()<<endl;
+
+  }
+  else if (Normalization == 2 || Normalization == 3 || Normalization == 4)
+  {
+    // TH1F *hist_D_sideband_2016 = new TH1F("hist_D_sideband_2016","hist_D_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+    // s.Form("%s>>hist_D_sideband_2016",what_to_opt.Data());
+    // sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  	// tree_data_2016->Draw(s,sel,"goff");
+    //
+    // TH1F *hist_D_sideband_2017 = new TH1F("hist_D_sideband_2017","hist_D_sideband_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+    // s.Form("%s>>hist_D_sideband_2017",what_to_opt.Data());
+    // sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  	// tree_data_2017->Draw(s,sel,"goff");
+    //
+    // TH1F *hist_D_sideband_2018 = new TH1F("hist_D_sideband_2018","hist_D_sideband_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- data sideband region
+    // s.Form("%s>>hist_D_sideband_2018",what_to_opt.Data());
+    // sel.Form("%s",(selection_data+Mgg_sideband).Data());
+  	// tree_data_2018->Draw(s,sel,"goff");
+
+
+
+
+    // TH1F *hist_B_2016 = new TH1F("hist_B_2016","hist_B_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+    s.Form("%s>>hist_B_2016",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2016->Draw(s,sel,"goff");
+  	hist_B_2016->Scale(hist_D_sideband_2016->Integral()/hist_B_2016->Integral());
+
+    TH1F *hist_B_2017 = new TH1F("hist_B_2017","hist_B_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+    s.Form("%s>>hist_B_2017",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2017->Draw(s,sel,"goff");
+  	hist_B_2017->Scale(hist_D_sideband_2017->Integral()/hist_B_2017->Integral());
+
+    TH1F *hist_B_2018 = new TH1F("hist_B_2018","hist_B_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+    s.Form("%s>>hist_B_2018",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2018->Draw(s,sel,"goff");
+  	hist_B_2018->Scale(hist_D_sideband_2018->Integral()/hist_B_2018->Integral());
+
+    hist_B_2016->Add(hist_B_2017);
+    hist_B_2016->Add(hist_B_2018);
+    // hist_B_2016->Scale(scale);
+
+    // TH1F *hist_B = (TH1F*)hist_B_2016->Clone("hist_B");
+
+  	// TH1F *hist_B_sideband_2016 = new TH1F("hist_B_sideband_2016","hist_B_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2016",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2016->Draw(s,sel,"goff");
+  	hist_B_sideband_2016->Scale(hist_D_sideband_2016->Integral()/hist_B_sideband_2016->Integral());
+
+    TH1F *hist_B_sideband_2017 = new TH1F("hist_B_sideband_2017","hist_B_sideband_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2017",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2017->Draw(s,sel,"goff");
+  	hist_B_sideband_2017->Scale(hist_D_sideband_2017->Integral()/hist_B_sideband_2017->Integral());
+
+    TH1F *hist_B_sideband_2018 = new TH1F("hist_B_sideband_2018","hist_B_sideband_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2018",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2018->Draw(s,sel,"goff");
+  	hist_B_sideband_2018->Scale(hist_D_sideband_2018->Integral()/hist_B_sideband_2018->Integral());
+
+    hist_B_sideband_2016->Add(hist_B_sideband_2017);
+    hist_B_sideband_2016->Add(hist_B_sideband_2018);
+    // hist_B_sideband_2016->Scale(scale);
+    // TH1F *hist_B_sideband = (TH1F*)hist_B_sideband_2016->Clone("hist_B_sideband");
+
+
+  }
+
+  if (Normalization == 5)
+  {
+    s.Form("%s>>hist_B_2016",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2016->Draw(s,sel,"goff");
+  	hist_B_2016->Scale(35.9);
+
+    TH1F *hist_B_2017 = new TH1F("hist_B_2017","hist_B_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+    s.Form("%s>>hist_B_2017",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2017->Draw(s,sel,"goff");
+  	hist_B_2017->Scale(41.5);
+
+    TH1F *hist_B_2018 = new TH1F("hist_B_2018","hist_B_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins  -- background signal region
+    s.Form("%s>>hist_B_2018",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_window).Data());
+  	tree_bg_2018->Draw(s,sel,"goff");
+  	hist_B_2018->Scale(54.38);
+
+    hist_B_2016->Add(hist_B_2017);
+    hist_B_2016->Add(hist_B_2018);
+    hist_B_2016->Scale(scale);
+
+    // TH1F *hist_B = (TH1F*)hist_B_2016->Clone("hist_B");
+
+  	// TH1F *hist_B_sideband_2016 = new TH1F("hist_B_sideband_2016","hist_B_sideband_2016",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2016",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2016->Draw(s,sel,"goff");
+  	hist_B_sideband_2016->Scale(35.9);
+
+    TH1F *hist_B_sideband_2017 = new TH1F("hist_B_sideband_2017","hist_B_sideband_2017",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2017",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2017->Draw(s,sel,"goff");
+  	hist_B_sideband_2017->Scale(41.5);
+
+    TH1F *hist_B_sideband_2018 = new TH1F("hist_B_sideband_2018","hist_B_sideband_2018",int((xmax-xmin)/precision),xmin,xmax); //200 bins -- background sideband region
+    s.Form("%s>>hist_B_sideband_2018",what_to_opt.Data());
+    sel.Form("%s",(selection_bg+Mgg_sideband).Data());
+  	tree_bg_2018->Draw(s,sel,"goff");
+  	hist_B_sideband_2018->Scale(54.38);
+
+    hist_B_sideband_2016->Add(hist_B_sideband_2017);
+    hist_B_sideband_2016->Add(hist_B_sideband_2018);
+    hist_B_sideband_2016->Scale(scale);
+    // TH1F *hist_B_sideband = (TH1F*)hist_B_sideband_2016->Clone("hist_B_sideband");
+  }
+
+   TH1F *hist_B = (TH1F*)hist_B_2016->Clone("hist_B");
+   TH1F *hist_B_sideband = (TH1F*)hist_B_sideband_2016->Clone("hist_B_sideband");
 
 
 	double END = hist_B->GetBinCenter(hist_B->FindLastBinAbove(-1.))+hist_B->GetBinWidth(1)/2.; //right end of BDT distibution
