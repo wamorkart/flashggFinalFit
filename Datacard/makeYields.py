@@ -27,15 +27,16 @@ def get_options():
   parser.add_option('--inputWSDirMap', dest='inputWSDirMap', default='2016:/vols/cms/jl2117/hgg/ws/UL/Sept20/MC_final/signal_2016', help="Map. Format: year=inputWSDir (separate years by comma)")
   parser.add_option('--cat', dest='cat', default='', help='Analysis category')
   parser.add_option('--procs', dest='procs', default='auto', help='Comma separated list of signal processes. auto = automatically inferred from input workspaces')
-  parser.add_option('--ext', dest='ext', default='', help='Extension for saving') 
+  parser.add_option('--ext', dest='ext', default='', help='Extension for saving')
   parser.add_option('--mass', dest='mass', default='125', help='Input workspace mass')
+  parser.add_option('--mass_a', dest='mass_a', default='', help="mass of pseudoscalar)")
   parser.add_option('--mergeYears', dest='mergeYears', default=False, action="store_true", help="Merge category across years")
   parser.add_option('--skipBkg', dest='skipBkg', default=False, action="store_true", help="Only add signal processes to datacard")
   parser.add_option('--bkgScaler', dest='bkgScaler', default=1., type="float", help="Add overall scale factor for background")
-  parser.add_option('--sigModelWSDir', dest='sigModelWSDir', default='./Models/signal', help='Input signal model WS directory') 
-  parser.add_option('--sigModelExt', dest='sigModelExt', default='packaged', help='Extension used when saving signal model') 
-  parser.add_option('--bkgModelWSDir', dest='bkgModelWSDir', default='./Models/background', help='Input background model WS directory') 
-  parser.add_option('--bkgModelExt', dest='bkgModelExt', default='multipdf', help='Extension used when saving background model') 
+  parser.add_option('--sigModelWSDir', dest='sigModelWSDir', default='./Models/signal', help='Input signal model WS directory')
+  parser.add_option('--sigModelExt', dest='sigModelExt', default='packaged', help='Extension used when saving signal model')
+  parser.add_option('--bkgModelWSDir', dest='bkgModelWSDir', default='./Models/background', help='Input background model WS directory')
+  parser.add_option('--bkgModelExt', dest='bkgModelExt', default='multipdf', help='Extension used when saving background model')
   # For yields calculations:
   parser.add_option('--skipZeroes', dest='skipZeroes', default=False, action="store_true", help="Skip signal processes with 0 sum of weights")
   parser.add_option('--skipCOWCorr', dest='skipCOWCorr', default=False, action="store_true", help="Skip centralObjectWeight correction for events in acceptance. Use if no centralObjectWeight in workspace")
@@ -47,8 +48,8 @@ def get_options():
 
 # Extract years and inputWSDir
 inputWSDirMap = od()
-for i in opt.inputWSDirMap.split(","): 
-  print " --> Taking %s input workspaces from: %s"%(i.split("=")[0],i.split("=")[1]) 
+for i in opt.inputWSDirMap.split(","):
+  print " --> Taking %s input workspaces from: %s"%(i.split("=")[0],i.split("=")[1])
   if not os.path.isdir( i.split("=")[1] ):
     print " --> [ERROR] Directory %s does not exist. Leaving..."%i.split("=")[1]
     leave()
@@ -83,7 +84,7 @@ print " ........................................................................
 # Signal processes
 for year in years:
   for proc in procs:
-
+    print "year", year
     # Identifier
     _id = "%s_%s_%s_%s"%(proc,year,opt.cat,sqrts__)
 
@@ -96,10 +97,13 @@ for year in years:
     if opt.mergeYears: _cat = opt.cat
     else: _cat = "%s_%s"%(opt.cat,year)
 
-    # Input flashgg ws 
-    _inputWSFile = glob.glob("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))[0]
-    _nominalDataName = "%s_%s_%s_%s"%(_proc_s0,opt.mass,sqrts__,opt.cat)
-
+    # Input flashgg ws
+    _inputWSFile = glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(inputWSDirMap[year],opt.mass_a,year))[0]
+    # _inputWSFile = glob.glob("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))[0]
+    # _nominalDataName = "%s_%s_%s_%s"%(_proc_s0,opt.mass,sqrts__,opt.cat)
+    ## H4GTag_Cat0_13TeV_2016
+    _nominalDataName = "%s_%s_%s_%s"%(_proc_s0,opt.cat,sqrts__,year)
+    # print "_nominalDataName: ", _nominalDataName
     # If opt.skipZeroes check nominal yield if 0 then do not add
     skipProc = False
     if opt.skipZeroes:
@@ -111,10 +115,14 @@ for year in years:
       f.Close()
     if skipProc: continue
 
-    # Input model ws 
+    # Input model ws
     if opt.cat == "NOTAG": _modelWSFile, _model = '-', '-'
     else:
-      _modelWSFile = "%s/CMS-HGG_sigfit_%s_%s.root"%(opt.sigModelWSDir,opt.sigModelExt,_cat)
+      # _modelWSFile = "%s/CMS-HGG_sigfit_%s_%s.root"%(opt.sigModelWSDir,opt.sigModelExt,_cat)
+      # CMS-HGG_sigfit_packaged_2016_15_Cat0.root
+      # print opt.sigModelExt[:8]
+      # print opt.sigModelExt[-3:]
+      _modelWSFile = "%s_%s_%s/CMS-HGG_sigfit_%s_%s%s_%s_%s.root"%(opt.sigModelWSDir,year,opt.mass_a,opt.sigModelExt[:8],year,opt.sigModelExt[-3:],_cat,year)
       _model = "%s_%s:%s_%s"%(outputWSName__,sqrts__,outputWSObjectTitle__,_id)
 
     # Extract rate from lumi
@@ -130,9 +138,11 @@ if( not opt.skipBkg)&( opt.cat != "NOTAG" ):
   _proc_data = "data_obs"
   if opt.mergeYears:
     _cat = opt.cat
-    _modelWSFile = "%s/CMS-HGG_%s_%s.root"%(opt.bkgModelWSDir,opt.bkgModelExt,_cat)
-    _model_bkg = "%s:CMS_%s_%s_%s_bkgshape"%(bkgWSName__,decayMode,_cat,sqrts__)
-    _model_data = "%s:roohist_data_mass_%s"%(bkgWSName__,_cat)
+    _modelWSFile = "%s_%s/CMS-HGG_%s_%s.root"%(opt.bkgModelWSDir,opt.mass_a,opt.bkgModelExt,_cat)
+    # _modelWSFile = "%s/CMS-HGG_%s_%s.root"%(opt.bkgModelWSDir,opt.bkgModelExt,_cat)
+    _model_bkg = "%s:CMS_%s_H4GTag_%s_%s_bkgshape"%(bkgWSName__,decayMode,_cat,sqrts__)
+    # _model_data = "%s:roohist_data_mass_%s"%(bkgWSName__,_cat)
+    _model_data = "%s:roohist_data_mass_H4GTag_%s"%(bkgWSName__,_cat)
     _proc_s0 = '-' #not needed for data/bkg
     _inputWSFile = '-' #not needed for data/bkg
     _nominalDataName = '-' #not needed for data/bkg
@@ -179,8 +189,8 @@ if opt.doSystematics:
   theoryFactoryType = {}
   # No experimental systematics for NOTAG
   if opt.cat != "NOTAG":
-    for s in experimental_systematics: 
-      if s['type'] == 'factory': 
+    for s in experimental_systematics:
+      if s['type'] == 'factory':
 	# Fix for HEM as only in 2018 workspaces
 	if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
 	else: experimentalFactoryType[s['name']] = factoryType(data,s)
@@ -188,8 +198,8 @@ if opt.doSystematics:
 	  data['%s_up_yield'%s['name']] = '-'
 	  data['%s_down_yield'%s['name']] = '-'
 	else: data['%s_yield'%s['name']] = '-'
-  for s in theory_systematics: 
-    if s['type'] == 'factory': 
+  for s in theory_systematics:
+    if s['type'] == 'factory':
       theoryFactoryType[s['name']] = factoryType(data,s)
       if theoryFactoryType[s['name']] in ["a_w","a_h"]:
 	data['%s_up_yield'%s['name']] = '-'
@@ -197,7 +207,7 @@ if opt.doSystematics:
 	if not opt.skipCOWCorr:
 	  data['%s_up_yield_COWCorr'%s['name']] = '-'
 	  data['%s_down_yield_COWCorr'%s['name']] = '-'
-      else: 
+      else:
 	data['%s_yield'%s['name']] = '-'
 	if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
 
@@ -242,8 +252,8 @@ for ir,r in data[data['type']=='sig'].iterrows():
       # Skip centralObjectWeight correction as concerns events in acceptance
       experimentalSystYields = calcSystYields(r['nominalDataName'],contents,inputWS,experimentalFactoryType,skipCOWCorr=True,proc=r['proc'],year=r['year'],ignoreWarnings=opt.ignore_warnings)
       for s,f in experimentalFactoryType.iteritems():
-	if f in ['a_w','a_h']: 
-	  for direction in ['up','down']: 
+	if f in ['a_w','a_h']:
+	  for direction in ['up','down']:
 	    data.at[ir,"%s_%s_yield"%(s,direction)] = experimentalSystYields["%s_%s"%(s,direction)]
 	else:
 	  data.at[ir,"%s_yield"%s] = experimentalSystYields[s]
@@ -251,8 +261,8 @@ for ir,r in data[data['type']=='sig'].iterrows():
     # For theoretical systematics:
     theorySystYields = calcSystYields(r['nominalDataName'],contents,inputWS,theoryFactoryType,skipCOWCorr=opt.skipCOWCorr,proc=r['proc'],year=r['year'],ignoreWarnings=opt.ignore_warnings)
     for s,f in theoryFactoryType.iteritems():
-      if f in ['a_w','a_h']: 
-	for direction in ['up','down']: 
+      if f in ['a_w','a_h']:
+	for direction in ['up','down']:
 	  data.at[ir,"%s_%s_yield"%(s,direction)] = theorySystYields["%s_%s"%(s,direction)]
 	  if not opt.skipCOWCorr: data.at[ir,"%s_%s_yield_COWCorr"%(s,direction)] = theorySystYields["%s_%s_COWCorr"%(s,direction)]
       else:

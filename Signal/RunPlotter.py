@@ -11,12 +11,12 @@ from tools.plottingTools import *
 
 def get_options():
   parser = OptionParser()
-  parser.add_option('--procs', dest='procs', default='all', help="Comma separated list of processes to include. all = sum all signal procs")  
-  parser.add_option('--years', dest='years', default='2016,2017,2018', help="Comma separated list of years to include")  
+  parser.add_option('--procs', dest='procs', default='all', help="Comma separated list of processes to include. all = sum all signal procs")
+  parser.add_option('--years', dest='years', default='2016,2017,2018', help="Comma separated list of years to include")
   parser.add_option('--cats', dest='cats', default='', help="Comma separated list of analysis categories to include. all = sum of all categories, wall = weighted sum of categories (requires S/S+B from ./Plots/getCatInfo.py)")
   parser.add_option('--loadCatWeights', dest='loadCatWeights', default='', help="Load S/S+B weights for analysis categories (path to weights json file)")
   parser.add_option('--ext', dest='ext', default='test', help="Extension: defines output dir where signal models are saved")
-  parser.add_option("--xvar", dest="xvar", default='CMS_hgg_mass:m_{#gamma#gamma}:GeV', help="x-var (name:title:units)")
+  parser.add_option("--xvar", dest="xvar", default='CMS_hgg_mass:m_{#gamma#gamma#gamma#gamma}:GeV', help="x-var (name:title:units)")
   parser.add_option("--mass", dest="mass", default='125', help="Mass of datasets")
   parser.add_option("--MH", dest="MH", default='125', help="Higgs mass (for pdf)")
   parser.add_option("--nBins", dest="nBins", default=160, type='int', help="Number of bins")
@@ -26,6 +26,8 @@ def get_options():
   parser.add_option("--translateProcs", dest="translateProcs", default=None, help="JSON to store proc translations")
   parser.add_option("--label", dest="label", default='Simulation Preliminary', help="CMS Sub-label")
   parser.add_option("--doFWHM", dest="doFWHM", default=False, action='store_true', help="Do FWHM")
+  parser.add_option('--outPlot', dest='outPlot', default=False, help="Store output plots ")
+
   return parser.parse_args()
 (opt,args) = get_options()
 
@@ -49,7 +51,8 @@ if opt.cats in ['all','wall']:
     citr += 1
 else:
   for cat in opt.cats.split(","):
-    f = "%s/outdir_%s/CMS-HGG_sigfit_%s_%s.root"%(swd__,opt.ext,opt.ext,cat)
+    # f = "%s/outdir_%s/CMS-HGG_sigfit_%s_%s.root"%(swd__,opt.ext,opt.ext,cat)
+    f = "%s/outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root"%(swd__,opt.ext,opt.ext,cat,opt.years)
     inputFiles[cat] = f
     if citr == 0:
       w = ROOT.TFile(f).Get("wsig_13TeV")
@@ -96,7 +99,7 @@ for cat,f in inputFiles.iteritems():
         k = "%s__%s"%(proc,year)
         _id = "%s_%s_%s_%s"%(proc,year,cat,sqrts__)
         norms[k] = w.function("%s_%s_normThisLumi"%(outputWSObjectTitle__,_id))
-    
+
   # Iterate over norms: extract total category norm
   catNorm = 0
   for k, norm in norms.iteritems():
@@ -117,7 +120,7 @@ for cat,f in inputFiles.iteritems():
     # Make empty copy of dataset
     d = w.data("sig_mass_m%s_%s"%(opt.mass,_id))
     d_rwgt = d.emptyClone(_id)
-    
+
     # Calc norm factor
     if d.sumEntries() == 0: nf = 0
     else: nf = nval/d.sumEntries()
@@ -130,7 +133,7 @@ for cat,f in inputFiles.iteritems():
     data_rwgt[_id] = d_rwgt
 
     # Extract pdf and create histogram
-    pdf = w.pdf("extend%s_%sThisLumi"%(outputWSObjectTitle__,_id)) 
+    pdf = w.pdf("extend%s_%sThisLumi"%(outputWSObjectTitle__,_id))
     hpdfs[_id] = pdf.createHistogram("h_pdf_%s"%_id,xvar,ROOT.RooFit.Binning(opt.pdf_nBins))
     hpdfs[_id].Scale(wcat*float(opt.nBins)/320) # FIXME: hardcoded 320
 
@@ -139,7 +142,7 @@ for cat,f in inputFiles.iteritems():
 
   # Sum pdf histograms
   for _id,p in hpdfs.iteritems():
-    if 'pdf' not in hists: 
+    if 'pdf' not in hists:
       hists['pdf'] = p.Clone("h_pdf")
       hists['pdf'].Reset()
     # Fill
@@ -154,7 +157,7 @@ for cat,f in inputFiles.iteritems():
       # Fill
       for _id,p in hpdfs.iteritems():
 	if year in _id: hists['pdf_%s'%year] += p
-   
+
   # Garbage removal
   for d in data_rwgt.itervalues(): d.Delete()
   for p in hpdfs.itervalues(): p.Delete()
@@ -163,4 +166,5 @@ for cat,f in inputFiles.iteritems():
 
 # Make plot
 if not os.path.isdir("%s/outdir_%s/Plots"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s/Plots"%(swd__,opt.ext))
-plotSignalModel(hists,opt,_outdir="%s/outdir_%s/Plots"%(swd__,opt.ext))
+# plotSignalModel(hists,opt,_outdir="%s/outdir_%s/Plots"%(swd__,opt.ext))
+plotSignalModel(hists,opt,_outdir="%s"%(opt.outPlot))

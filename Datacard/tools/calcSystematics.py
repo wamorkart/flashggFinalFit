@@ -16,7 +16,7 @@ def addConstantSyst(sd,_syst,options):
     with open( _syst['value'], "r" ) as jsonfile: uval = json.load(jsonfile)
 
   # Add column to dataFrame with default value
-  if _syst['correlateAcrossYears'] == 1: 
+  if _syst['correlateAcrossYears'] == 1:
     sd[_syst['name']] = '-'
     if fromJson:
       sd.loc[(sd['type']=='sig'),_syst['name']] = sd[(sd['type']=='sig')].apply(lambda x: getValueFromJson(x,uval,_syst['name']), axis=1)
@@ -45,7 +45,7 @@ def getValueFromJson(row,uncertainties,sname):
   p = re.sub("_2016_%s"%decayMode,"",row['proc'])
   p = re.sub("_2017_%s"%decayMode,"",p)
   p = re.sub("_2018_%s"%decayMode,"",p)
-  if p in uncertainties: 
+  if p in uncertainties:
     if type(uncertainties[p][sname])==list: return uncertainties[p][sname]
     else: return [uncertainties[p][sname]]
   else: return '-'
@@ -65,9 +65,17 @@ def factoryType(d,s):
   for ir, r in d[d['type']=='sig'].iterrows():
     f = ROOT.TFile(r.inputWSFile)
     ws = f.Get(inputWSName__)
-    dataHistUp = "%s_%sUp01sigma"%(r.nominalDataName,s['name'])
-    dataHistDown = "%s_%sDown01sigma"%(r.nominalDataName,s['name'])
+    # print r.nominalDataName
+    # print s['name']
+    # print "%s_%sUp01sigma_%s"%(r.nominalDataName[:11],s['name'],r.nominalDataName[-10:])
 
+    # print  "%s_%sUp01sigma"%(r.nominalDataName,s['name'])
+    # dataHistUp = "%s_%sUp01sigma"%(r.nominalDataName,s['name'])
+    # dataHistDown = "%s_%sDown01sigma"%(r.nominalDataName,s['name'])
+    dataHistUp = "%s_%sUp01sigma_%s"%(r.nominalDataName[:11],s['name'],r.nominalDataName[-10:])
+    dataHistDown = "%s_%sDown01sigma_%s"%(r.nominalDataName[:11],s['name'],r.nominalDataName[-10:])
+    # print "dataHistUp: ", dataHistUp
+    # print "dataHistDown: ", dataHistDown
     # Check if syst is var (i.e. weight) in workspace
     if ws.allVars().selectByName("%s*"%(s['name'])).getSize():
       nWeights = ws.allVars().selectByName("%s*"%(s['name'])).getSize()
@@ -106,10 +114,10 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
   # Loop over systematics and create counter in dict
   for s, f in _systFactoryTypes.iteritems():
     if f in ["a_h","a_w"]:
-      for direction in ['up','down']: 
+      for direction in ['up','down']:
         systYields["%s_%s"%(s,direction)] = 0
         if not skipCOWCorr: systYields["%s_%s_COWCorr"%(s,direction)] = 0
-    else: 
+    else:
       systYields[s] = 0
       if not skipCOWCorr: systYields["%s_COWCorr"%s] = 0
 
@@ -124,8 +132,10 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
     elif f == "a_w":
       if( "%sUp01sigma"%s not in _nominalDataContents )|( "%sDown01sigma"%s not in _nominalDataContents ):
 	systToSkip.append(s)
+
 	print " --> [%s] Weight in nominal RooDataSet for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString)
-	if not ignoreWarnings: sys.exit(1) 
+
+	if not ignoreWarnings: sys.exit(1)
     else:
       if s not in _nominalDataContents:
 	systToSkip.append(s)
@@ -146,7 +156,7 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
       # If asymmetric weights:
       elif f == "a_w":
 
-        if s in systToSkip: 
+        if s in systToSkip:
           systYields["%s_up"%s] += w
           systYields["%s_down"%s] += w
           if not skipCOWCorr:
@@ -166,7 +176,7 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
           else:
             w_up, w_down = w*(f_up/f_central), w*(f_down/f_central)
           # Add weights to counters
-          systYields["%s_up"%s] += w_up        
+          systYields["%s_up"%s] += w_up
           systYields["%s_down"%s] += w_down
           if not skipCOWCorr:
             if f_COWCorr != 0:
@@ -184,7 +194,7 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
 
         else:
           if "scaleWeight" in s: centralWeightStr = "scaleWeight_0"
-          elif "alphaSWeight" in s: centralWeightStr = "scaleWeight_0" 
+          elif "alphaSWeight" in s: centralWeightStr = "scaleWeight_0"
           elif "pdfWeight" in s: centralWeightStr = "pdfWeight_0"
           else: centralWeightStr = "centralObjectWeight"
 	  f_central = p.getRealValue(centralWeightStr) if centralWeightStr in _nominalDataContents else 1.
@@ -209,7 +219,10 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
   # For systematics stored as separate RooDataHists
   for s, f in _systFactoryTypes.iteritems():
     if f == "a_h":
-      data_hist_up, data_hist_down = _inputWS.data("%s_%sUp01sigma"%(_nominalDataName,s)), _inputWS.data("%s_%sDown01sigma"%(_nominalDataName,s))
+      # data_hist_up, data_hist_down = _inputWS.data("%s_%sUp01sigma"%(_nominalDataName,s)), _inputWS.data("%s_%sDown01sigma"%(_nominalDataName,s))
+      data_hist_up, data_hist_down = _inputWS.data("%s_%sUp01sigma_%s"%(_nominalDataName[:11],s,_nominalDataName[-10:])), _inputWS.data("%s_%sDown01sigma_%s"%(_nominalDataName[:11],s,_nominalDataName[-10:]))
+      # print "data_hist_up: ", "%s_%sUp01sigma_%s"%(_nominalDataName[:11],s,_nominalDataName[-10:])
+      # print "data_hist_down: ", "%s_%sDown01sigma_%s"%(_nominalDataName[:11],s,_nominalDataName[-10:])
       # Check if datasets exist: if not print warning message and set to nominal weight
       if( data_hist_up == None )|( data_hist_down == None ):
         print " --> [%s] RooDataHist for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString)
@@ -220,10 +233,10 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
         systYields["%s_up"%s] = data_hist_up.sumEntries()
         systYields["%s_down"%s] = data_hist_down.sumEntries()
 
-        
+
   # Add variations to dataFrame
   return systYields
-  
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # EXPERIMENTAL SYSTEMATICS FACTORY:
@@ -252,7 +265,7 @@ def experimentalSystFactory(d,systs,ftype,options,_removal=False):
 
     # Remove yield columns from dataFrame
     if _removal:
-      if f in ['a_h','a_w']: 
+      if f in ['a_h','a_w']:
 	for direction in ['up','down']: d.drop(['%s_%s_yield'%(s['name'],direction)], axis=1, inplace=True)
       else: d.drop(['%s_yield'%s['name']], axis=1, inplace=True)
 
@@ -264,7 +277,7 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
 
   # For process yields: sum central object weight corrected (remove experimental effects)
   corrExt = "_COWCorr" if not options.skipCOWCorr else ''
-   
+
   # Calculate the per-production mode (per-year) yield variation: add as column in dataFrame
   for proc_s0 in d[d['type']=='sig'].proc_s0.unique():
     for year in options.years.split(","):
@@ -273,23 +286,23 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
       for s in systs:
 	if s['type'] == 'constant': continue
 	f = ftype[s['name']]
-	if f in ['a_w','a_h']: 
-	  for direction in ['up','down']: 
+	if f in ['a_w','a_h']:
+	  for direction in ['up','down']:
             d.loc[mask,'proc_s0_%s_%s_yield'%(s['name'],direction)] = d[mask]['%s_%s_yield%s'%(s['name'],direction,corrExt)].sum()
-	else: 
+	else:
           d.loc[mask,'proc_s0_%s_yield'%s['name']] = d[mask]['%s_yield%s'%(s['name'],corrExt)].sum()
   # Calculate the per-STXS bin (per-year already in proc name) yield variations: add as column in dataFrame
   for proc in d[d['type']=='sig'].proc.unique():
     mask = (d['proc']==proc)
-    d.loc[mask,'proc_nominal_yield'] = d[mask]['nominal_yield%s'%corrExt].sum() 
+    d.loc[mask,'proc_nominal_yield'] = d[mask]['nominal_yield%s'%corrExt].sum()
     for s in systs:
       if s['type'] == 'constant': continue
       mask = (d['proc']==proc)
       f = ftype[s['name']]
-      if f in ['a_w','a_h']: 
-        for direction in ['up','down']: 
+      if f in ['a_w','a_h']:
+        for direction in ['up','down']:
           d.loc[mask,'proc_%s_%s_yield'%(s['name'],direction)] = d[mask]['%s_%s_yield%s'%(s['name'],direction,corrExt)].sum()
-      else: 
+      else:
 	d.loc[mask,'proc_%s_yield'%s['name']] = d[mask]['%s_yield%s'%(s['name'],corrExt)].sum()
 
   # For merging STXS bins in parameter scheme:
@@ -297,7 +310,7 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
     for mergeName, mergeBins in stxsMergeScheme.iteritems():
       for year in options.years.split(","):
         mBins = [] # add full name (inc year and and decay)
-        for mb in mergeBins: mBins.append("%s_%s_hgg"%(mb,year)) 
+        for mb in mergeBins: mBins.append("%s_%s_hgg"%(mb,year))
 	mask = (d['type']=='sig')&(d.apply(lambda x: x['proc'] in mBins, axis=1))
         d.loc[mask,'merge_%s_nominal_yield'%mergeName] = d[mask]['nominal_yield%s'%corrExt].sum()
         # Loop over systematics
@@ -314,8 +327,8 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
   # Loop over systematics and add new column in dataFrame for each tier
   for s in systs:
     if s['type'] == 'constant': continue
-    for tier in s['tiers']: 
-      if tier == 'mnorm': 
+    for tier in s['tiers']:
+      if tier == 'mnorm':
         if options.doSTXSMerging:
           for mergeName in stxsMergeScheme: d["%s_%s_mnorm"%(s['name'],mergeName)] = '-'
       else: d["%s_%s"%(s['name'],tier)] = '-'
@@ -329,7 +342,7 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
     if "THU_ggH" in s['name']: mask = (d['type']=='sig')&(d['nominal_yield']!=0)&(d['proc'].str.contains('ggH'))
     else: mask = (d['type']=='sig')&(d['nominal_yield']!=0)
     # Loop over tiers and use appropriate mode for compareYield function: skip mnorm as treated separately below
-    for tier in s['tiers']: 
+    for tier in s['tiers']:
       if tier == 'mnorm': continue
       d.loc[mask,"%s_%s"%(s['name'],tier)] = d[mask].apply(lambda x: compareYield(x,f,s['name'],mode=tier), axis=1)
 
@@ -355,12 +368,12 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
       if s['type'] == 'constant': continue
       # Extract factory type
       f = ftype[s['name']]
-      if f in ['a_h','a_w']: 
-	for direction in ['up','down']: 
+      if f in ['a_h','a_w']:
+	for direction in ['up','down']:
 	  for id_ in ids_:
 	    d.drop(['%s%s_%s_yield'%(id_,s['name'],direction)], axis=1, inplace=True)
-      else: 
-	for id_ in ids_: 
+      else:
+	for id_ in ids_:
 	  d.drop(['%s%s_yield'%(id_,s['name'])], axis=1, inplace=True)
 
     # Remove also nominal yields for all combinations
@@ -368,10 +381,10 @@ def theorySystFactory(d,systs,ftype,options,stxsMergeScheme=None,_removal=False)
     for id_ in ids_: d.drop(['%snominal_yield'%id_], axis=1, inplace=True)
 
   return d
-  
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Function for extracting systematic factors:
-#   * mode == treatment of theory systematic  
+#   * mode == treatment of theory systematic
 def compareYield(row,factoryType,sname,mode='default',mname=None):
 
   # Catch: if any yields in denominators are zero: return 1
@@ -383,7 +396,7 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
       if factoryType in ["a_w","a_h"]: return [1.,1.]
       else: return [1.]
     if factoryType in ["a_w","a_h"]:
-      for direction in ['up','down']: 
+      for direction in ['up','down']:
 	if row["proc_%s_%s_yield"%(sname,direction)] == 0: return [1.,1.]
     else:
       if row["proc_%s_yield"%sname] == 0: return [1.]
@@ -398,7 +411,7 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
     else: return [row["%s_yield"%sname]/row['nominal_yield']]
 
   elif mode=='shape':
-    if factoryType in ["a_w","a_h"]: 
+    if factoryType in ["a_w","a_h"]:
       shape_up = (row["%s_up_yield"%sname]/row['nominal_yield'])/(row["proc_%s_up_yield"%sname]/row["proc_nominal_yield"])
       shape_down = (row["%s_down_yield"%sname]/row['nominal_yield'])/(row["proc_%s_down_yield"%sname]/row["proc_nominal_yield"])
       return [shape_down,shape_up]
@@ -423,7 +436,7 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
     else:
       mnorm = (row["proc_%s_yield"%sname]/row["proc_nominal_yield"])/(row["merge_%s_%s_yield"%(mname,sname)]/row["merge_%s_nominal_yield"%mname])
       return [mnorm]
- 
+
   elif mode == 'inorm':
     if factoryType in ["a_w","a_h"]:
       inorm_up = (row["proc_%s_up_yield"%sname]/row["proc_nominal_yield"])
@@ -431,7 +444,7 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
       return [inorm_down,inorm_up]
     else:
       inorm = (row["proc_%s_yield"%sname]/row[proc_yield_str])
-      return [inorm]  
+      return [inorm]
 
   elif mode == 'inc':
     if factoryType in ["a_w","a_h"]:
@@ -440,18 +453,18 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
       return [inc_down,inc_up]
     else:
       inc = (row["proc_s0_%s_yield"%sname]/row["proc_s0_nominal_yield"])
-      return [inc]  
+      return [inc]
 
-  else: 
+  else:
     print " --> [ERROR] theory systematic tier %s is not supported. Leaving"%mode
-    sys.exit(1) 
+    sys.exit(1)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Function to group systematics: e.g. for scaleWeight where up/down = [1,2],[3,6] etc
 def groupSystematics(d,systs,options,prefix="scaleWeight",groupings=[],stxsMergeScheme=None,_removal=False):
-  
+
   # Loop over groupings
-  for group_idx in range(len(groupings)): 
+  for group_idx in range(len(groupings)):
     gr = groupings[group_idx]
 
     # Extract systematic from systs
@@ -504,7 +517,7 @@ def groupSystematics(d,systs,options,prefix="scaleWeight",groupings=[],stxsMerge
       elif s['name'] == "%s_%g"%(prefix,gr[1]): systs.remove(s)
 
   return d,systs
-      
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Function to calculate the envelope of systematics with a regexp
 def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_removal=False):
@@ -525,10 +538,10 @@ def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_remova
   env = {}
   env['name'] = "%s_env"%("_".join(s_regexp[0]['name'].split("_")[:-1]))
   env['title'] = "%s_env"%("_".join(s_regexp[0]['title'].split("_")[:-1]))
-  env['tiers'] = s_regexp[0]['tiers'] 
-  env['prior'] = s_regexp[0]['prior'] 
-  env['correlateAcrossYears'] = s_regexp[0]['correlateAcrossYears'] 
-  env['type'] = s_regexp[0]['type'] 
+  env['tiers'] = s_regexp[0]['tiers']
+  env['prior'] = s_regexp[0]['prior']
+  env['correlateAcrossYears'] = s_regexp[0]['correlateAcrossYears']
+  env['type'] = s_regexp[0]['type']
 
   # Loop over systematic tiers: all enveloped systematics must have the same tiers
   for s in s_regexp:
@@ -540,29 +553,29 @@ def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_remova
         # Loop over merging schemes
         for mergeName in stxsMergeScheme:
           env_name = "%s_%s_%s"%(env['name'],mergeName,tier)
-          d[env_name] = '-'      
+          d[env_name] = '-'
           # Define mask as all entries when first entry in envelope is set
           mask = (d['%s_%s_%s'%(s_regexp[0]['name'],mergeName,tier)]!='-')
           d.loc[mask,env_name] = d[mask].apply(lambda x: compareSystForEnvelope(x,s_regexp,tier,mname=mergeName) ,axis=1)
           # Remove original columns from dataFrame
           if _removal:
-            for s in s_regexp: d.drop( ["%s_%s_%s"%(s['name'],mergeName,tier)], axis=1, inplace=True ) 
+            for s in s_regexp: d.drop( ["%s_%s_%s"%(s['name'],mergeName,tier)], axis=1, inplace=True )
       else: continue
     else:
      env_name = "%s_%s"%(env['name'],tier)
-     d[env_name] = '-'      
+     d[env_name] = '-'
      # Define mask as all entries when first entry in envelope is set
-     mask = (d['%s_%s'%(s_regexp[0]['name'],tier)]!='-') 
+     mask = (d['%s_%s'%(s_regexp[0]['name'],tier)]!='-')
      d.loc[mask,env_name] = d[mask].apply(lambda x: compareSystForEnvelope(x,s_regexp,tier) ,axis=1)
      # Remove original columns from dataFrame
      if _removal:
-       for s in s_regexp: d.drop( ["%s_%s"%(s['name'],tier)], axis=1, inplace=True ) 
- 
+       for s in s_regexp: d.drop( ["%s_%s"%(s['name'],tier)], axis=1, inplace=True )
+
   # Add envelope to syst dictionary
   systs.append(env)
   if _removal:
     for s in s_regexp: systs.remove(s)
- 
+
   return d, systs
 
 # Function to compare systematic variation for envelope
@@ -575,7 +588,7 @@ def compareSystForEnvelope(row,systs,stier,mname=None):
     else: sname = "%s_%s"%(s['name'],stier)
     if len(row[sname]) == 2: e_symm = 0.5*(abs(row[sname][0]-1)+abs(row[sname][1]-1))
     else: e_symm = abs(row[sname][0]-1)
-    if e_symm > e_symm_max: 
+    if e_symm > e_symm_max:
       e_symm_max = e_symm
       env_idx = sidx
   env_s = systs[env_idx]

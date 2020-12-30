@@ -20,7 +20,7 @@ BATCH=""
 QUEUE=""
 YEAR="2016"
 CATOFFSET=0
-
+OUTDIRPLOT="";
 usage(){
 	echo "The script runs background scripts:"
 		echo "options:"
@@ -43,6 +43,7 @@ echo "--isData) specified in fb^-{1} (default $DATA)) "
 echo "--unblind) specified in fb^-{1} (default $UNBLIND)) "
 echo "--batch) which batch system to use (None (''),HTCONDOR,IC) (default '$BATCH')) "
 echo "--queue) queue to submit jobs to (specific to batch))"
+echo "--outdirplot) "
 }
 
 
@@ -78,7 +79,7 @@ case $1 in
 --unblind) UNBLIND=1;;
 --batch) BATCH=$2; shift;;
 --queue) QUEUE=$2; shift;;
-
+--outdirplot) OUTDIRPLOT=$2; shift;;
 (--) shift; break;;
 (-*) usage; echo "$0: error - unrecognized option $1" 1>&2; usage >> /dev/stderr; exit 1;;
 (*) break;;
@@ -86,10 +87,10 @@ esac
 shift
 done
 
-
 OUTDIR="outdir_${EXT}"
+OUTDIRPLOT=${OUTDIRPLOT}
 echo "[INFO] outdir is $OUTDIR, INTLUMI $INTLUMI" 
-
+echo "[INFO] outdir plot is $OUTDIRPLOT"
 if [ $ISDATA == 1 ]; then
 DATAEXT="-Data"
 fi
@@ -159,8 +160,8 @@ if [ $ISDATA == 1 ]; then
 OPT=" --isData 1"
 fi
 
-echo " ./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT_$CATS.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR --catOffset $CATOFFSET"
-./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT_$CATS.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR --catOffset $CATOFFSET
+echo " ./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT_$CATS.root  -D $OUTDIR/bkgfTest$DATAEXT -O $OUTDIRPLOT -f $CATS $OPT --year $YEAR --catOffset $CATOFFSET"
+./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT_$CATS.root  -D $OUTDIR/bkgfTest$DATAEXT -O $OUTDIRPLOT -f $CATS $OPT --year $YEAR --catOffset $CATOFFSET
 
 OPT=""
 fi

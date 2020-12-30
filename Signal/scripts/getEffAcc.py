@@ -26,13 +26,16 @@ def get_options():
   parser.add_option('--ext', default='test', help='Extension (to define analysis)')
   parser.add_option('--procs', dest='procs', default='', help='Signal processes')
   parser.add_option('--massPoints', dest='massPoints', default='120,125,130', help='MH')
+  parser.add_option('--mass_a', dest='mass_a', default='60', help="pseudoscalar mass")
+  parser.add_option('--year', dest='year', default='2016', help="year")
   parser.add_option('--skipCOWCorr', dest='skipCOWCorr', default=False, action="store_true", help="Skip centralObjectWeight correction for events in acceptance")
   parser.add_option('--doSTXSFractions', dest='doSTXSFractions', default=False, action="store_true", help="Fractional cross sections in each STXS bin (per stage0 process)")
   return parser.parse_args()
 (opt,args) = get_options()
 
 # Extract all processed analysis categories
-WSFileNames = extractWSFileNames(opt.inputWSDir)
+# WSFileNames = extractWSFileNames(opt.inputWSDir)
+WSFileNames = extractWSFileNames_H4G(opt.inputWSDir, opt.mass_a, opt.year)
 if not WSFileNames: leave()
 allCats = extractListOfCats(WSFileNames)
 if containsNOTAG(WSFileNames): allCats += ",NOTAG"
@@ -99,7 +102,7 @@ for _mp in opt.massPoints.split(","):
     ea = r['nominal_yield']/proc_yield
     if ea < 0.: ea = 0.
     effAcc[r['granular_key']] = ea
-  
+
   # Write to file
   if opt.skipCOWCorr: outfileName = "%s/outdir_%s/getEffAcc/json/effAcc_M%s_%s_skipCOWCorr.json"%(swd__,opt.ext,_mp,opt.ext)
   else: outfileName = "%s/outdir_%s/getEffAcc/json/effAcc_M%s_%s.json"%(swd__,opt.ext,_mp,opt.ext)
@@ -115,7 +118,7 @@ if opt.doSTXSFractions:
   # Loop over mass points
   for _mp in opt.massPoints.split(","):
     fout = open("%s/outdir_%s/getEffAcc/fractions/STXS_fractions_M%s.txt"%(swd__,opt.ext,_mp),"w")
-    fout.write(" --> STXS fractions:\n") 
+    fout.write(" --> STXS fractions:\n")
     for proc_s0 in ['GG2H','VBF','WH2HQQ','ZH2HQQ','QQ2HLNU','QQ2HLL',"GG2HQQ","GG2HLL","GG2HNUNU",'TTH','THQ','THW','BBH']:
       mask = (data.apply( lambda x: x['proc'].split("_")[0] == proc_s0, axis=1))&(data['massPoint']==_mp)
       proc_s0_yield = data[mask].nominal_yield_COWCorr.sum()
@@ -125,5 +128,4 @@ if opt.doSTXSFractions:
 	  mask = (data['proc']==proc)&(data['massPoint']==_mp)
 	  proc_yield = data[mask].nominal_yield_COWCorr.sum()
 	  fout.write("    * %s = %.4f\n"%(proc,proc_yield/proc_s0_yield))
-    fout.close()      
-
+    fout.close()

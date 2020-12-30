@@ -14,7 +14,8 @@ twd__ = "%s/Trees2WS"%cwd__
 sqrts__ = "13TeV"
 
 # Luminosity map in fb^-1
-lumiMap = {'2016':35.92, '2017':41.53, '2018':59.74, 'combined':137.19}
+# lumiMap = {'2016':35.92, '2017':41.53, '2018':59.74, 'combined':137.19}
+lumiMap = {'2016':35.92, '2017':41.53, '2018':54.38, 'combined':131.83}
 lumiScaleFactor = 1000. # Converting from pb to fb
 
 # Constants

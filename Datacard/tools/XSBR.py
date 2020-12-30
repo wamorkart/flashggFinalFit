@@ -21,6 +21,13 @@ XSBRMap = od()
 #XSBRMap['example']['GG2H'] = {'mode':'ggH'}
 #XSBRMap['example']['VBF'] = {'mode':'qqH'}
 #XSBRMap['example']['WH2HQQ'] = {'mode':'WH','factor':BR_W_qq}
+## H4G analysis
+XSBRMap['H4G'] = od()
+XSBRMap['H4G']['decay'] = {'mode':'constant','factor':1}
+XSBRMap['H4G']['H4GTag'] = {'mode':'constant','factor':0.001}
+
+
+
 # STXS analysis
 XSBRMap['STXS'] = od()
 XSBRMap['STXS']['decay'] = {'mode':'hgg'}
@@ -207,5 +214,3 @@ def extractXSBR(d,mass='125',analysis='STXS'):
   br = fd*xsbr[mode]
   XSBR_for_analysis['BR'] = br
   return XSBR_for_analysis
-
-

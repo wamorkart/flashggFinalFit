@@ -14,6 +14,8 @@ def get_options():
   parser = OptionParser()
   # Take inputs from config file
   parser.add_option('--inputConfig', dest='inputConfig', default='', help="Name of input config file (if specified will ignore other options)")
+  parser.add_option('--mass_a', dest='mass_a', default='', help="mass of pseudoscalar)")
+  parser.add_option('--year', dest='year', default='', help="year)")
   parser.add_option('--mode', dest='mode', default='', help="Which script to run. Options: ['fTest','getDiagProc','getEffAcc','calcPhotonSyst','signalFit','packageOnly','sigPlotsOnly']")
   parser.add_option('--modeOpts', dest='modeOpts', default='', help="Additional options to add to command line when running scripts (specify all within quotes e.g. \"--XYZ ABC\")")
   parser.add_option('--jobOpts', dest='jobOpts', default='', help="Additional options to add to job submission. For Condor separate individual options with a colon (specify all within quotes e.g. \"option_xyz = abc+option_123 = 456\")")
@@ -39,12 +41,15 @@ if opt.inputConfig != '':
     _cfg = signalScriptCfg
 
     #Extract options
-    options['inputWSDir']   = _cfg['inputWSDir']
+    options['inputWSDir']   = _cfg['inputWSDir']+str(opt.mass_a)+"/Reduced_8Events_1Cats/WS_1Cats"
     options['procs']        = _cfg['procs']
     options['cats']         = _cfg['cats']
-    options['ext']          = _cfg['ext']
+    options['ext']          = _cfg['ext']+"_"+str(opt.year)+"_"+str(opt.mass_a)
     options['analysis']     = _cfg['analysis']
-    options['year']         = _cfg['year']
+    # options['year']         = _cfg['year']
+    options['year']         = opt.year
+    # options['mass_a']       = _cfg['mass_a']
+    options['mass_a']       = opt.mass_a
     options['massPoints']   = _cfg['massPoints']
     options['scales']       = _cfg['scales']
     options['scalesCorr']   = _cfg['scalesCorr']
@@ -58,14 +63,13 @@ if opt.inputConfig != '':
     options['jobOpts']                 = opt.jobOpts
     options['groupSignalFitJobsByCat'] = opt.groupSignalFitJobsByCat
     options['printOnly']               = opt.printOnly
-  
+
     #Delete copy of file
     os.system("rm config.py")
-  
   else:
     print "[ERROR] %s config file does not exist. Leaving..."%opt.inputConfig
     leave()
-else: 
+else:
   print "[ERROR] Please specify config file to run from. Leaving..."%opt.inputConfig
   leave()
 
@@ -77,10 +81,15 @@ else:
 if options['mode'] not in ['fTest','getEffAcc','getDiagProc','calcPhotonSyst','signalFit']:
   print " --> [ERROR] mode %s not allowed. Please use one of the following: ['fTest','getEffAcc','getDiagProc','calcPhotonSyst','signalFit']. Leaving..."%options['mode']
   leave()
-
+print options['mode']
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Extract list of filenames
-WSFileNames = extractWSFileNames(options['inputWSDir'])
+
+if ( options['analysis'] == 'H4G'):
+    WSFileNames = extractWSFileNames_H4G(options['inputWSDir'],options['mass_a'],options['year'])
+else:
+    WSFileNames = extractWSFileNames(options['inputWSDir'])
+
 if not WSFileNames: leave()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,7 +151,7 @@ writeSubFiles(options)
 print "  --> Finished writing submission scripts"
 
 # Submit scripts to batch system
-if not options['printOnly']: 
+if not options['printOnly']:
   submitFiles(options)
 else:
   print "  --> Running with printOnly option. Will not submit scripts"

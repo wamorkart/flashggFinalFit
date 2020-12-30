@@ -14,21 +14,31 @@ def rooiter(x):
     yield ret
     ret = iter.Next()
 
-def extractWSFileNames( _inputWSDir ): 
+def extractWSFileNames( _inputWSDir ):
   if not os.path.isdir(_inputWSDir):
     print " --> [ERROR] No such directory (%s)"
     return False
   return glob.glob("%s/output_*.root"%_inputWSDir)
 
+def extractWSFileNames_H4G( _inputWSDir,_mass,_year ):
+  if not os.path.isdir(_inputWSDir):
+
+    print " --> [ERROR] No such directory (%s)"
+    return False
+  print "%s/signal_m_%s_%s_even_skim_WS.root"%(_inputWSDir,_mass,_year)    
+  return glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(_inputWSDir,_mass,_year))
+
+
 def extractListOfProcs( _listOfWSFileNames ):
   procs = []
   for fName in _listOfWSFileNames:
+    print fName
     p = fName.split("pythia8_")[1].split(".root")[0]
     if p not in procs: procs.append(p)
   return ",".join(procs)
 
 def extractListOfCats( _listOfWSFileNames ):
-  f0 = ROOT.TFile(_listOfWSFileNames[0]) 
+  f0 = ROOT.TFile(_listOfWSFileNames[0])
   ws = f0.Get(inputWSName__)
   allData = ws.allData()
   cats = []
@@ -57,7 +67,7 @@ def extractListOfCatsFromData( _fileName ):
   return ",".join(cats)
 
 def containsNOTAG( _listOfWSFileNames ):
-  f0 = ROOT.TFile(_listOfWSFileNames[0]) 
+  f0 = ROOT.TFile(_listOfWSFileNames[0])
   ws = f0.Get(inputWSName__)
   allData = ws.allData()
   for d in allData:

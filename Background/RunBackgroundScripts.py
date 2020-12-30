@@ -15,6 +15,8 @@ def get_options():
   parser.add_option('--mode', dest='mode', default='std', help="Which script to run. Options: ['fTestOnly','fTestParallel','bkgPlotsOnly']")
   parser.add_option('--jobOpts', dest='jobOpts', default='', help="Additional options to add to job submission. For Condor separate individual options with a colon (specify all within quotes e.g. \"option_xyz = abc+option_123 = 456\")")
   parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print submission files only") 
+  parser.add_option('--mass_a', dest='mass_a', default='', help="mass of pseudoscalar)")
+  parser.add_option('--outdirplot', dest='outdirplot', default='', help="outdir plot)")
   return parser.parse_args()
 
 (opt,args) = get_options()
@@ -36,15 +38,15 @@ if opt.inputConfig != '':
     _cfg = backgroundScriptCfg
 
     #Extract options
-    options['dataFile']     = "%s/allData.root"%_cfg['inputWSDir']
+    options['dataFile']     = "%s%s/Reduced_8Events_1Cats/WS_1Cats/allData.root"%(_cfg['inputWSDir'],opt.mass_a)
     options['cats']         = _cfg['cats']
     options['catOffset']    = _cfg['catOffset']
-    options['ext']          = _cfg['ext']
+    options['ext']          = _cfg['ext']+'_'+opt.mass_a
     options['year']         = _cfg['year']
     options['lumi']         = lumiMap[_cfg['year']]
     options['batch']        = _cfg['batch']
     options['queue']        = _cfg['queue']
-
+    options['outdirplot']   = opt.outdirplot
     # Options from command line
     options['mode']                    = opt.mode
     options['jobOpts']                 = opt.jobOpts
@@ -83,6 +85,7 @@ print " --> Categories: %s"%options['cats']
 print " --> Extension: %s"%options['ext']
 print " --> Category offset: %g"%options['catOffset']
 print " --> Year: %s ::: Corresponds to intLumi = %s fb^-1"%(options['year'],options['lumi'])
+print " --> outdirPlot: %s"%(opt.outdirplot)
 print ""
 print " --> Job information:"
 print "     * Batch: %s"%options['batch']

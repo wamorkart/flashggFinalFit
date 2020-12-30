@@ -34,11 +34,14 @@ def get_options():
   parser.add_option("--nProcsToFTest", dest='nProcsToFTest', default=5, type='int',help="Number of signal processes to fTest (ordered by sum entries), others are set to nRV=1,nWV=1. Set to -1 to run over all")
   parser.add_option("--cat", dest='cat', default='', help="RECO category")
   parser.add_option('--mass', dest='mass', default='125', help="Mass point to fit")
+  parser.add_option('--mass_a', dest='mass_a', default='60', help="pseudoscalar mass")
+  parser.add_option('--year', dest='year', default='2016', help="year")
   parser.add_option('--doPlots', dest='doPlots', default=False, action="store_true", help="Produce Signal fTest plots")
   parser.add_option('--nBins', dest='nBins', default=80, type='int', help="Number of bins for fit")
   parser.add_option('--threshold', dest='threshold', default=30, type='int', help="Threshold number of events")
   parser.add_option('--nGaussMax', dest='nGaussMax', default=5, type='int', help="Max number of gaussians to test")
   parser.add_option('--skipWV', dest='skipWV', default=False, action="store_true", help="Skip processing of WV case")
+  parser.add_option('--outPlot', dest='outPlot', default=False, help="Store output plots ")
   # Minimizer options
   parser.add_option('--minimizerMethod', dest='minimizerMethod', default='TNC', help="(Scipy) Minimizer method")
   parser.add_option('--minimizerTolerance', dest='minimizerTolerance', default=1e-8, type='float', help="(Scipy) Minimizer toleranve")
@@ -47,11 +50,13 @@ def get_options():
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch(True)
-if opt.doPlots: 
+if opt.doPlots:
   if not os.path.isdir("%s/outdir_%s/fTest/Plots"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s/fTest/Plots"%(swd__,opt.ext))
 
 # Load xvar to fit
-nominalWSFileName = glob.glob("%s/output*"%(opt.inputWSDir))[0]
+# print "%s/output*"%(opt.inputWSDir)
+nominalWSFileName = glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(opt.inputWSDir,opt.mass_a,opt.year))[0]
+# nominalWSFileName = glob.glob("%s/output*"%(opt.inputWSDir))[0]
 f0 = ROOT.TFile(nominalWSFileName,"read")
 inputWS0 = f0.Get(inputWSName__)
 xvar = inputWS0.var(opt.xvar)
@@ -69,10 +74,16 @@ MH.setConstant(True)
 df = pd.DataFrame(columns=['proc','sumEntries','nRV','nWV'])
 procYields = od()
 for proc in opt.procs.split(","):
-  WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,opt.mass,proc))[0]
+  # print "%s/signal_m_%s_%s_even_skim_WS.root"%(opt.inputWSDir,opt.mass_a,opt.year
+  WSFileName = glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(opt.inputWSDir,opt.mass_a,opt.year))[0]
+  # WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,opt.mass,proc))[0]
+  # WSFileName = glob.glob("%s/output*.root"%(opt.inputWSDir))[0]
   f = ROOT.TFile(WSFileName,"read")
   inputWS = f.Get(inputWSName__)
-  d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)),aset)
+  # H4GTag_Cat0_13TeV_2016
+  print "%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.cat,sqrts__,opt.year)
+  d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.cat,sqrts__,opt.year)),aset)
+  # d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)),aset)
   df.loc[len(df)] = [proc,d.sumEntries(),1,1]
   inputWS.Delete()
   f.Close()
@@ -80,22 +91,24 @@ for proc in opt.procs.split(","):
 # Extract processes to perform fTest (i.e. first nProcsToFTest):
 if( opt.nProcsToFTest == -1)|( opt.nProcsToFTest > len(opt.procs.split(",")) ): procsToFTest = opt.procs.split(",")
 else: procsToFTest = list(df.sort_values('sumEntries',ascending=False)[0:opt.nProcsToFTest].proc.values)
-for pidx, proc in enumerate(procsToFTest): 
+for pidx, proc in enumerate(procsToFTest):
 
   print "\n --> Process (%g): %s"%(pidx,proc)
 
   # Split dataset to RV/WV: ssf requires input as dict (with mass point as key)
   datasets_RV, datasets_WV = od(), od()
-  WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,opt.mass,proc))[0]
+  WSFileName =  glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(opt.inputWSDir,opt.mass_a,opt.year))[0]
+  # WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,opt.mass,proc))[0]
   f = ROOT.TFile(WSFileName,"read")
   inputWS = f.Get(inputWSName__)
-  d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)),aset)
+  d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.cat,sqrts__,opt.year)),aset)
+  # d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)),aset)
   datasets_RV[opt.mass] = splitRVWV(d,aset,mode="RV")
   datasets_WV[opt.mass] = splitRVWV(d,aset,mode="WV")
 
   # Run fTest: RV
   # If numEntries below threshold then keep as n = 1
-  if datasets_RV[opt.mass].numEntries() < opt.threshold: continue  
+  if datasets_RV[opt.mass].numEntries() < opt.threshold: continue
   else:
     ssfs = od()
     min_reduced_chi2, nGauss_opt = 999, 1
@@ -105,9 +118,9 @@ for pidx, proc in enumerate(procsToFTest):
       ssf.buildNGaussians(nGauss)
       ssf.runFit()
       ssf.buildSplines()
-      if ssf.Ndof >= 1: 
+      if ssf.Ndof >= 1:
 	ssfs[k] = ssf
-	if ssfs[k].getReducedChi2() < min_reduced_chi2: 
+	if ssfs[k].getReducedChi2() < min_reduced_chi2:
 	  min_reduced_chi2 = ssfs[k].getReducedChi2()
 	  nGauss_opt = nGauss
 	print "   * (%s,%s,RV): nGauss = %g, chi^2/n(dof) = %.4f"%(proc,opt.cat,nGauss,ssfs[k].getReducedChi2())
@@ -115,8 +128,10 @@ for pidx, proc in enumerate(procsToFTest):
     df.loc[df['proc']==proc,'nRV'] = nGauss_opt
     # Make plots
     if( opt.doPlots )&( len(ssfs.keys())!=0 ):
-      plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="RV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
-      plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="RV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      # plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="RV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      # plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="RV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/"%(opt.outPlot),_extension="RV_"+str(opt.year),_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/"%(opt.outPlot),_extension="RV_"+str(opt.year),_proc=proc,_cat=opt.cat,_mass=opt.mass)
 
   # Run fTest: WV
   # If numEntries below threshold then keep as n = 1
@@ -140,8 +155,10 @@ for pidx, proc in enumerate(procsToFTest):
     df.loc[df['proc']==proc,'nWV'] = nGauss_opt
     # Make plots
     if( opt.doPlots )&( len(ssfs.keys())!=0 ):
-      plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="WV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
-      plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="WV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      # plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="WV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      # plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/outdir_%s/fTest/Plots"%(swd__,opt.ext),_extension="WV",_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      plotFTest(ssfs,_opt=nGauss_opt,_outdir="%s/"%(opt.outPlot),_extension="WV_"+str(opt.year),_proc=proc,_cat=opt.cat,_mass=opt.mass)
+      plotFTestResults(ssfs,_opt=nGauss_opt,_outdir="%s/"%(opt.outPlot),_extension="WV_"+str(opt.year),_proc=proc,_cat=opt.cat,_mass=opt.mass)
 
   # Close ROOT file
   inputWS.Delete()
@@ -162,4 +179,3 @@ for ir,r in df.sort_values('sumEntries',ascending=False).iterrows():
   pitr += 1
 ff.write("}")
 ff.close()
-

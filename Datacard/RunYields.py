@@ -17,6 +17,7 @@ def get_options():
   parser.add_option('--procs', dest='procs', default='auto', help='Comma separated list of signal processes. auto = automatically inferred from input workspaces')
   parser.add_option('--ext', dest='ext', default='test', help='Extension for saving')
   parser.add_option('--mass', dest='mass', default='125', help='Input workspace mass')
+  parser.add_option('--mass_a', dest='mass_a', default='', help="mass of pseudoscalar)")
   parser.add_option('--mergeYears', dest='mergeYears', default=False, action="store_true", help="Merge category across years")
   parser.add_option('--skipBkg', dest='skipBkg', default=False, action="store_true", help="Only add signal processes to datacard")
   parser.add_option('--bkgScaler', dest='bkgScaler', default=1., type="float", help="Add overall scale factor for background")
@@ -67,16 +68,18 @@ options['batch'] = opt.batch
 options['queue'] = opt.queue
 options['jobOpts'] = opt.jobOpts
 options['printOnly'] = opt.printOnly
-
+options['mass_a'] = opt.mass_a
 # If auto: extract cats from first input workspace dir
 inputWSDir0 = options['inputWSDirMap'].split(",")[0].split("=")[1]
+# print "inputWSDir0: ", inputWSDir0
 WSFileNames = extractWSFileNames(inputWSDir0)
+# WSFileNames = extractWSFileNames_H4G('inputWSDir0'],options['mass_a'],options['year'])
 if options['cats'] == "auto": options['cats'] = extractListOfCats(WSFileNames)
 
 if( opt.doNOTAG )&( 'NOTAG' not in options['cats'] ):
   if( containsNOTAG(WSFileNames) ): options['cats'] += ',NOTAG'
   else:
-    print " --> [WARNING] NOTAG dataset not present in input workspace. Skipping NOTAG" 
+    print " --> [WARNING] NOTAG dataset not present in input workspace. Skipping NOTAG"
 
 options['nCats'] = len(options['cats'].split(","))
 

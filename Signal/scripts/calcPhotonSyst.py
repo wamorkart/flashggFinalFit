@@ -1,6 +1,6 @@
 # Script to calculate photon systematics
 # * Run script once per category, loops over signal processes
-# * Output is pandas dataframe 
+# * Output is pandas dataframe
 
 print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG PHOTON SYST CALCULATOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
 import ROOT
@@ -27,6 +27,8 @@ def get_options():
   parser.add_option("--procs", dest='procs', default='', help="Signal processes")
   parser.add_option("--ext", dest='ext', default='', help="Extension")
   parser.add_option("--inputWSDir", dest='inputWSDir', default='', help="Input flashgg WS directory")
+  parser.add_option('--mass_a', dest='mass_a', default='60', help="pseudoscalar mass")
+  parser.add_option('--year', dest='year', default='2016', help="year")
   parser.add_option("--scales", dest='scales', default='', help="Photon shape systematics: scales")
   parser.add_option("--scalesCorr", dest='scalesCorr', default='', help='Photon shape systematics: scalesCorr')
   parser.add_option("--scalesGlobal", dest='scalesGlobal', default='', help='Photon shape systematics: scalesGlobal')
@@ -51,8 +53,8 @@ def getHistograms( _ws, _nominalDataName, _sname ):
     else: _hists[htype] = ROOT.TH1F("%s_%s"%(_sname,htype),"%s_%s"%(_sname,htype),opt.nBins,100,180)
   # Extract nominal RooDataSet and syst RooDataHists
   rds_nominal = _ws.data(_nominalDataName)
-  rdh_up = _ws.data("%s_%sUp01sigma"%(_nominalDataName,_sname))
-  rdh_down = _ws.data("%s_%sDown01sigma"%(_nominalDataName,_sname))
+  rdh_up = _ws.data("%s_%sUp01sigma_%s"%(_nominalDataName[:11],_sname,_nominalDataName[-10:])) ## H4GTag_Cat0_MvaShiftUp01sigma_13TeV_2016
+  rdh_down = _ws.data("%s_%sDown01sigma_%s"%(_nominalDataName[:11],_sname,_nominalDataName[-10:]))
   # Check if not NONE type and fill histograms
   if rds_nominal: rds_nominal.fillHistogram(_hists['nominal'],ROOT.RooArgList(mgg))
   else:
@@ -65,7 +67,7 @@ def getHistograms( _ws, _nominalDataName, _sname ):
   if rdh_down: rdh_down.fillHistogram(_hists['down'],ROOT.RooArgList(mgg))
   else:
     print " --> [ERROR] Could not extract RooDataHist (%s,down) for %s. Leaving"%(_sname,_nominalDataName)
-    sys,exit(1) 
+    sys,exit(1)
   return _hists
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,13 +110,15 @@ for stype in ['scales','scalesCorr','smears']:
   for s in systs.split(","):
     if s == '': continue
     for x in ['mean','sigma','rate']: columns_data.append("%s_%s_%s"%(s,outputNuisanceExtMap[stype],x))
-data = pd.DataFrame( columns=columns_data ) 
+data = pd.DataFrame( columns=columns_data )
 
 # Loop over processes and add row to dataframe
 for _proc in opt.procs.split(","):
   # Glob M125 filename
-  _WSFileName = glob.glob("%s/output*M125*%s.root"%(opt.inputWSDir,_proc))[0]
-  _nominalDataName = "%s_125_%s_%s"%(procToData(_proc.split("_")[0]),sqrts__,opt.cat)
+  _WSFileName = glob.glob("%s/signal_m_%s_%s_even_skim_WS.root"%(opt.inputWSDir,opt.mass_a,opt.year))[0]
+  _nominalDataName = "%s_%s_%s_%s"%(procToData(_proc.split("_")[0]),opt.cat,sqrts__,opt.year) ## H4GTag_Cat0_13TeV_2016
+  # _WSFileName = glob.glob("%s/output*M125*%s.root"%(opt.inputWSDir,_proc))[0]
+  # _nominalDataName = "%s_125_%s_%s"%(procToData(_proc.split("_")[0]),sqrts__,opt.cat)
   data = data.append({'proc':_proc,'cat':opt.cat,'inputWSFile':_WSFileName,'nominalDataName':_nominalDataName}, ignore_index=True, sort=False)
 
 # Loop over rows in dataFrame and open ws
@@ -125,7 +129,7 @@ for ir,r in data.iterrows():
   # Open ROOT file and extract workspace
   f = ROOT.TFile(r['inputWSFile'])
   inputWS = f.Get(inputWSName__)
- 
+
   # Loop over scale and smear systematics
   for stype in ['scales','scalesCorr','smears']:
     for s in getattr(opt,stype).split(","):
@@ -156,5 +160,5 @@ for ir,r in data.iterrows():
 if not os.path.isdir("%s/outdir_%s"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s"%(swd__,opt.ext))
 if not os.path.isdir("%s/outdir_%s/calcPhotonSyst"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s/calcPhotonSyst"%(swd__,opt.ext))
 if not os.path.isdir("%s/outdir_%s/calcPhotonSyst/pkl"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s/calcPhotonSyst/pkl"%(swd__,opt.ext))
-with open("%s/outdir_%s/calcPhotonSyst/pkl/%s.pkl"%(swd__,opt.ext,opt.cat),"wb") as f: pickle.dump(data,f) 
+with open("%s/outdir_%s/calcPhotonSyst/pkl/%s.pkl"%(swd__,opt.ext,opt.cat),"wb") as f: pickle.dump(data,f)
 print " --> Successfully saved photon systematics as pkl file: %s/outdir_%s/calcPhotonSyst/pkl/%s.pkl"%(swd__,opt.ext,opt.cat)

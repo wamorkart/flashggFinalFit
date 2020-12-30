@@ -1,7 +1,7 @@
 # Python script to hold XS * BR for normalisation of signal models
 from collections import OrderedDict as od
 from commonObjects import *
-  
+
 # Add analyses to globalReplacementMap. See "STXS" as an example
 globalXSBRMap = od()
 
@@ -9,6 +9,7 @@ globalXSBRMap = od()
 #globalXSBRMap['example'] = od()
 #globalXSBRMap['example']['decay'] = {'mode':'constant','factor':1}
 #globalXSBRMap['example']['PROCNAME'] = {'mode':'constant','factor':0.001}
+
 
 # For case of inclusive production mode then have no additional factor beyond V branching ratios
 globalXSBRMap['example'] = od()
@@ -27,6 +28,11 @@ globalXSBRMap['example']['BBH'] = {'mode':'bbH'}
 globalXSBRMap['example']['THQ'] = {'mode':'tHq'}
 globalXSBRMap['example']['THW'] = {'mode':'tHW'}
 # ...
+
+## H4G Analysis
+globalXSBRMap['H4G'] = od()
+globalXSBRMap['H4G']['decay'] = {'mode':'constant'}
+globalXSBRMap['H4G']['H4GTag'] = {'mode':'constant','factor':0.001}
 
 # STXS analysis: add factor for bin composition
 globalXSBRMap['STXS'] = od()

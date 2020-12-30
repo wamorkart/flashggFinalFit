@@ -11,7 +11,7 @@ from commonObjects import *
 from commonTools import *
 from signalTools import *
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Function to load XS/BR from Combine
 from HiggsAnalysis.CombinedLimit.DatacardParser import *
 from HiggsAnalysis.CombinedLimit.ModelTools import *
@@ -72,16 +72,19 @@ def initialiseXSBR():
   if('ggZH' in productionModes)&('ZH' in productionModes): xsbr['qqZH'] = xsbr['ZH']-xsbr['ggZH']
   return xsbr
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class FinalModel:
   # Constructor
-  def __init__(self,_ssfMap,_proc,_cat,_ext,_year,_sqrts,_datasets,_xvar,_MH,_MHLow,_MHHigh,_massPoints,_xsbrMap,_procSyst,_scales,_scalesCorr,_scalesGlobal,_smears,_doVoigtian,_useDCB,_skipVertexScenarioSplit,_skipSystematics,_doEffAccFromJson):
+  def __init__(self,_ssfMap,_proc,_cat,_ext,_year,_mass_a,_sqrts,_datasets,_xvar,_MH,_MHLow,_MHHigh,_massPoints,_xsbrMap,_procSyst,_scales,_scalesCorr,_scalesGlobal,_smears,_doVoigtian,_useDCB,_skipVertexScenarioSplit,_skipSystematics,_doEffAccFromJson):
+
+  # def __init__(self,_ssfMap,_proc,_cat,_ext,_year,mass_a,_sqrts,_datasets,_xvar,_MH,_MHLow,_MHHigh,_massPoints,_xsbrMap,_procSyst,_scales,_scalesCorr,_scalesGlobal,_smears,_doVoigtian,_useDCB,_skipVertexScenarioSplit,_skipSystematics,_doEffAccFromJson):
     self.ssfMap = _ssfMap
     self.proc = _proc
     self.procSyst = _procSyst # Signal process used for systematics (useful for low stat cases)
     self.cat = _cat
     self.ext = _ext
     self.year = _year
+    self.mass_a = _mass_a
     self.sqrts = _sqrts
     self.name = "%s_%s_%s_%s"%(self.proc,self.year,self.cat,self.sqrts)
     self.datasets = _datasets
@@ -113,13 +116,13 @@ class FinalModel:
     self.Pdfs = od()
     self.Datasets = od()
     # Build XS/BR/EA splines
-    self.XSBR = initialiseXSBR() 
+    self.XSBR = initialiseXSBR()
     self.buildXSBRSplines()
     self.buildEffAccSpline()
     # If not skip systematics: add nuisance params to dict
     if not self.skipSystematics: self.buildNuisanceMap()
     # Build final pdfs
-    if not self.skipVertexScenarioSplit: 
+    if not self.skipVertexScenarioSplit:
       self.buildRVFracFunction()
       self.buildPdf(self.ssfMap['RV'],ext="rv",useDCB=self.useDCB)
       self.buildPdf(self.ssfMap['WV'],ext="wv",useDCB=self.useDCB)
@@ -130,7 +133,7 @@ class FinalModel:
     # Build final normalisation, datasets and extended Pdfs
     self.buildNorm()
     self.buildDatasets()
-    self.buildExtended() 
+    self.buildExtended()
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Functions to get XS, BR and EA splines for given proc/decay from map
@@ -149,7 +152,7 @@ class FinalModel:
 
   def buildEffAccSpline(self):
     # Two treatments: load from json created with getEffAcc.py script or calc from sum of weights
-    # Loop over mass points  
+    # Loop over mass points
     ea, mh = [], []
     for mp in self.massPoints.split(","):
       mh.append(float(mp))
@@ -164,7 +167,7 @@ class FinalModel:
         sumw = self.datasets[mp].sumEntries()
         self.MH.setVal(float(mp))
         xs,br = self.Splines['xs'].getVal(), self.Splines['br'].getVal()
-        ea.append(sumw/(lumiScaleFactor*xs*br)) 
+        ea.append(sumw/(lumiScaleFactor*xs*br))
     # If single mass point then add MHLow and MHHigh dummy points for constant ea
     if len(ea) == 1: ea, mh = [ea[0],ea[0],ea[0]], [float(self.MHLow),mh[0],float(self.MHHigh)]
     # Convert to numpy arrays and make spline
@@ -190,7 +193,7 @@ class FinalModel:
       'rateConst':ROOT.RooConstVar("const_%s_rate_%s"%(self.name,nuisanceName),"const_%s_rate_%s"%(self.name,nuisanceName),nuisanceRateConst),
       'opts':nuisanceOpts}
     self.NuisanceMap[nuisanceType][nuisanceName]['param'].setConstant(True)
-  
+
   # Function for building Nuisance param map:
   def buildNuisanceMap(self):
     # Dict to store nuisances of different type in map
@@ -203,7 +206,7 @@ class FinalModel:
       print " --> [ERROR] Photon systematics do not exist (%s). Please run calcPhotonSyst mode first or skip systematics (--skipSystematics)"%psname
       sys.exit(1)
     with open(psname,"r") as fpkl: psdata = pickle.load(fpkl)
-    
+
     # Get row for proc: option to use diagonal process
     r = psdata[psdata['proc']==self.procSyst]
     if len(r) == 0:
@@ -277,7 +280,7 @@ class FinalModel:
       self.buildSigma('sigma_dcb_%s'%extStr,skipSystematics=self.skipSystematics)
       # Build DCB pdf
       self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("dcb_%s"%extStr,"dcb_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
-      
+
       # + Gaussian: shares mean with DCB
       self.Splines['sigma_gaus_%s'%extStr] = ssf.Splines['sigma_gaus'].Clone()
       self.Splines['sigma_gaus_%s'%extStr].SetName("sigma_fit_gaus_%s"%extStr)
@@ -313,12 +316,12 @@ class FinalModel:
         self.buildMean('dm_g%g_%s'%(g,extStr),skipSystematics=self.skipSystematics)
         self.buildSigma('sigma_g%g_%s'%(g,extStr),skipSystematics=self.skipSystematics)
         # Build Gaussian
-        if self.doVoigtian: 
+        if self.doVoigtian:
           self.Pdfs['gaus_g%g_%s'%(g,extStr)] = ROOT.RooVoigtian("gaus_g%g_%s"%(g,extStr),"gaus_g%g_%s"%(g,extStr),self.xvar,self.Functions["mean_g%g_%s"%(g,extStr)],self.GammaH,self.Functions["sigma_g%g_%s"%(g,extStr)])
-        else: 
+        else:
           self.Pdfs['gaus_g%g_%s'%(g,extStr)] = ROOT.RooGaussian("gaus_g%g_%s"%(g,extStr),"gaus_g%g_%s"%(g,extStr),self.xvar,self.Functions["mean_g%g_%s"%(g,extStr)],self.Functions["sigma_g%g_%s"%(g,extStr)])
         _pdfs.add(self.Pdfs['gaus_g%g_%s'%(g,extStr)])
-        
+
         # Fractions
         if g < ssf.nGaussians-1:
           self.Splines['frac_g%g_%s'%(g,extStr)] = ssf.Splines['frac_g%g_constrained'%g]
@@ -331,7 +334,7 @@ class FinalModel:
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Functions to build mean, sigma and rate functions with systematics
   def buildMean(self,dmSplineName="",skipSystematics=False):
-    meanName = re.sub("dm","mean",dmSplineName) 
+    meanName = re.sub("dm","mean",dmSplineName)
     # Build formula string and dependents list
     dependents = ROOT.RooArgList()
     formula = "(@0+@1)"
@@ -344,7 +347,7 @@ class FinalModel:
       for sName, sInfo in self.NuisanceMap['scalesGlobal'].iteritems():
         formula += "+@%g"%dependents.getSize()
         # For adding additional factor
-        for so in sInfo['opts']: 
+        for so in sInfo['opts']:
           if "factor_%s"%self.cat in so:
             additionalFactor = float(so.split("=")[-1])
             formula += "*%3.1f"%additionalFactor
@@ -398,7 +401,7 @@ class FinalModel:
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Function to build datasets to add to workspace
   def buildDatasets(self):
-    for mp, d in self.datasets.iteritems(): 
+    for mp, d in self.datasets.iteritems():
       self.Datasets[mp] = d.Clone("sig_mass_m%s_%s"%(mp,self.name))
       self.Datasets['%s_copy'%mp] = d.Clone("sig_mass_m%s_%s"%(mp,self.cat))
 
@@ -409,7 +412,7 @@ class FinalModel:
     self.Functions['final_normThisLumi'] = ROOT.RooFormulaVar("%s_normThisLumi"%finalPdfName,"%s_normThisLumi"%finalPdfName,"@0*@1*@2*@3*@4",ROOT.RooArgList(self.Splines['xs'],self.Splines['br'],self.Splines['ea'],self.Functions['rate_%s'%self.name],self.intLumi))
     self.Pdfs['final_extend'] = ROOT.RooExtendPdf("extend%s"%finalPdfName,"extend%s"%finalPdfName,self.Pdfs['final'],self.Functions['final_norm'])
     self.Pdfs['final_extendThisLumi'] = ROOT.RooExtendPdf("extend%sThisLumi"%finalPdfName,"extend%sThisLumi"%finalPdfName,self.Pdfs['final'],self.Functions['final_normThisLumi'])
- 
+
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Function for saving to output workspace
   def save(self,wsout):
@@ -419,4 +422,4 @@ class FinalModel:
     wsout.imp(self.Functions['final_normThisLumi'],ROOT.RooFit.RecycleConflictNodes())
     wsout.imp(self.Pdfs['final_extend'],ROOT.RooFit.RecycleConflictNodes())
     wsout.imp(self.Pdfs['final_extendThisLumi'],ROOT.RooFit.RecycleConflictNodes())
-    for d in self.Datasets.itervalues(): wsout.imp(d) 
+    for d in self.Datasets.itervalues(): wsout.imp(d)
