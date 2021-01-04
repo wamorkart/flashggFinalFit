@@ -159,7 +159,7 @@ int Normalization_13TeV::Init(int sqrtS, string FinalState){
         // HHWWgg 
         XSectionMap_HHWWgg[mH] = 0.001; // arbitrary HHWWgg cross section 
         // XSectionMap_HHWWgg[mH] = 0.001*valBR_HHWWgg; // arbitrary fgg cross section * branching ratio of process: qqlnu, lnulnu or qqqq for normalization 
-
+       XSectionMap_H4G[mH] = 0.001;
     }
 }
 
@@ -357,6 +357,9 @@ TGraph * Normalization_13TeV::GetSigmaGraph(TString process)
   
     else if ( process=="GluGluToHHTo" ) {
     XSectionMap = &XSectionMap_HHWWgg; 
+  }
+  else if ( process=="H4G" ) {
+    XSectionMap = &XSectionMap_H4G;
   }
 
   else {
@@ -604,7 +607,9 @@ double Normalization_13TeV::GetXsection(double mass, TString HistName) {
     else if ( HistName.Contains("GluGluToHHTo") ) {
     XSectionMap = &XSectionMap_HHWWgg; 
   }
-
+   else if ( HistName.Contains("H4G") ) {
+    XSectionMap = &XSectionMap_H4G;
+  }
     else {
     std::cout << "[WARNING] Normalization_13TeV: No known process found in the name!!" << HistName << std::endl;
     //exit(1);

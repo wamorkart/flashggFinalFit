@@ -42,7 +42,7 @@ echo "--isData) specified in fb^-{1} (default $DATA)) "
 echo "--unblind) specified in fb^-{1} (default $UNBLIND)) "
 echo "--batch) which batch system to use (None (''),HTCONDOR,IC) (default '$BATCH')) "
 echo "--queue) queue to submit jobs to (specific to batch))"
-echo "--analysis) analysis to run on" 
+echo "--analysis) analysis to run on"
 }
 
 
@@ -88,7 +88,7 @@ done
 
 
 OUTDIR="outdir_${EXT}"
-echo "[INFO] outdir is $OUTDIR, INTLUMI $INTLUMI" 
+echo "[INFO] outdir is $OUTDIR, INTLUMI $INTLUMI"
 
 if [ $ISDATA == 1 ]; then
 DATAEXT="-Data"
@@ -159,8 +159,8 @@ if [ $ISDATA == 1 ]; then
 OPT=" --isData 1"
 fi
 
-echo " ./bin/fTest -i $FILE --saveMultiPdf CMS-HGG_multipdf_$EXT.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR"
-./bin/fTest -i $FILE --saveMultiPdf CMS-HGG_multipdf_$EXT.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR
+echo " ./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR"
+./bin/fTest -i $FILE --saveMultiPdf $OUTDIR/CMS-HGG_multipdf_$EXT.root  -D $OUTDIR/bkgfTest$DATAEXT -f $CATS $OPT --year $YEAR
 
 OPT=""
 fi
@@ -185,12 +185,15 @@ fi
 ANOption=""
 if [ "$ANALYSIS" != "" ]; then
   ANOption="--analysis ${ANALYSIS}"
-fi 
+fi
 
-echo "./scripts/subBkgPlots.py -b CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands --massStep 1 $SIG -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --batch $BATCH -q $QUEUE --year $YEAR $ANOption"
-./scripts/subBkgPlots.py -b CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands  --massStep 1 $SIG -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --batch $BATCH -q $QUEUE --year $YEAR $ANOption
+echo "./scripts/subBkgPlots.py -b $OUTDIR/CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands --massStep 1  -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --runLocal --year 2016 $ANOption"
+./scripts/subBkgPlots.py -b $OUTDIR/CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands  --massStep 1  -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --runLocal --year 2016 $ANOption
 
-# FIX THIS FOR CONDOR: 
+# echo "./scripts/subBkgPlots.py -b CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands --massStep 1 $SIG -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --batch $BATCH -q $QUEUE --year $YEAR $ANOption"
+# ./scripts/subBkgPlots.py -b CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots$DATAEXT -S 13 --isMultiPdf --useBinnedData  --doBands  --massStep 1 $SIG -L 100 -H 180 -f $CATS -l $CATS --intLumi $INTLUMI $OPT --batch $BATCH -q $QUEUE --year $YEAR $ANOption
+
+# FIX THIS FOR CONDOR:
 #continueLoop=1
 #while (($continueLoop==1))
 #do
@@ -202,7 +205,7 @@ echo "./scripts/subBkgPlots.py -b CMS-HGG_multipdf_$EXT.root -d $OUTDIR/bkgPlots
 #  if (($number==0)) ; then
 #     ((continueLoop=0))
 #  fi
-#done 
+#done
 
 OPT=""
 fi

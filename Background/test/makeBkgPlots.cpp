@@ -72,7 +72,7 @@ int getBestFitFunction(RooMultiPdf *bkg, RooAbsData *data, RooCategory *cat, boo
 	double global_minNll = 1E10;
 	int best_index = 0;
 	int number_of_indeces = cat->numTypes();
-	
+
 	RooArgSet snap,clean;
 	RooArgSet *params = bkg->getParameters(*data);
 	params->snapshot(snap);
@@ -82,13 +82,13 @@ int getBestFitFunction(RooMultiPdf *bkg, RooAbsData *data, RooCategory *cat, boo
 		params->Print("V");
 		std::cout << "-----------------------" << std::endl;
 	}
-	
+
 	//bkg->setDirtyInhibit(1);
 	RooAbsReal *nllm = bkg->createNLL(*data);
 	RooMinimizer minim(*nllm);
 	minim.setStrategy(2);
-	
-	for (int id=0;id<number_of_indeces;id++){		
+
+	for (int id=0;id<number_of_indeces;id++){
 		params->assignValueOnly(clean);
 		cat->setIndex(id);
 
@@ -99,7 +99,7 @@ int getBestFitFunction(RooMultiPdf *bkg, RooAbsData *data, RooCategory *cat, boo
 			params->Print("V");
 			std::cout << "-----------------------" << std::endl;
 		}
-		
+
 		minim.minimize("Minuit2","simplex");
 		double minNll = nllm->getVal()+bkg->getCorrection();
 		if (!silent) {
@@ -108,12 +108,12 @@ int getBestFitFunction(RooMultiPdf *bkg, RooAbsData *data, RooCategory *cat, boo
 			bkg->Print("v");
 			bkg->getCurrentPdf()->getParameters(*data)->Print("V");
 			std::cout << " ------------------------------------  " << std::endl;
-	
+
 			std::cout << "[INFO] AFTER FITTING" << std::endl;
 			params->Print("V");
 			std::cout << "-----------------------" << std::endl;
 		}
-			
+
 		if (minNll < global_minNll){
         		global_minNll = minNll;
 			snap.assignValueOnly(*params);
@@ -122,7 +122,7 @@ int getBestFitFunction(RooMultiPdf *bkg, RooAbsData *data, RooCategory *cat, boo
 	}
 	params->assignValueOnly(snap);
     	cat->setIndex(best_index);
-	
+
 	if (!silent) {
 		std::cout << "[INFO] Best fit Function -- " << bkg->getCurrentPdf()->GetName() << " " << cat->getIndex() <<std::endl;
 		bkg->getCurrentPdf()->getParameters(*data)->Print("v");
@@ -144,7 +144,7 @@ RooMultiPdf* getExtendedMultiPdfs(RooMultiPdf* mpdf, RooCategory* mcat){
 }
 
 pair<double,double> getNormTermNllAndRes(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCategory *mcat, double normVal=-1., double massRangeLow=-1., double massRangeHigh=-1.){
-	
+
 	double bestFitNll=1.e8;
 	double bestFitNorm;
 
@@ -162,7 +162,7 @@ pair<double,double> getNormTermNllAndRes(RooRealVar *mgg, RooAbsData *data, RooM
 			extPdf = new RooExtendPdf(Form("%sext",mpdf->getCurrentPdf()->GetName()),"",*(mpdf->getCurrentPdf()),*normVar);
 			nll = extPdf->createNLL(*data,Extended());
 		}
-		
+
 		if (normVal>-1.){
 			normVar->setConstant(false);
 			normVar->setVal(normVal);
@@ -193,7 +193,7 @@ double getNormTermNll(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooC
 }
 
 double getNllThisVal(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar *norm, double val, double doMinosErr=false){
-	
+
 	RooArgSet clean;
 	RooArgSet *params = mpdf->getParameters(*data);
 	params->snapshot(clean);
@@ -239,7 +239,7 @@ double quadInterpolate(double C, double X1,double X2,double X3,double Y1,double 
 
 				g.Fit(&func,"Q");
 
-				/*	
+				/*
 				double entries[9];
         entries[0]=X1*X1; entries[1]=X1; entries[2]=1;
         entries[3]=X2*X2; entries[4]=X2; entries[5]=1;
@@ -269,7 +269,7 @@ double quadInterpolate(double C, double X1,double X2,double X3,double Y1,double 
 }
 
 double guessNew(RooRealVar *mgg, RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, double bestPoint, double nllBest, double boundary, double massRangeLow, double massRangeHigh, double crossing, double tolerance){
-	
+
 	bool isLowSide;
 	double guess, guessNll, lowPoint,highPoint;
 	if (boundary>bestPoint) {
@@ -286,17 +286,17 @@ double guessNew(RooRealVar *mgg, RooMultiPdf *mpdf, RooCategory *mcat, RooAbsDat
 	double distanceFromTruth = 1.e6;
 	int nIts=0;
 	while (TMath::Abs(distanceFromTruth/crossing)>tolerance) {
-		
+
 		//prevDistanceFromTruth=distanceFromTruth;
 		guess = lowPoint+(highPoint-lowPoint)/2.;
 		guessNll = getNormTermNll(mgg,data,mpdf,mcat,guess,massRangeLow,massRangeHigh)-nllBest;
     distanceFromTruth = crossing - guessNll;
-	
+
 		if (verbose_) {
 			cout << "[INFO] "<< Form("\t lP: %7.3f hP: %7.3f xg: %7.3f yg: %7.3f",lowPoint,highPoint,guess,guessNll) << endl;;
 			cout << "[INFO] \t ----------- " << distanceFromTruth/crossing << " -------------" << endl;
 		}
-		
+
 		// for low side. if nll val is lower than target move right point left. if nll val is higher than target move left point right
 		// vice versa for high side
 		if (isLowSide){
@@ -317,14 +317,14 @@ double guessNew(RooRealVar *mgg, RooMultiPdf *mpdf, RooCategory *mcat, RooAbsDat
 			nIts=0;
 			if (verbose_) cout << "[INFO] RESET:" << endl;
 			// if it's a ridicolous value it wont converge so return value of bestGuess
-			if (TMath::Abs(guessNll)>2e4) return 0.; 
+			if (TMath::Abs(guessNll)>2e4) return 0.;
 		}
 	}
 	return guess;
 }
 
 double guess(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar *norm, double bestPoint, double nllBest, double boundary, double crossing, double tolerance){
-	
+
 	bool isLowSide;
 	double guess, guessNll, lowPoint,highPoint;
 	if (boundary>bestPoint) {
@@ -340,11 +340,11 @@ double guess(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar 
 	double distanceFromTruth = 1.e6;
 	int nIts=0;
 	while (TMath::Abs(distanceFromTruth/crossing)>tolerance) {
-		
+
 		guess = lowPoint+(highPoint-lowPoint)/2.;
 		guessNll = getNllThisVal(mpdf,mcat,data,norm,guess)-nllBest;
 		distanceFromTruth = crossing - guessNll;
-	
+
 		if (verbose_) {
 			cout << "[INFO] "<< Form("\t lP: %7.3f hP: %7.3f xg: %7.3f yg: %7.3f",lowPoint,highPoint,guess,guessNll) << endl;;
 			cout << "[INFO]" <<" \t ----------- " << distanceFromTruth/crossing << " -------------" << endl;
@@ -369,7 +369,7 @@ double guess(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar 
 }
 
 double quadInterpCoverageOnCrossingPoint(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar *norm, double lowPoint, double highPoint, double bestPoint, double nllBest, double crossing, double tolerance){
-	
+
 	// x = 2NLL, y = nEvs
 	double x1,x2,x3,y1,y2,y3;
   if (lowPoint<bestPoint){ // low side
@@ -384,18 +384,18 @@ double quadInterpCoverageOnCrossingPoint(RooMultiPdf *mpdf, RooCategory *mcat, R
 	x1 = getNllThisVal(mpdf,mcat,data,norm,y1)-nllBest;
 	x3 = getNllThisVal(mpdf,mcat,data,norm,y3)-nllBest;
 	x2 = getNllThisVal(mpdf,mcat,data,norm,y2)-nllBest;
-	
+
 	double guess,guessNll;
 
 	double distanceFromTruth = 1.e6;
 	int nIts=0;
 	while (TMath::Abs(distanceFromTruth/crossing)>tolerance) {
-	
+
 		guess = quadInterpolate(crossing,x1,x2,x3,y1,y2,y3);
 		guessNll = getNllThisVal(mpdf,mcat,data,norm,guess)-nllBest;
-		
+
 		distanceFromTruth = crossing-guessNll;
-		
+
 		cout << "[INFO] " << Form("\t x1: %5.3f x2: %5.3f x3: %5.3f -> xg: %5.3f",x1,x2,x3,guessNll) << endl;;
 		cout << "[INFO] " <<Form("\t y1: %5.3f y2: %5.3f y3: %5.3f -> yg: %5.3f",y1,y2,y3,guess) << endl;;
 		cout << "[INFO] \t ----------- " << distanceFromTruth/crossing << " -------------" << endl;
@@ -431,20 +431,20 @@ double quadInterpCoverageOnCrossingPoint(RooMultiPdf *mpdf, RooCategory *mcat, R
 	}
 	cout << "[INFO] \t nIts = " << nIts << endl;
 	return guess;
-	
+
 }
 
 double convergeOnCrossingPoint(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooRealVar *norm, double lowPoint, double highPoint, double nllBest, double crossing, double tolerance){
 
 	// Assumes starting from best fit
-	double lowPointNll; 
+	double lowPointNll;
 	double highPointNll;
 	double guess;
 	double guessNll;
 	double distanceFromTruth = 1.e6;
 	int nIts=0;
 	while (TMath::Abs(distanceFromTruth/crossing)>tolerance) {
-	
+
 		lowPointNll = getNllThisVal(mpdf,mcat,data,norm,lowPoint)-nllBest;
 		highPointNll = getNllThisVal(mpdf,mcat,data,norm,highPoint)-nllBest;
 
@@ -491,7 +491,7 @@ pair<double,double> asymmErr(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *d
 
 	//RooRealVar *norm = new RooRealVar("norm","",0.0,0.0,1.e6);
 	//mass->setRange("errRange",lowedge,upedge);
-	
+
 	//double nllBest = getNllThisVal(mpdf,mcat,data,norm,nomBkg);
 	double nllBest = getNormTermNll(mgg,data,mpdf,mcat,-1,lowedge,upedge); // will return best fit
 	double nllBestCheck = getNormTermNll(mgg,data,mpdf,mcat,nomBkg,lowedge,upedge); // should return same value
@@ -502,7 +502,7 @@ pair<double,double> asymmErr(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *d
 		cout << "[INFO] "<< "Best fit - " << nomBkg << "has nll " << nllBest << " check " << nllBestCheck << endl;
 		cout << "[INFO] "<< "Scanning - " << lowRange << " -- " << highRange << endl;
 	}
-	
+
 	return make_pair(1.,1.);
 	/*
 	double lowErr = guess(mpdf,mcat,data,norm,nomBkg,nllBest,lowRange,target,tolerance);
@@ -526,7 +526,7 @@ TGraph* profNorm(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooReal
 	TGraph *envNll = new TGraph();
 	TGraph *grNllPer[mpdf->getNumPdfs()];
 	for (int i=0; i<mpdf->getNumPdfs(); i++) grNllPer[i] = new TGraph();
-	
+
 	int color[10] = {kBlue,kOrange,kGreen,kRed,kMagenta,kPink,kViolet,kCyan,kYellow,kBlack};
 	int p=0;
 	//for (double scanVal=80; scanVal<151; scanVal++){
@@ -576,13 +576,13 @@ TGraph* profNorm(RooMultiPdf *mpdf, RooCategory *mcat, RooAbsData *data, RooReal
 	canv->cd();
 	envNll->Draw("ALP");
 	for (int i=0; i<mpdf->getNumPdfs(); i++) {
-		
+
 		for (int p=0; p<grNllPer[i]->GetN(); p++){
 			grNllPer[i]->GetPoint(p,x,y);
 			grNllPer[i]->SetPoint(p,x,y-min);
 		}
 		canv->cd();
-		grNllPer[i]->Draw("LPsame");	
+		grNllPer[i]->Draw("LPsame");
 		grNllPer[i]->Write();
 	}
 	*/
@@ -636,8 +636,9 @@ void profileExtendTerm(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, Roo
 		delete prof;
 	}
 }
+void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCategory *mcat, string name, int cat, bool unblind, int isFlashgg, std::vector<string> flashggCats){
 
-void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCategory *mcat, string name, int cat, bool unblind, int isFlashgg, std::vector<string> flashggCats, int year=2016){
+// void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCategory *mcat, string name, int cat, bool unblind, int isFlashgg, std::vector<string> flashggCats, int year=2016){
 	string catname;
 	if (isFlashgg){
 		catname = Form("%s",flashggCats[cat].c_str());
@@ -703,7 +704,8 @@ void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCatego
   lat2.Draw("same");
 	canv->Modified();
 	canv->Update();
-  lumi_sqrtS = Form("%s (13 TeV, %d)",lumi_13TeV.Data(),year);
+  // lumi_sqrtS = Form("%s (13 TeV, %d)",lumi_13TeV.Data(),year);
+	lumi_sqrtS = Form("%s (13 TeV, Full Run 2)",lumi_13TeV.Data());
   std::string txt="";
   CMS_lumi( canv, 0,0,txt);
 	canv->Print(Form("%s.pdf",name.c_str()));
@@ -714,7 +716,7 @@ void plotAllPdfs(RooRealVar *mgg, RooAbsData *data, RooMultiPdf *mpdf, RooCatego
 
 int main(int argc, char* argv[]){
   gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libHiggsAnalysisGBRLikelihood.so");
-  
+
   setTDRStyle();
   writeExtraText = true;       // if extra text
   extraText  = "Preliminary";  // default extra text is "Preliminary"
@@ -728,7 +730,6 @@ int main(int argc, char* argv[]){
 	string sigFileName;
 	string outFileName;
 	string outDir;
-	string analysis;
 	int cat;
 	string catLabel;
 	double massStep;
@@ -749,7 +750,7 @@ int main(int argc, char* argv[]){
 	int isFlashgg_ =1;
 	string flashggCatsStr_;
 	vector<string> flashggCats_;
-    double higgsResolution_=0.5;
+  double higgsResolution_=0.5;
 
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -758,7 +759,6 @@ int main(int argc, char* argv[]){
 		("sigFileName,s", po::value<string>(&sigFileName), 																	"Input file name")
 		("outFileName,o", po::value<string>(&outFileName)->default_value("BkgPlots.root"),	"Output file name")
 		("outDir,d", po::value<string>(&outDir)->default_value("BkgPlots"),						 			"Output directory")
-		("analysis,a", po::value<string>(&analysis)->default_value(""),						 			"Output directory")
 		("cat,c", po::value<int>(&cat),																								 			"Category")
 		("catLabel,l", po::value<string>(&catLabel),																	 			"Label category")
 		("doBands",																																		 			"Do error bands")
@@ -794,13 +794,9 @@ int main(int argc, char* argv[]){
 	RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 	RooMsgService::instance().setSilentMode(true);
 	split(flashggCats_,flashggCatsStr_,boost::is_any_of(","));
-  lumi_13TeV =Form("%.1f fb^{-1}",intLumi);	
+  lumi_13TeV =Form("%.1f fb^{-1}",intLumi);
 	system(Form("mkdir -p %s",outDir.c_str()));
 	if (makeCrossCheckProfPlots) system(Form("mkdir -p %s/normProfs",outDir.c_str()));
-
-	std::cout << "[makeBkgPlots] - bkgFileName: " << bkgFileName << std::endl;
-	// std::cout << "[makeBkgPlots] - inFile: " << inFile << std::endl;
-
 
 	TFile *inFile = TFile::Open(bkgFileName.c_str());
 	//RooWorkspace *inWS = (RooWorkspace*)inFile->Get("multipdf");
@@ -821,32 +817,17 @@ int main(int argc, char* argv[]){
 	TFile *outFile = TFile::Open(outFileName.c_str(),"RECREATE");
 	RooWorkspace *outWS = new RooWorkspace("bkgplotws","bkgplotws");
 
-	useBinnedData=1; // HHWWgg hack 
-	std::cout << "[makeBkgPlots] - in source code" << std::endl;
-	std::cout << "[makeBkgPlots] - analysis: " << analysis << std::endl;
-
-	RooAbsData *data; 
-
-	if(useBinnedData) data = (RooDataHist*)inWS->data(Form("roohist_data_mass_%s",catname.c_str()));
-	else data = (RooDataSet*)inWS->data(Form("data_mass_%s",catname.c_str()));
-
-	// RooAbsData *data = (RooDataSet*)inWS->data(Form("data_mass_%s",catname.c_str()));
-	// if (useBinnedData) data = (RooDataHist*)inWS->data(Form("roohist_data_mass_%s",catname.c_str()));
+	RooAbsData *data = (RooDataSet*)inWS->data(Form("data_mass_%s",catname.c_str()));
+	if (useBinnedData) data = (RooDataHist*)inWS->data(Form("roohist_data_mass_%s",catname.c_str()));
 
 	RooAbsPdf *bpdf = 0;
-	RooMultiPdf *mpdf = 0; 
+	RooMultiPdf *mpdf = 0;
 	RooCategory *mcat = 0;
 	if (isMultiPdf) {
-		//RooMultiPdf* mpdf; 
-		//RooCategory* mcat; 
-		// if(analysis == "HHWWgg") mpdf = (RooMultiPdf*)inWS->pdf(Form("CMS_hgg_%s_%dTeV_bkgshape",catname.c_str(),sqrts)); // get rid of 13TeV in name 
-		mpdf = (RooMultiPdf*)inWS->pdf(Form("CMS_hgg_%s_%d_%dTeV_bkgshape",catname.c_str(),year_,sqrts)); // changed order of year, sqrts for HHWWgg
-		// if(analysis == "HHWWgg") mcat = (RooCategory*)inWS->cat(Form("pdfindex_%s_13TeV",catname.c_str()));
-		mcat = (RooCategory*)inWS->cat(Form("pdfindex_%s_%d_%dTeV",catname.c_str(),year_,sqrts)); // changed order of year, sqrts for HHWWgg
-		
-		cout << "mpdf: " << mpdf << endl;
-		cout << "mcat: " << mcat << endl;
-
+		// mpdf = (RooMultiPdf*)inWS->pdf(Form("CMS_hgg_%s_%dTeV_%d_bkgshape",catname.c_str(),sqrts,year_));
+		// mcat = (RooCategory*)inWS->cat(Form("pdfindex_%s_%dTeV_%d",catname.c_str(),sqrts,year_));
+		mpdf = (RooMultiPdf*)inWS->pdf(Form("CMS_hgg_%s_%dTeV_bkgshape",catname.c_str(),sqrts));
+		mcat = (RooCategory*)inWS->cat(Form("pdfindex_%s_%dTeV",catname.c_str(),sqrts));
 		if (!mpdf || !mcat){
 			cout << "[ERROR] "<< "Can't find multipdfs (" << Form("CMS_hgg_%s_%dTeV_%d_bkgshape",catname.c_str(),sqrts,year_) << ") or multicat ("<< Form("pdfindex_%s_%dTeV_%d",catname.c_str(),sqrts,year_) <<")" << endl;
 			exit(0);
@@ -865,23 +846,24 @@ int main(int argc, char* argv[]){
 	}
 
 	cout << "[INFO] "<< "Current PDF and data:" << endl;
-	// cout<< "[INFO] " << "\t"; mpdf->getCurrentPdf()->Print();
-	// cout << "[INFO] "<< "\t"; data->Print();
+	cout<< "[INFO] " << "\t"; mpdf->getCurrentPdf()->Print();
+	cout << "[INFO] "<< "\t"; data->Print();
 
 	// plot all the pdfs for reference
-	if (isMultiPdf || verbose_) plotAllPdfs(mgg,data,mpdf,mcat,Form("%s/allPdfs_%s",outDir.c_str(),catname.c_str()),cat,unblind, isFlashgg_, flashggCats_, year_);
+	// if (isMultiPdf || verbose_) plotAllPdfs(mgg,data,mpdf,mcat,Form("%s/allPdfs_%s",outDir.c_str(),catname.c_str()),cat,unblind, isFlashgg_, flashggCats_, year_);
+	if (isMultiPdf || verbose_) plotAllPdfs(mgg,data,mpdf,mcat,Form("%s/allPdfs_%s",outDir.c_str(),catname.c_str()),cat,unblind, isFlashgg_, flashggCats_);
 
 	// include normalization hack RooBernsteinFast;
 	/*
 		 for (int pInd=0; pInd<mpdf->getNumPdfs(); pInd++){
 		 mcat->setIndex(pInd);
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<1>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<2>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<3>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<4>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<5>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<6>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
-		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<7>::Class())) mpdf->getCurrentPdf()->forceNumInt();	
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<1>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<2>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<3>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<4>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<5>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<6>::Class())) mpdf->getCurrentPdf()->forceNumInt();
+		 if (mpdf->getCurrentPdf()->IsA()->InheritsFrom(RooBernsteinFast<7>::Class())) mpdf->getCurrentPdf()->forceNumInt();
 		 }
 		 */
 
@@ -1029,7 +1011,7 @@ int main(int argc, char* argv[]){
 
 		TCanvas *canv = new TCanvas("c","",800,800);
   ///start extra bit for ratio plot///
-//   bool doRatioPlot_=1;
+  bool doRatioPlot_=1;
   TPad *pad1 = new TPad("pad1","pad1",0,0.25,1,1);
   TPad *pad2 = new TPad("pad2","pad2",0,0,1,0.35);
   pad1->SetBottomMargin(0.18);
@@ -1121,7 +1103,7 @@ int main(int argc, char* argv[]){
 				MH->setVal(mhvalue_);
 				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				sigPDF->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
-				std::cout << "[INFO] expected number of events in signal PDF " << sigPDF->expectedEvents(*MH) << std::endl;	
+				std::cout << "[INFO] expected number of events in signal PDF " << sigPDF->expectedEvents(*MH) << std::endl;
 				//sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal()/*get intlumi (/fb) from ws, and divide by 100 for /pb */,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
 				//sigPDF->plotOn(plot,Normalization(0.001*lumi->getVal(),RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3),FillColor(38),FillStyle(3001),DrawOption("F"));
 				sigPDF->plotOn(plotLC,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(3));
@@ -1134,7 +1116,7 @@ int main(int argc, char* argv[]){
 		plot->Draw("same");
 		leg->Draw("same");
 
-		TLatex *latex = new TLatex();	
+		TLatex *latex = new TLatex();
 		latex->SetTextSize(0.045);
 		latex->SetNDC();
 		TLatex *cmslatex = new TLatex();
@@ -1175,15 +1157,15 @@ int main(int argc, char* argv[]){
   //std::cout << "[INFO] plotdata->Integral() " <<  plotdata->Integral() << " ( bins " << npoints  << ") hbkgplots[i]->Integral() " << hbplottmp->Integral() << " (bins " << hbplottmp->GetNbinsX() << std::endl;
  double errhi = plotdata->GetErrorYhigh(ipoint);
  double errlow = plotdata->GetErrorYlow(ipoint);
-       
+
  //std::cout << "[INFO]  Channel " << name  << " errhi " << errhi << " errlow " << errlow  << std::endl;
  std::cout << "[INFO] Channel  " << " setting point " << point <<" : xtmp "<< xtmp << "  ytmp " << ytmp << " bkgval  " << bkgval << " ytmp-bkgval " << ytmp-bkgval << std::endl;
  bool drawZeroBins_ =1;
- if (!drawZeroBins_) if(fabs(ytmp)<1e-5) continue; 
+ if (!drawZeroBins_) if(fabs(ytmp)<1e-5) continue;
  hdatasub->SetPoint(point,xtmp,ytmp-bkgval);
  hdatasub->SetPointError(point,0.,0.,errlow,errhi );
  point++;
-  } 
+  }
   pad2->cd();
   TH1 *hdummy = new TH1D("hdummyweight","",80,100,180);
   hdummy->SetMaximum(hdatasub->GetHistogram()->GetMaximum()+1);
@@ -1218,4 +1200,3 @@ int main(int argc, char* argv[]){
 
 		return 0;
 	}
-
