@@ -312,14 +312,16 @@ return data;
 void plotBeamSpotDZdist(RooDataSet *data0, string suffix=""){
   gStyle->SetOptFit(1111);
 	RooRealVar *weight0 = new RooRealVar("weight","weight",-100000,1000000);
-	TH1F *histSmallDZ = new TH1F ("h1sdz","h1sdz",20,-0.1,0.1);
+	// TH1F *histSmallDZ = new TH1F ("h1sdz","h1sdz",20,-0.1,0.1);
+	TH1F *histSmallDZ = new TH1F ("h1sdz","h1sdz",20,-100,100);
 	TH1F *histLargeDZ = new TH1F ("h1ldz","h1ldz",20,-25,25);
 
   for (unsigned int i=0 ; i < data0->numEntries() ; i++){
     mass_->setVal(data0->get(i)->getRealValue("CMS_hgg_mass"));
     weight0->setVal(data0->weight() ); // <--- is this correct?
     dZ_->setVal(data0->get(i)->getRealValue("dZ"));
-    if (fabs(dZ_->getVal()) <0.1){
+    // if (fabs(dZ_->getVal()) <0.1){
+		if (fabs(dZ_->getVal()) <100){
 		histSmallDZ->Fill( dZ_->getVal(),data0->weight());
 		} else {
 		histLargeDZ->Fill( dZ_->getVal(),data0->weight());
@@ -359,7 +361,7 @@ RooDataSet * rvwvDataset(RooDataSet *data0, string rvwv){
     mass_->setVal(data0->get(i)->getRealValue("CMS_hgg_mass"));
     weight0->setVal(data0->weight() );
 		dZ_->setVal(data0->get(i)->getRealValue("dZ"));
-    if (fabs(dZ_->getVal() )<1.){
+    if (fabs(dZ_->getVal() )<100.){
       dataRV->add( RooArgList(*mass_, *dZ_, *weight0), weight0->getVal() );
     } else{
       dataWV->add( RooArgList(*mass_, *dZ_, *weight0), weight0->getVal() );
@@ -386,7 +388,8 @@ RooDataSet * beamSpotReweigh(RooDataSet *data0 /*original dataset*/){
     dZ_->setVal(data0->get(i)->getRealValue("dZ"));
    double factor =1.0;
 
-		if (fabs(dZ_->getVal()) < 0.1 ){
+		// if (fabs(dZ_->getVal()) < 0.1 ){
+		if (fabs(dZ_->getVal()) < 100 ){
     factor =1;
 		} else {
     double mcBeamSpot=TMath::Gaus(dZ_->getVal(),0,TMath::Sqrt(2)*mcBeamSpotWidth_,true);
@@ -643,7 +646,6 @@ int main(int argc, char *argv[]){
 
                   // If no replacement specified: use those in Signal/python/replacementMap.py for given analysis
       		  } else {
-							cout << "[IN SIGNAL FIT ]: HERE" << endl;
 							cout << "[IN SIGNAL FIT ]: " <<  cat <<  "   " <<replacementProcRVMap[cat] << "   " <<   replacementCatRVMap[cat] << "   "  << replacementProcWV <<  "  "  << replacementCatWV << endl;
 
             if (analysis_ == "H4G")
@@ -808,6 +810,7 @@ int main(int argc, char *argv[]){
 					cout << "Looking for dataset: " << Form("%sTag_%s_13TeV_%d_%d",proc.c_str(),cat.c_str(),year_,mh) << endl;
 					RooDataSet *data00   = reduceDataset((RooDataSet*)inWS->data(Form("%sTag_%s_13TeV_%d_%d",proc.c_str(),cat.c_str(),year_,mh)));
           data0 = data00;
+					std::cout <<  "Total number of entries: " << data0->GetName() << "," << data0->sumEntries() << "," << data0->numEntries()  << std::endl;
 				}
         else{
           RooDataSet *data00   = reduceDataset((RooDataSet*)inWS->data(Form("%d%s",mh,proc.c_str()), Form("%s_%d_13TeV_%s",proc.c_str(),mh,cat.c_str())));
@@ -834,6 +837,8 @@ int main(int argc, char *argv[]){
         float sEntriesRV= dataRV->sumEntries();
         float nEntriesWV =dataWV->numEntries();
         float sEntriesWV= dataWV->sumEntries(); // count the number of entries and total weight on the RV/WV datasets
+
+				// cout << "nEntriesRV: " << nEntriesRV << "  nEntriesWV:  " << nEntriesWV << endl;
 
         // if there are few atcual entries or if there is an  overall negative sum of weights...
         // or if it was specified that one should use the replacement dataset, then need to replace!

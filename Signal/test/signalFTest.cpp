@@ -382,11 +382,16 @@ void fTest(string analysis_, string filename, string outdir_, vector<string> pro
             weight0->setVal(data0->weight() ); // <--- is this correct?
             dZ->setVal(data0->get(i)->getRealValue("dZ"));
             data->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
-            if (dZ->getVal() <1.){
+						if (dZ->getVal() <200.){
             dataRV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
             } else{
             dataWV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
             }
+            // if (dZ->getVal() <1.){
+            // dataRV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
+            // } else{
+            // dataWV->add( RooArgList(*mass, *dZ, *weight0), weight0->getVal() );
+            // }
         }
 
         //print out contents, if you want...
