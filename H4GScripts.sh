@@ -10,9 +10,7 @@
 
 step=$1
 mass='60 55 50 45 40 35 30 25 20 15'
-#mass='60 55 50 45 40 30 25 20 15'
-#mass='60'
-#year='2017'
+
 year='2016 2017 2018'
 # pdfindex='3'
 pdfindex='0 1 2 3'
@@ -63,7 +61,7 @@ if [ $step == "DataMix" ]; then
       #python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/H4G_PhoMVA_manyKinVars_aMass_fullRun2_DataMix_HighStat_kinWeight_dataSBScaling_MGPodd_bkgOdd_noCorrel/60/Reduced_8Events_1Cats/WS_1Cats --mergeYears --mass_a 60 --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir outdir_H4G_2Mar2021_PerMassPoint_WithMa_NoCorrel_M60 --BkgWSDir outdir_H4G_3Mar2021_NoCorrelTraining_DataMix_M60_${e} --output Datacard_4Mar2021_DataMix_${e}_TH1.txt --BkgExt H4G_3Mar2021_NoCorrelTraining_DataMix_ --DataMix ${e}
       #echo text2workspace.py Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}_TH1.txt -m 125
       #text2workspace.py Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}_TH1.txt -m 125
-      text2workspace.py Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}.txt -m 125 
+      text2workspace.py Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}.txt -m 125
       #echo combine Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}_TH1.root -M GenerateOnly -t 500 --setParameters r=1 --saveToys --name _8Mar2021_Cut0p98_Parametrized_NoCorrel_${e} -m 125 --toysNoSystematics
       #combine Datacard_8Mar2021_Cut0p98_Parametrized_NoCorrel_${e}_TH1.root -M GenerateOnly -t 500 --setParameters r=1 --saveToys --name _8Mar2021_Cut0p98_Parametrized_NoCorrel_${e} -m 125 --toysNoSystematics
       #combine Datacard_4Mar2021_DataMix_${e}_TH1.root -M GenerateOnly -t 1000 --setParameters r=1 --saveToys --name _4Mar2021_${e} -m 125 --toysNoSystematics
@@ -91,8 +89,8 @@ if [ $step == "datacard" ]; then
     BkgExt='H4G_10Mar2021_Parametrized'
     #outputName=Datacard_2Mar2021_M${m}_PerMassPoint_WithMa_NoCorrel_DataMix_withoutweight_110
     outputName=Datacard_10Mar2021_M${m}_Parametrized
-    python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/${inputTraining}/${m}/Reduced_8Events_1Cats/WS_1Cats l  --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir ${SignalWSDir}_M${m}  --BkgWSDir ${BkgWSDir} --output ${outputName}.txt --BkgExt ${BkgExt} --doSystematics 
-    #python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/${inputTraining}/${m}/Reduced_8Events_1Cats/WS_1Cats --doSystematics  --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir ${SignalWSDir}_M${m}  --BkgWSDir ${BkgWSDir}_M${m} --output ${outputName}.txt --BkgExt ${BkgExt} 
+    python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/${inputTraining}/${m}/Reduced_8Events_1Cats/WS_1Cats l  --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir ${SignalWSDir}_M${m}  --BkgWSDir ${BkgWSDir} --output ${outputName}.txt --BkgExt ${BkgExt} --doSystematics
+    #python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/${inputTraining}/${m}/Reduced_8Events_1Cats/WS_1Cats --doSystematics  --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir ${SignalWSDir}_M${m}  --BkgWSDir ${BkgWSDir}_M${m} --output ${outputName}.txt --BkgExt ${BkgExt}
       #python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/dataset_PhoMVA_manyKinVars_aMass_fullRun2_DataMix_HighStat_kinWeight_dataSBScaling_MGPodd_bkgOdd/${m}/Reduced_8Events_1Cats/WS_1Cats  --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir outdir_H4G_23Jan2021_M${m} --BkgWSDir outdir_H4G_23Jan2021_M${m} --output Datacard_23Jan2021_M${m}_noSyst.txt
 
       #python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/dataset_PhoMVA_manyKinVars_aMass_fullRun2_DataMix_HighStat_kinWeight_dataSBScaling_MGPodd_bkgOdd/${m}/Reduced_8Events_1Cats/WS_1Cats --mergeYears --mass_a ${m} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018 --SignalWSDir outdir_H4G_23Jan2021_M${m} --BkgWSDir outdir_H4G_23Jan2021_M${m} --output Datacard_3Feb2021_M${m}_noSyst.txt
@@ -109,7 +107,7 @@ fi
 if [ $step == "combine" ]; then
     cd Datacard
     for m in ${mass};
-    do 
+    do
       datacardName=Datacard_10Mar2021_M${m}_Parametrized.txt
       #datacardName=Datacard_20Feb2021_M${m}_AllMasses_WithoutMa.txt
       #datacardName='Datacard_3Feb2021_M'
