@@ -215,3 +215,10 @@ If you are satisfied with the datacard, you can now run combine with:
 If this works properly, the background and signal models will be used to compute the upper limit of the signal process. Note that if a branching ratio was not defined in the signal model steps (for HHWWgg, it is currently not) then this result will be the quantile values of the upper limit of cross section (production->HH->WWgg->finalstate). In order to obtain the upper limit on WWgg you need to divide by the branching ratio of the final state * 2 because either W can decay into this, and then divide by the branching ratio of HH->WWgg * 2 because either H can decay to WW or gg. For the moment, these computations are done in Plots/FinalResults/plot_limits
 
 ## Bias Studies
+As part of the background modeling procedure, after representative functions are chosen via
+the F-test, we must also ensure that the chosen functional form does not bias a possible signal
+strength measurement in the analysis. This can happen because the real background shape
+that is being fitted might not be exactly the functional form that is chosen. We use the Envelope
+method for modeling the background and checking that the bias is less than 0.14, when the
+envelope method is allowed to pick the optimal fit function, is enough to establish that the
+chosen functional form does not introduce a bias in the signal strength measurement.
