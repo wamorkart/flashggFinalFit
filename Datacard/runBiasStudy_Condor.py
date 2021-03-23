@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import numpy as n
 from ROOT import *
+from root_numpy import tree2array
 import sys, getopt
 from array import array
 import itertools
@@ -32,45 +33,68 @@ queue arguments from arguments.txt
      cnd_out.write(condor)
 
   outputDir = os.getcwd()
-  script = '''#!/bin/sh -e
+  step = "toys"
+  if (step=="text2workspace"):
+      script = '''#!/bin/sh -e
+
+mass=$1;
+datacard=$2;
+nToys=$3;
+
+cd /afs/cern.ch/work/t/twamorka/fggfinalfit_h4g_run2/CMSSW_10_2_13/src/flashggFinalFit/Datacard/
+eval `scramv1 ru -sh`
+BiasStudyDir=BiasStudy_23Mar2021_Parametrized_M${mass}_${nToys}Toys
+mkdir ${BiasStudyDir}/
+text2workspace.py ${datacard} -m 125 -o ${BiasStudyDir}/M${mass}.root
+
+    '''
+
+  else:
+      script = '''#!/bin/sh -e
 
 m=$1;
 p=$2;
 e=$3;
 r_min=$4;
 r_max=$5;
-
 nToys=2000;
-BiasStudyDir=BiasStudy_10Mar2021_Parametrized_FullMassRange_M${m}_${nToys}Toys
-Datacard=Datacard_10Mar2021_M${m}_Parametrized.txt
+
 cd /afs/cern.ch/work/t/twamorka/fggfinalfit_h4g_run2/CMSSW_10_2_13/src/flashggFinalFit/Datacard/
 eval `scramv1 ru -sh`
-text2workspace.py  ${Datacard} -o ${BiasStudyDir}/M${m}.root
+BiasStudyDir=BiasStudy_23Mar2021_Parametrized_M${mass}_${nToys}Toys
 cd ${BiasStudyDir}/
 combine M${m}.root -M GenerateOnly  -t ${nToys} --setParameters pdfindex_H4GTag_Cat0_13TeV=${p},r=${e} --saveToys --name _M${m}_Cat0_13TeV_pdfindex${p}_signal${e} -m 125 --toysNoSystematics
 combine M${m}.root -M MultiDimFit --toysFile=higgsCombine_M${m}_Cat0_13TeV_pdfindex${p}_signal${e}.GenerateOnly.mH125.123456.root -P r -t ${nToys} -m 125 --cminDefaultMinimizerStrategy 0 --algo singles --saveFitResult --name _M${m}_pdfindex${p}_signal${e}_${nToys}Toys_rmin${r_min}_rmax${r_max}_Envelope --setParameterRanges r=${r_min},${r_max} --setParameters r=${e}
 
-'''
+    '''
+
   arguments=[]
-
-  mass = [60,55,50,45,40,35,30,25,20,15]
+  mass = []
+  inDir = "/eos/user/t/twamorka/H4G_Limits/23March2021_ParametrizedTraining/"
+  for m in range(15,61):
+      mass.append(m)
   pdfindex=[0,1,2,3]
+  toys=2000
 
-  r_min = -2
-  r_max = 10
-  for m in mass:
-      if (m==60): expectSignal=["0.2"]
-      elif (m==55): expectSignal=["0.4"]
-      elif (m==50): expectSignal=["0.7"]
-      elif (m==45): expectSignal=["0.8"]
-      elif (m==40): expectSignal=["0.6"]
-      elif (m==30): expectSignal=["0.9"]
-      elif (m==25): expectSignal=["1.0"]
-      elif (m==20): expectSignal=["0.8"]
-      elif (m==15): expectSignal=["1.0"]
-      for p in pdfindex:
-          for e in expectSignal:
-              arguments.append("{} {} {} {} {}".format(m,p,e,r_min,r_max))
+
+
+  if (step=="text2workspace"):
+      for m in mass:
+          arguments.append("{} {} {}".format(m,"Datacard_18Mar2021_M"+str(m)+"_Parametrized_cleaned.txt",toys))
+
+  else:
+      r_min = 0
+      r_max = 10
+      for m in mass:
+          file_in = TFile(inDir+"higgsCombineDatacard_18Mar2021_M"+str(m)+"_Parametrized_cleaned.AsymptoticLimits.mH125.root","read")
+          tree_in = file_in.Get("limit")
+          limit = tree2array(tree_in,branches="limit")
+          # print(round(limit[2],2))
+          expectSignal=[str(round(limit[2],2))]
+          # print expectSignal
+          for p in pdfindex:
+              for e in expectSignal:
+                  arguments.append("{} {} {} {} {}".format(m,p,e,r_min,r_max))
   with open("arguments.txt", "w") as args:
      args.write("\n".join(arguments))
   with open("run_script.sh", "w") as rs:
