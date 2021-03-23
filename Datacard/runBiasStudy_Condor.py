@@ -61,7 +61,7 @@ nToys=2000;
 
 cd /afs/cern.ch/work/t/twamorka/fggfinalfit_h4g_run2/CMSSW_10_2_13/src/flashggFinalFit/Datacard/
 eval `scramv1 ru -sh`
-BiasStudyDir=BiasStudy_23Mar2021_Parametrized_M${mass}_${nToys}Toys
+BiasStudyDir=BiasStudy_23Mar2021_Parametrized_M${m}_${nToys}Toys
 cd ${BiasStudyDir}/
 combine M${m}.root -M GenerateOnly  -t ${nToys} --setParameters pdfindex_H4GTag_Cat0_13TeV=${p},r=${e} --saveToys --name _M${m}_Cat0_13TeV_pdfindex${p}_signal${e} -m 125 --toysNoSystematics
 combine M${m}.root -M MultiDimFit --toysFile=higgsCombine_M${m}_Cat0_13TeV_pdfindex${p}_signal${e}.GenerateOnly.mH125.123456.root -P r -t ${nToys} -m 125 --cminDefaultMinimizerStrategy 0 --algo singles --saveFitResult --name _M${m}_pdfindex${p}_signal${e}_${nToys}Toys_rmin${r_min}_rmax${r_max}_Envelope --setParameterRanges r=${r_min},${r_max} --setParameters r=${e}
