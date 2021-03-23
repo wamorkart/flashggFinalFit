@@ -60,25 +60,32 @@ if [ $STEP == "Datacard_Multipdf" ]; then
    text2workspace.py ${scriptDir}/${OUTPUTNAME}.txt
 fi
 if [ $STEP == "Datacard_Fit" ]; then 
-   combine ${scriptDir}/${OUTPUTNAME}.root -M MultiDimFit --toysFile=higgsCombine${TOYNAME} -P r --expectSignal 1 -t 1000 -m 125 --cminDefaultMinimizerStrategy 0 --algo singles  --saveFitResult --setParameterRanges r=0,10 --name ${TOYNAME}
+   combine ${scriptDir}/${OUTPUTNAME}.root -M MultiDimFit --toysFile=${scriptDir}/higgsCombine${TOYNAME}.GenerateOnly.mH125.123456.root -P r --expectSignal 1 -t 1000 -m 125 --cminDefaultMinimizerStrategy 0 --algo singles  --saveFitResult --setParameterRanges r=0,10 --name ${TOYNAME}
+fi
+
+if [ $STEP == "All" ]; then 
+   python ${scriptDir}/makeDatacard_DataMix.py --inputWSDir ${INPUTWSDIR} --mergeYears --mass_a ${MASS} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018  --SignalWSDir ${SIGNALWSDIR} --BkgWSDir ${BKGWSDIR} --BkgExt ${BKGEXT} --output ${scriptDir}/${OUTPUTNAME}_TH1.txt
+   text2workspace.py ${scriptDir}/${OUTPUTNAME}_TH1.txt
+   combine ${scriptDir}/${OUTPUTNAME}_TH1.root -M GenerateOnly -t 1000 --setParameters r=1 --saveToys --name ${TOYNAME} -m 125 --toysNoSystematics
+   python ${scriptDir}/makeDatacard.py --inputWSDir ${INPUTWSDIR} --mergeYears --mass_a ${MASS} --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018  --SignalWSDir ${SIGNALWSDIR} --BkgWSDir ${BKGWSDIR} --BkgExt ${BKGEXT} --output ${scriptDir}/${OUTPUTNAME}.txt
+   text2workspace.py ${scriptDir}/${OUTPUTNAME}.txt
+   #combine ${scriptDir}/${OUTPUTNAME}.root -M MultiDimFit --toysFile=${scriptDir}/higgsCombine${TOYNAME}.GenerateOnly.mH125.123456.root -P r --expectSignal 1 -t 1000 -m 125 --cminDefaultMinimizerStrategy 0 --algo singles  --saveFitResult --setParameterRanges r=0,10 --name ${TOYNAME}
 fi
 echo -e "DONE";
 '''
-#python makeDatacard_DataMix.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/Parametrized_NoCorrel_FullMassRange/60/Reduced_8Events_1Cats/WS_1Cats --mergeYears --mass_a 60 --procs H4GTag --removeNats Cat0 --years 2016,2017,2018  --SignalWSDir outdir_H4G_10Mar2021_Parametrized_M60 --BkgWSDir Parametrized_DataMix_M60_20000_TurnOn_12Mar2021 --BkgExt H4G_Parametrized_DataMix_20000_TurnOn --output test
-# python makeDatacard.py --inputWSDir /eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/Parametrized_NoCorrel_FullMassRange/15/Reduced_8Events_1Cats/WS_1Cats --mergeYears --mass_a 60 --procs H4GTag --removeNoTag --cats Cat0 --years 2016,2017,2018  --SignalWSDir outdir_H4G_10Mar2021_Parametrized_M60 --BkgWSDir Parametrized_DataMix_M60_1700000_TurnOn_12Mar2021 --output test.txt --BkgExt H4G_Parametrized_DataMix_1700000_TurnOn
   arguments=[]
 
-  inDir = '/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/Parametrized_NoCorrel_FullMassRange/'
-  SignalWSDir = 'outdir_H4G_10Mar2021_Parametrized_M'
-  BkgWSDir = 'Parametrized_DataMix_M'
-  BkgExt = 'H4G_Parametrized_DataMix'
-  Output = 'Parametrized_DataMix_12Mar2021'
-  mass = [60,55,50,45,40,35,30,25,20,15]
+  inDir = '/eos/user/t/twamorka/h4g_fullRun2/TrainingApplied_22Jan2021/19Feb2021/H4G_PhoMVA_manyKinVars_aMass_fullRun2_DataMix_HighStat_kinWeight_dataSBScaling_MGPodd_bkgOdd_noCorrel/'
+  SignalWSDir = 'outdir_H4G_10Mar2021_NoCorrel_M'
+  BkgWSDir = 'NoCorrelTraining_DataMix_M'
+  BkgExt = 'H4G_NoCorrelTraining_DataMix'
+  Output = 'NoCorrel_DataMix_18Mar2021'
+  mass = [15]
   step = "Datacard_Fit"
   for m in mass:
       for num in range(1,101):
           e=num*20000
-          arguments.append("{} {} {} {} {} {} {} {}". format(inDir+str(m)+"/Reduced_8Events_1Cats/WS_1Cats", m, SignalWSDir+str(m), BkgWSDir+str(m)+"_"+str(e)+"_TurnOn_12Mar2021", BkgExt+"_"+str(e)+"_TurnOn", Output+"_M"+str(m)+"_"+str(e),Output+"_M"+str(m)+"_"+str(e),step ))
+          arguments.append("{} {} {} {} {} {} {} {}". format(inDir+str(m)+"/Reduced_8Events_1Cats/WS_1Cats", m, SignalWSDir+str(m), BkgWSDir+str(m)+"_"+str(e)+"_TurnOn_18Mar2021", BkgExt+"_"+str(e)+"_TurnOn", Output+"_M"+str(m)+"_"+str(e),Output+"_M"+str(m)+"_"+str(e),step ))
 
   with open("arguments.txt", "w") as args:
      args.write("\n".join(arguments))
